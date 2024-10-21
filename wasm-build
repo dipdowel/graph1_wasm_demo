@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Clean up the old build
+rm -rf ./pkg
+
+# Compile
+#RUSTFLAGS="--cfg=target_os=\"wasm32\"" wasm-pack build --target web --out-name graph1_web_demo -- --features web --no-default-features
+#wasm-pack build --out-name graph1_web_demo
+#RUSTFLAGS="--cfg=target_os=\"wasm32\"" wasm-pack build --target web --out-name graph1_web_demo  --no-default-features
+wasm-pack build --target web --out-name graph1_web_demo  --no-default-features
+
+
+# Make sure our custom `index.html` is there.
+cp ./web-files/index.html ./pkg/
+# Kill the previous PPython3 webserver, if any
+#PID=$(ps aux | grep "python3 -m http.server 8080 --directory ./pkg/" | grep -v grep | awk '{print $2}')
+PID=$(ps aux | grep "python3 graph1_demo_serve.py" | grep -v grep | awk '{print $2}')
+
+if [[ -n "$PID" ]]; then
+  echo "Killing the old Python3 webserver process $PID"
+  kill -9 $PID
+else
+  echo "No Python3 webserver process found"
+fi
+
+# Run a new Python3 webserver
+echo "Starting a Python3 webserver for our WASM"
+#python3 -m http.server 8080 --directory ./pkg/
+python3 graph1_demo_serve.py
