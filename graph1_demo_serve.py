@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import http.server
 import socketserver
-import socket
+
 import os
 FILES_LOCATION='./pkg'
-PORT = 8082
+PORT = 8083
 web_dir = os.path.join(os.path.dirname(__file__), FILES_LOCATION)
 os.chdir(web_dir)
 
