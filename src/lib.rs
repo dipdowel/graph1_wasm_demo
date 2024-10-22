@@ -1,5 +1,4 @@
 mod web_utils;
-
 use wasm_bindgen::prelude::*;
 use crate::web_utils::console_log;
 
@@ -18,7 +17,6 @@ impl AppState {
 }
 
 static mut STATE: Option<AppState> = None;
-
 
 
 #[wasm_bindgen]
@@ -53,7 +51,7 @@ pub fn set_name(name: String) {
     unsafe {
         // If STATE is Some, update the name with the provided value
         if let Some(state) = STATE.as_mut() {
-            state.name = name.clone();
+            state.name = name;
             console_log(&format!(
                 "Name updated to: {}! Current frame: {}",
                 state.name, state.frame_count
