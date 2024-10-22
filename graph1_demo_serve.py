@@ -4,7 +4,7 @@ import socketserver
 
 import os
 FILES_LOCATION='./pkg'
-PORT = 8083
+PORT = 8080
 web_dir = os.path.join(os.path.dirname(__file__), FILES_LOCATION)
 os.chdir(web_dir)
 
@@ -37,6 +37,8 @@ class HttpRequestHandler(http.server.SimpleHTTPRequestHandler):
         """
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")
         self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
+
+socketserver.TCPServer.allow_reuse_address = True
 
 with socketserver.TCPServer(("localhost", PORT), HttpRequestHandler) as httpd:
     try:

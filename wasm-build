@@ -18,7 +18,7 @@ PID=$(ps aux | grep "python3 graph1_demo_serve.py" | grep -v grep | awk '{print 
 
 if [[ -n "$PID" ]]; then
   echo "Killing the old Python3 webserver process $PID"
-  kill -9 $PID
+  kill -15 $PID
 else
   echo "No Python3 webserver process found"
 fi

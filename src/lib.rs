@@ -19,5 +19,5 @@ pub fn greet(name: &str) {
 
     // Safely log the names outside the unsafe block
     let all_names = unsafe { NAMES.as_ref().unwrap().join(", ") };
-    console_log(&format!("Hello, {}! Previous names: {}", name, all_names));
+    console_log(&format!("Hello, {} there!  Previous names: {}", name, all_names));
 }
