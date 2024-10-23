@@ -23,8 +23,6 @@
     <canvas
       style="border: solid 1px lime"
       id="myCanvas"
-      width="640"
-      height="240"
     ></canvas>
 
     <script type="module">
@@ -34,7 +32,6 @@
       // Prepare the 2D-canvas
       const canvas = document.getElementById("myCanvas");
       const ctx = canvas.getContext("2d");
-      const imageData = ctx.createImageData(640, 240);
 
       // Count of frames in the demo
       let frame_count = 0;
@@ -49,6 +46,7 @@
         const bufSize = initResult.buf_size;
         const width = initResult.width;
         const height = initResult.height;
+        // console.log("bufPtr: " + bufPointer + ", bufSize: " + bufSize);
 
         // Get access to WASM memory
         let memory = wasmModule.memory.buffer;
@@ -56,7 +54,10 @@
         // Configure dimensions of the canvas according to the WASM module's state
         canvas.style.maxWidth = `${width}px`;
         canvas.style.maxHeight = `${height}px`;
-        console.log("bufPtr: " + bufPointer + ", bufSize: " + bufSize);
+        canvas.width = width;
+        canvas.height = height;
+
+        const imageData = ctx.createImageData(width, height);
 
         let bufferView;
 

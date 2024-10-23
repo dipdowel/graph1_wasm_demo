@@ -6,7 +6,7 @@ fn console_log(msg: &str) {
 }
 
 /// Width of the window, in pixels
-const WIN_WIDTH: u32 = 640;
+const WIN_WIDTH: u32 = 320;
 /// Height of the window, in pixels
 const WIN_HEIGHT: u32 = 240;
 /// Framebuffer size, in bytes
