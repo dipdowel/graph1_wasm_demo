@@ -1,8 +1,9 @@
-mod web_utils;
-
-use crate::web_utils::console_log;
 use graph1::graph1_core::context::WindowContext;
 use wasm_bindgen::prelude::*;
+use web_sys::console;
+fn console_log(msg: &str) {
+    console::log_1(&msg.into());
+}
 
 /// Width of the window, in pixels
 const WIN_WIDTH: u32 = 640;
@@ -62,8 +63,7 @@ pub fn init_state(frame: usize) -> InitStateResult {
         }
 
         if let Some(state) = STATE.as_ref() {
-            console_log(&format!("Current window context: {:#?}", state.win_ctx));
-
+            // console_log(&format!("Current window context: {:#?}", state.win_ctx));
             return InitStateResult {
                 pointer: state.buf.as_ptr(),
                 ..DEFAULT_INIT_RESULT
