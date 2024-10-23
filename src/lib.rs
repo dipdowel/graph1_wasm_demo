@@ -4,9 +4,33 @@ use crate::web_utils::console_log;
 use graph1::graph1_core::context::WindowContext;
 use wasm_bindgen::prelude::*;
 
-const WINDOW_WIDTH: u32 = 640;
-const WINDOW_HEIGHT: u32 = 240;
-const BUF_SIZE: usize = 4 * (WINDOW_WIDTH * WINDOW_HEIGHT) as usize;
+/// Width of the window, in pixels
+const WIN_WIDTH: u32 = 640;
+/// Height of the window, in pixels
+const WIN_HEIGHT: u32 = 240;
+/// Framebuffer size, in bytes
+const BUF_SIZE: usize = 4 * (WIN_WIDTH * WIN_HEIGHT) as usize;
+
+#[wasm_bindgen]
+/// This data is passed to the JS-world to render the framebuffer on a 2D-canvas.
+pub struct InitStateResult {
+    /// Points to the start of the frame buffer
+    pub pointer: *const u8,
+    /// Size of the frame buffer in bytes
+    pub buf_size: usize,
+    /// Width of the window
+    pub width: u32,
+    /// Height of the window
+    pub height: u32,
+}
+
+/// A default instance of `InitStateResult`
+const DEFAULT_INIT_RESULT: InitStateResult = InitStateResult {
+    pointer: std::ptr::null(),
+    buf_size: BUF_SIZE,
+    width: WIN_WIDTH,
+    height: WIN_HEIGHT,
+};
 
 struct AppState {
     /// Memory for the window
@@ -24,18 +48,17 @@ impl AppState {
         AppState {
             name,
             frame_count,
-            win_ctx: WindowContext::new(WINDOW_WIDTH, WINDOW_HEIGHT),
+            win_ctx: WindowContext::new(WIN_WIDTH, WIN_HEIGHT),
             buf: [0x54; BUF_SIZE],
         }
     }
-
 }
 
 static mut STATE: Option<AppState> = None;
 
 #[wasm_bindgen]
 /// Initialize the WASM module: create `STATE` and populate it with the initial values
-pub fn init_state(name: &str, frame: usize) -> usize {
+pub fn init_state(name: &str, frame: usize) -> InitStateResult {
     unsafe {
         if STATE.is_none() {
             STATE = Some(AppState::new(name.to_string(), frame));
@@ -43,15 +66,20 @@ pub fn init_state(name: &str, frame: usize) -> usize {
 
         if let Some(state) = STATE.as_ref() {
             console_log(&format!("Current window context: {:#?}", state.win_ctx));
-            return state.buf.len();
+
+            return InitStateResult {
+                pointer: state.buf.as_ptr(),
+                .. DEFAULT_INIT_RESULT
+            };
         }
     }
-    return 0;
+
+    DEFAULT_INIT_RESULT
 }
 
 #[wasm_bindgen]
 /// Set current frame (if STATE exists)
-pub fn update_frame(frame: usize) -> *const u8 {
+pub fn update_frame(frame: usize) {
     unsafe {
         // If STATE is Some, update the frame_count with the provided frame value
         if let Some(state) = STATE.as_mut() {
@@ -68,11 +96,7 @@ pub fn update_frame(frame: usize) -> *const u8 {
                 pixel[3] = 0xcc * frame as u8;
             }
         }
-        if let Some(state) = STATE.as_ref() {
-            return state.buf.as_ptr()
-        }
     }
-    std::ptr::null()
 }
 
 #[wasm_bindgen]
