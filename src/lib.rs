@@ -33,20 +33,16 @@ const DEFAULT_INIT_RESULT: InitStateResult = InitStateResult {
 };
 
 struct AppState {
-    /// Memory for the window
+    /// Framebuffer
     buf: [u8; BUF_SIZE],
     /// Current frame count
     frame_count: usize,
-    /// Name of the module (TODO: shall we remove it?)
-    name: String,
     /// Graph1 window context
     win_ctx: WindowContext,
 }
-
 impl AppState {
-    fn new(name: String, frame_count: usize) -> Self {
+    fn new(frame_count: usize) -> Self {
         AppState {
-            name,
             frame_count,
             win_ctx: WindowContext::new(WIN_WIDTH, WIN_HEIGHT),
             buf: [0x54; BUF_SIZE],
@@ -54,14 +50,15 @@ impl AppState {
     }
 }
 
+/// The Application state, maintained between frames
 static mut STATE: Option<AppState> = None;
 
 #[wasm_bindgen]
 /// Initialize the WASM module: create `STATE` and populate it with the initial values
-pub fn init_state(name: &str, frame: usize) -> InitStateResult {
+pub fn init_state(frame: usize) -> InitStateResult {
     unsafe {
         if STATE.is_none() {
-            STATE = Some(AppState::new(name.to_string(), frame));
+            STATE = Some(AppState::new(frame));
         }
 
         if let Some(state) = STATE.as_ref() {
@@ -69,7 +66,7 @@ pub fn init_state(name: &str, frame: usize) -> InitStateResult {
 
             return InitStateResult {
                 pointer: state.buf.as_ptr(),
-                .. DEFAULT_INIT_RESULT
+                ..DEFAULT_INIT_RESULT
             };
         }
     }
@@ -81,13 +78,9 @@ pub fn init_state(name: &str, frame: usize) -> InitStateResult {
 /// Set current frame (if STATE exists)
 pub fn update_frame(frame: usize) {
     unsafe {
-        // If STATE is Some, update the frame_count with the provided frame value
         if let Some(state) = STATE.as_mut() {
             state.frame_count = frame;
-            console_log(&format!(
-                "[ {} ] Current frame: {}",
-                state.name, state.frame_count
-            ));
+            // console_log(&format!("Current frame: {}", state.frame_count));
 
             for pixel in state.buf.chunks_mut(4) {
                 pixel[0] = 0xff;
@@ -95,21 +88,6 @@ pub fn update_frame(frame: usize) {
                 pixel[2] = 0xbb * frame as u8;
                 pixel[3] = 0xcc * frame as u8;
             }
-        }
-    }
-}
-
-#[wasm_bindgen]
-/// Set name (if STATE exists)
-pub fn set_name(name: String) {
-    unsafe {
-        // If STATE is Some, update the name with the provided value
-        if let Some(state) = STATE.as_mut() {
-            state.name = name;
-            console_log(&format!(
-                "Name updated to: {}! Current frame: {}",
-                state.name, state.frame_count
-            ));
         }
     }
 }
