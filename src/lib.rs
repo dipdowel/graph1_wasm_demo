@@ -1,5 +1,5 @@
 use graph1::graph1_core::context::{GraphContext, WindowContext};
-use graph1::primitives::primitives::{BufferRGBA, Dimensions2d};
+use graph1::primitives::primitives::Dimensions2d;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use graph1::utils::color::math::{rgba_operation, ColorOperation};
 use wasm_bindgen::prelude::*;
@@ -19,12 +19,18 @@ const DEFAULT_COLOR_RGBA: u32 = 0x33_33_33_ff;
 
 const BACKGROUND_COLOR_RGBA: u32 = 0xff_33_ee_ff;
 
+/// Frame buffer, gets rendered on the HTML canvas
 static mut FRAME_BUF: [u32; BUF_SIZE] = [BACKGROUND_COLOR_RGBA; BUF_SIZE];
+
+/// Draft buffer, used for intermediate graphics operations and manipulations
 static mut DRAFT_BUF: [u32; BUF_SIZE] = [BACKGROUND_COLOR_RGBA; BUF_SIZE];
 
-// JavaScript and HTML Canvas use ABGR model, so the result produced by Graph1 needs to be converted
+/// JavaScript and HTML Canvas use ABGR model, hence
+/// the result produced by Graph1 needs to be converted from RGBA to ABGR.
+/// JS renders `CANVAS_BUF_ABGR` on the HTML canvas, not `FRAME_BUF` directly.
 static mut CANVAS_BUF_ABGR: [u32; BUF_SIZE] = [0xff_ff_00_ff; BUF_SIZE];
 
+/// Window context, a sub-context of the `GraphContext`
 const WIN_CTX: WindowContext = WindowContext {
     w: WIN_WIDTH,
     h: WIN_WIDTH,
@@ -58,52 +64,32 @@ const DEFAULT_INIT_RESULT: InitStateResult = InitStateResult {
     height: WIN_HEIGHT,
 };
 
-// struct AppState {
-//     /// Framebuffer
-//     buf: [u8; BUF_SIZE],
-//     /// Current frame count
-//     frame_count: usize,
-//     /// Graph1 context
-//     ctx: GraphContext<'static>,
-// }
-// impl AppState {
-//     fn new(frame_count: usize) -> Self {
-//         AppState {
-//             frame_count,
-//             win_ctx: WindowContext::new(WIN_WIDTH, WIN_HEIGHT),
-//             buf: [0x54; BUF_SIZE],
-//         }
-//     }
-// }
-
-/// The Application state, maintained between frames
-static mut STATE: Option<GraphContext> = None;
+/// Global context container, maintains the state between frames
+static mut CONTEXT_CONTAINER: Option<GraphContext> = None;
 
 #[wasm_bindgen]
-/// Initialize the WASM module: create `STATE` and populate it with the initial values
+/// Initialize the WASM module:
+/// 1. Create the `GraphContext` context and store it in the global container.
+/// 2. Inform the JS-world on where to look for the frame buffer, what its size is, etc.
 pub fn init_state(frame: Option<usize>) -> InitStateResult {
-
-    let frame:usize = frame.unwrap_or(0);
-
-
+    let frame: usize = frame.unwrap_or(0);
 
     unsafe {
-        if STATE.is_none() {
-
+        if CONTEXT_CONTAINER.is_none() {
             let ctx: GraphContext = GraphContext {
-                frame_buf: &mut FRAME_BUF, //&mut [BACKGROUND_COLOR_RGBA; BUF_SIZE],
-                draft_buf: Some(&mut  DRAFT_BUF),
+                frame_buf: &mut FRAME_BUF,
+                draft_buf: Some(&mut DRAFT_BUF),
                 win: &WIN_CTX,
                 default_color: DEFAULT_COLOR_RGBA,
                 bezier: None,
                 frame_count: frame,
             };
 
-            STATE = Some(ctx);
-        }
+            // Place the context into the global container
+            // so that it persists between frames
+            CONTEXT_CONTAINER = Some(ctx);
 
-        if let Some(state) = STATE.as_ref() {
-            // console_log(&format!("Current window context: {:#?}", state.win_ctx));
+            // Update the JS-world with the details on the frame buffer
             return InitStateResult {
                 pointer: CANVAS_BUF_ABGR.as_ptr(),
                 ..DEFAULT_INIT_RESULT
@@ -113,22 +99,22 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
     DEFAULT_INIT_RESULT
 }
 
-
-
 #[wasm_bindgen]
-/// Set current frame (if STATE exists)
+/// Tell the app which frame to render
 pub fn update_frame(frame: usize) {
     unsafe {
-        if let Some(state) = STATE.as_mut() {
+        if let Some(state) = CONTEXT_CONTAINER.as_mut() {
+            // console_log(format!("Frame: {}", frame).as_str());
             state.frame_count = frame;
 
-             for pixel in state.frame_buf.as_mut() {
-                 *pixel = rgba_operation(pixel, &0x00_00_00_02, &ColorOperation::Subtract);
+            // With each frame, gradually decrease the Alpha from 0xFF to 0x00
+            for pixel in state.frame_buf.as_mut() {
+                *pixel = rgba_operation(pixel, &0x00_00_00_02, &ColorOperation::Subtract);
             }
 
-            // Convert the internal RGBA buffer to ABGR, so it can be rendered on the HTML canvas
+            // Convert the internal RGBA buffer to ABGR and write it to `CANVAS_BUF_ABGR`.
+            // JS renders `CANVAS_BUF_ABGR` on the HTML canvas, not `FRAME_BUF`.
             rgba_to_abgr(&mut CANVAS_BUF_ABGR, &state.frame_buf);
-
         }
     }
 }
