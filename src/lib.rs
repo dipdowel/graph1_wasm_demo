@@ -1,7 +1,8 @@
 use graph1::graph1_core::context::{GraphContext, WindowContext};
-use graph1::primitives::primitives::Dimensions2d;
+use graph1::primitives::plane::Dimensions2d;
 use graph1::utils::color::adapters::rgba_to_abgr;
-use graph1::utils::color::math::{rgba_operation, ColorOperation};
+use graph1::utils::color::math::operations::ColorOperation;
+use graph1::utils::color::math::rgba_operation::rgba_operation;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 fn console_log(msg: &str) {
