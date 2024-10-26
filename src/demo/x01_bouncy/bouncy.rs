@@ -5,7 +5,7 @@ use graph1::graph1_core::context::GraphContext;
 use graph1::primitives::plane::RectArea;
 
 /// Side of Bouncy, in pixels
-const SQUARE_SIDE_PX:i32 = 8;
+const SQUARE_SIDE_PX:i32 = 16;
 
 /// Render a frame with Bouncy, who is just a square bouncing on the screen
 /// Bouncy is the hero of this demo.
@@ -14,8 +14,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>){
     // Initialize the animation variables on the zero-th frame
     if ctx.frame_count == 0 {
         // Set the starting `x` and `y` for Bouncy.
-        ctx.user_data.bouncy.x = 30;
-        ctx.user_data.bouncy.y = 12;
+        ctx.user_data.bouncy.x = 0;
+        ctx.user_data.bouncy.y = 27;
 
         // Set the starting per-frame position increments for `x` and `y`
         // So on each frame we'll be changing `x` and `y` by `dx` and `dy` correspondingly.

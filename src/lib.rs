@@ -1,32 +1,38 @@
 mod utils;
 
-use crate::demo::user_data::{Bouncy, DemoUserData};
-use crate::demo::x01_bouncy::bouncy;
+use crate::demo::user_data::DemoUserData;
+use crate::demo::x01_bouncy::config::BOUNCY;
+use crate::demo::x01_bouncy::bouncy_alpha;
 use graph1::graph1_core::context::{GraphContext, WindowContext};
 use graph1::primitives::plane::Dimensions2d;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use wasm_bindgen::prelude::*;
-use crate::demo::x01_bouncy::config::BOUNCY;
 
+/// A collection of demo modules
 pub mod demo {
+    /// User data, used to store arbitrary data that needs to be persisted between frames
     pub mod user_data;
+    /// Bouncy demo. Helps to understand the basics of rendering and animation.
     pub mod x01_bouncy {
+        /// A minimal example of displaying and animating a square on the screen
         pub mod bouncy;
+        /// Explanation on how to use the alpha channel in rendering
+        pub mod bouncy_alpha;
         pub mod config;
     }
 
 }
 
 /// Width of the window, in pixels
-const WIN_WIDTH: u32 = 320;
+const WIN_WIDTH: u32 = 480;
 /// Height of the window, in pixels
 const WIN_HEIGHT: u32 = 240;
 /// Framebuffer size, in bytes
 const BUF_SIZE: usize = 4 * (WIN_WIDTH * WIN_HEIGHT) as usize;
 
-const FOREGROUND_COLOR_RGBA: u32 = 0x11_ee_22_ff;
+const FOREGROUND_COLOR_RGBA: u32 = 0x11_ff_22_ff;
 
-const BACKGROUND_COLOR_RGBA: u32 = 0x00_44_11_ff;
+const BACKGROUND_COLOR_RGBA: u32 = 0x00_23_00_ff;
 
 /// Frame buffer, gets rendered on the HTML canvas
 static mut FRAME_BUF: [u32; BUF_SIZE] = [BACKGROUND_COLOR_RGBA; BUF_SIZE];
@@ -126,7 +132,9 @@ pub fn update_frame(frame: usize) {
     unsafe {
         if let Some(mut ctx) = CONTEXT_CONTAINER.as_mut() {
             ctx.frame_count = frame;
-            bouncy::render_frame(&mut ctx);
+
+            // bouncy::render_frame(&mut ctx);
+            bouncy_alpha::render_frame(&mut ctx);
 
 
             /*
