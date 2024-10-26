@@ -84,6 +84,7 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
                 default_color: DEFAULT_COLOR_RGBA,
                 bezier: None,
                 frame_count: frame,
+                use_alpha: true,
             };
 
             // Place the context into the global container
@@ -104,18 +105,19 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
 /// Tell the app which frame to render
 pub fn update_frame(frame: usize) {
     unsafe {
-        if let Some(state) = CONTEXT_CONTAINER.as_mut() {
+        if let Some(ctx) = CONTEXT_CONTAINER.as_mut() {
             // console_log(format!("Frame: {}", frame).as_str());
-            state.frame_count = frame;
+            ctx.frame_count = frame;
 
+            let c2 = 0x00_00_00_02;
             // With each frame, gradually decrease the Alpha from 0xFF to 0x00
-            for pixel in state.frame_buf.as_mut() {
-                *pixel = rgba_operation(pixel, &0x00_00_00_02, &ColorOperation::Subtract);
+            for pixel in ctx.frame_buf.as_mut() {
+                *pixel = rgba_operation(pixel, &c2, &ColorOperation::Subtract, ctx.use_alpha);
             }
 
             // Convert the internal RGBA buffer to ABGR and write it to `CANVAS_BUF_ABGR`.
             // JS renders `CANVAS_BUF_ABGR` on the HTML canvas, not `FRAME_BUF`.
-            rgba_to_abgr(&mut CANVAS_BUF_ABGR, &state.frame_buf);
+            rgba_to_abgr(&mut CANVAS_BUF_ABGR, &ctx.frame_buf);
         }
     }
 }
