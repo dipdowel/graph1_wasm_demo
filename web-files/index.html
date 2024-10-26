@@ -48,8 +48,8 @@
         const height = initResult.height;
         // console.log("bufPtr: " + bufPointer + ", bufSize: " + bufSize);
 
-        // Get access to WASM memory
-        let memory = wasmModule.memory.buffer;
+        // // Get access to WASM memory
+        // let memory = wasmModule.memory.buffer;
 
         // Configure dimensions of the canvas according to the WASM module's state
         canvas.style.maxWidth = `${width}px`;
@@ -60,10 +60,14 @@
         const imageData = ctx.createImageData(width, height);
 
         let bufferView;
+        let wasmMemory;
 
         function render() {
           update_frame(frame_count);
-          bufferView = new Uint8Array(memory, bufPointer, bufSize);
+
+          // Re-reference the latest WASM memory buffer on each frame
+          wasmMemory = wasmModule.memory.buffer;
+          bufferView = new Uint8Array(wasmMemory, bufPointer, bufSize);
           imageData.data.set(bufferView);
           ctx.putImageData(imageData, 0, 0);
           frame_count++;

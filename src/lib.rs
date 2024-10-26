@@ -15,9 +15,9 @@ const WIN_HEIGHT: u32 = 240;
 /// Framebuffer size, in bytes
 const BUF_SIZE: usize = 4 * (WIN_WIDTH * WIN_HEIGHT) as usize;
 
-const FOREGROUND_COLOR_RGBA: u32 = 0xbb_22_33_ff;
+const FOREGROUND_COLOR_RGBA: u32 = 0x11_ee_22_ff;
 
-const BACKGROUND_COLOR_RGBA: u32 = 0xcc_cc_cc_ff;
+const BACKGROUND_COLOR_RGBA: u32 = 0x00_44_11_ff;
 
 /// Frame buffer, gets rendered on the HTML canvas
 static mut FRAME_BUF: [u32; BUF_SIZE] = [BACKGROUND_COLOR_RGBA; BUF_SIZE];
@@ -36,6 +36,8 @@ const WIN_CTX: WindowContext = WindowContext {
     h: WIN_WIDTH,
     w_usize: WIN_WIDTH as usize,
     h_usize: WIN_HEIGHT as usize,
+    w_i32: WIN_WIDTH as i32,
+    h_i32: WIN_HEIGHT as i32,
     size: BUF_SIZE,
     background_color: BACKGROUND_COLOR_RGBA,
     dimensions: Dimensions2d {
@@ -111,8 +113,11 @@ fn clear_screen(ctx: &mut GraphContext) {
 pub fn update_frame(frame: usize) {
     unsafe {
         if let Some(mut ctx) = CONTEXT_CONTAINER.as_mut() {
-            // console_log(format!("Frame: {}", frame).as_str());
+
             ctx.frame_count = frame;
+
+            // TODO: make it a constant!
+            let square_side:i32 = 8;
 
             // Set the square movement directions
             if frame == 0 {
@@ -130,38 +135,33 @@ pub fn update_frame(frame: usize) {
             // TODO: Continue here!
             // TODO: Make use of `dx` and `dy` to make the square bounce around!
 
-            console_log(format!("x: {}, y: {}, dx: {}, dy: {}", x, y, dx, dy).as_str());
+            // console_log(format!("x: {}, y: {}, dx: {}, dy: {}", x, y, dx, dy).as_str());
+
+            if x+dx > (ctx.win.w_i32 - square_side) || x + dx < 0{
+                dx = -dx;
+            }
+
+            if y + dy > (ctx.win.h_i32 - square_side) || y + dy < 0{
+                dy = -dy;
+            }
 
             x = x + dx;
             y = y + dy;
 
-            // if x > ctx.win.w as i32 - 10 || x < 0 {
-            //     direction_x = -direction_x;
-            // }
+            &ctx.user_data.insert(0, x); // current X
+            &ctx.user_data.insert(1, y); // current y
+            &ctx.user_data.insert(2, dx); // current dx
+            &ctx.user_data.insert(3, dy); // current dy
 
-            // &ctx.user_data.insert(0, 30); // start for X
-
-            // &ctx.user_data.insert(1, 332);
-
-            // let direction_x= ctx.user_data[0];
-            // let direction_y= ctx.user_data[1];
+            // console_log(format!("x: {}, y: {}, dx: {}, dy: {}", x, y, dx, dy).as_str());
 
             clear_screen(ctx);
 
-            let local_frame = frame % ctx.win.w_usize;
-            let win_middle = ctx.win.w_usize / 2;
+            let x = x as u32;
+            let y = y as u32;
+            let side = square_side as u32;
 
-            let mut direction = 1;
-            if local_frame > win_middle {
-                direction = -1;
-            }
-
-            let x = frame as u32;
-            let y = frame as u32;
-
-            let side = 20;
-
-            draw::rectangle::filled(ctx, &RectArea::square(x, y, side, Some(0xee_44_44_ff)));
+            draw::rectangle::filled(ctx, &RectArea::square(x, y, side, Some(FOREGROUND_COLOR_RGBA)));
 
             /*
             let c2 = 0x00_00_00_02;
