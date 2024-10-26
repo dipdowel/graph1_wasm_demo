@@ -1,11 +1,18 @@
-use graph1::draw;
+mod utils;
+
+use crate::demo::user_data::{Bouncy, DemoUserData};
+use crate::demo::x01_bouncy::bouncy;
 use graph1::graph1_core::context::{GraphContext, WindowContext};
-use graph1::primitives::plane::{Dimensions2d, RectArea};
+use graph1::primitives::plane::Dimensions2d;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use wasm_bindgen::prelude::*;
-use web_sys::console;
-fn console_log(msg: &str) {
-    console::log_1(&msg.into());
+
+pub mod demo {
+    pub mod user_data;
+    pub mod x01_bouncy {
+        pub mod bouncy;
+    }
+
 }
 
 /// Width of the window, in pixels
@@ -47,7 +54,7 @@ const WIN_CTX: WindowContext = WindowContext {
 };
 
 #[wasm_bindgen]
-/// This data is passed to the JS-world to render the framebuffer on a 2D-canvas.
+/// This data is passed back to the JS-world to render the framebuffer on a 2D-canvas.
 pub struct InitStateResult {
     /// Points to the start of the frame buffer
     pub pointer: *const u32,
@@ -59,7 +66,7 @@ pub struct InitStateResult {
     pub height: u32,
 }
 
-/// A default instance of `InitStateResult`
+/// A default instance of `InitStateResult`,
 const DEFAULT_INIT_RESULT: InitStateResult = InitStateResult {
     pointer: std::ptr::null(),
     buf_size: BUF_SIZE,
@@ -68,21 +75,31 @@ const DEFAULT_INIT_RESULT: InitStateResult = InitStateResult {
 };
 
 /// Global context container, maintains the state between frames
-static mut CONTEXT_CONTAINER: Option<GraphContext> = None;
+static mut CONTEXT_CONTAINER: Option<GraphContext<DemoUserData>> = None;
 
 #[wasm_bindgen]
 /// Initialize the WASM module:
 /// 1. Create the `GraphContext` context and store it in the global container.
 /// 2. Inform the JS-world on where to look for the frame buffer, what its size is, etc.
 pub fn init_state(frame: Option<usize>) -> InitStateResult {
-    let frame: usize = frame.unwrap_or(0);
 
+    let frame: usize = frame.unwrap_or(0);
     unsafe {
         if CONTEXT_CONTAINER.is_none() {
-            let ctx: GraphContext = GraphContext {
+            // Create the application context,
+            // which will be used to pass around the data essential for using `Graph1`
+            let ctx: GraphContext<DemoUserData> = GraphContext {
                 frame_buf: &mut FRAME_BUF,
                 draft_buf: Some(&mut DRAFT_BUF),
-                user_data: Box::new(Vec::new()),
+
+                user_data: Box::new(DemoUserData{
+                    bouncy: Bouncy {
+                        x: 10,
+                        y: 10,
+                        dx: 1,
+                        dy: 1,
+                    }
+                }),
                 win: &WIN_CTX,
                 default_color: FOREGROUND_COLOR_RGBA,
                 bezier: None,
@@ -104,64 +121,15 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
     DEFAULT_INIT_RESULT
 }
 
-fn clear_screen(ctx: &mut GraphContext) {
-    draw::tools::fill::buffer(ctx.frame_buf, ctx.win.background_color);
-}
 
 #[wasm_bindgen]
 /// Tell the app which frame to render
 pub fn update_frame(frame: usize) {
     unsafe {
         if let Some(mut ctx) = CONTEXT_CONTAINER.as_mut() {
-
             ctx.frame_count = frame;
+            bouncy::render_frame(&mut ctx);
 
-            // TODO: make it a constant!
-            let square_side:i32 = 8;
-
-            // Set the square movement directions
-            if frame == 0 {
-                &ctx.user_data.push(30); // start for X
-                &ctx.user_data.push(12); // start for Y
-                &ctx.user_data.push(1); // direction for X
-                &ctx.user_data.push(1); // direction for Y
-            }
-
-            let mut x = ctx.user_data[0];
-            let mut y = ctx.user_data[1];
-            let mut dx = ctx.user_data[2];
-            let mut dy = ctx.user_data[3];
-
-            // TODO: Continue here!
-            // TODO: Make use of `dx` and `dy` to make the square bounce around!
-
-            // console_log(format!("x: {}, y: {}, dx: {}, dy: {}", x, y, dx, dy).as_str());
-
-            if x+dx > (ctx.win.w_i32 - square_side) || x + dx < 0{
-                dx = -dx;
-            }
-
-            if y + dy > (ctx.win.h_i32 - square_side) || y + dy < 0{
-                dy = -dy;
-            }
-
-            x = x + dx;
-            y = y + dy;
-
-            &ctx.user_data.insert(0, x); // current X
-            &ctx.user_data.insert(1, y); // current y
-            &ctx.user_data.insert(2, dx); // current dx
-            &ctx.user_data.insert(3, dy); // current dy
-
-            // console_log(format!("x: {}, y: {}, dx: {}, dy: {}", x, y, dx, dy).as_str());
-
-            clear_screen(ctx);
-
-            let x = x as u32;
-            let y = y as u32;
-            let side = square_side as u32;
-
-            draw::rectangle::filled(ctx, &RectArea::square(x, y, side, Some(FOREGROUND_COLOR_RGBA)));
 
             /*
             let c2 = 0x00_00_00_02;
