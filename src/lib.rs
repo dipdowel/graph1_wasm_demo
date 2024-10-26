@@ -1,8 +1,7 @@
+use graph1::draw;
 use graph1::graph1_core::context::{GraphContext, WindowContext};
-use graph1::primitives::plane::Dimensions2d;
+use graph1::primitives::plane::{Dimensions2d, RectArea};
 use graph1::utils::color::adapters::rgba_to_abgr;
-use graph1::utils::color::math::operations::ColorOperation;
-use graph1::utils::color::math::rgba_operation::rgba_operation;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 fn console_log(msg: &str) {
@@ -16,9 +15,9 @@ const WIN_HEIGHT: u32 = 240;
 /// Framebuffer size, in bytes
 const BUF_SIZE: usize = 4 * (WIN_WIDTH * WIN_HEIGHT) as usize;
 
-const DEFAULT_COLOR_RGBA: u32 = 0x33_33_33_ff;
+const FOREGROUND_COLOR_RGBA: u32 = 0xbb_22_33_ff;
 
-const BACKGROUND_COLOR_RGBA: u32 = 0xff_33_ee_ff;
+const BACKGROUND_COLOR_RGBA: u32 = 0xcc_cc_cc_ff;
 
 /// Frame buffer, gets rendered on the HTML canvas
 static mut FRAME_BUF: [u32; BUF_SIZE] = [BACKGROUND_COLOR_RGBA; BUF_SIZE];
@@ -38,6 +37,7 @@ const WIN_CTX: WindowContext = WindowContext {
     w_usize: WIN_WIDTH as usize,
     h_usize: WIN_HEIGHT as usize,
     size: BUF_SIZE,
+    background_color: BACKGROUND_COLOR_RGBA,
     dimensions: Dimensions2d {
         w: WIN_WIDTH,
         h: WIN_HEIGHT,
@@ -80,8 +80,9 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
             let ctx: GraphContext = GraphContext {
                 frame_buf: &mut FRAME_BUF,
                 draft_buf: Some(&mut DRAFT_BUF),
+                user_data: Box::new(Vec::new()),
                 win: &WIN_CTX,
-                default_color: DEFAULT_COLOR_RGBA,
+                default_color: FOREGROUND_COLOR_RGBA,
                 bezier: None,
                 frame_count: frame,
                 use_alpha: true,
@@ -101,19 +102,74 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
     DEFAULT_INIT_RESULT
 }
 
+fn clear_screen(ctx: &mut GraphContext) {
+    draw::tools::fill::buffer(ctx.frame_buf, ctx.win.background_color);
+}
+
 #[wasm_bindgen]
 /// Tell the app which frame to render
 pub fn update_frame(frame: usize) {
     unsafe {
-        if let Some(ctx) = CONTEXT_CONTAINER.as_mut() {
+        if let Some(mut ctx) = CONTEXT_CONTAINER.as_mut() {
             // console_log(format!("Frame: {}", frame).as_str());
             ctx.frame_count = frame;
 
+            // Set the square movement directions
+            if frame == 0 {
+                &ctx.user_data.push(30); // start for X
+                &ctx.user_data.push(12); // start for Y
+                &ctx.user_data.push(1); // direction for X
+                &ctx.user_data.push(1); // direction for Y
+            }
+
+            let mut x = ctx.user_data[0];
+            let mut y = ctx.user_data[1];
+            let mut dx = ctx.user_data[2];
+            let mut dy = ctx.user_data[3];
+
+            // TODO: Continue here!
+            // TODO: Make use of `dx` and `dy` to make the square bounce around!
+
+            console_log(format!("x: {}, y: {}, dx: {}, dy: {}", x, y, dx, dy).as_str());
+
+            x = x + dx;
+            y = y + dy;
+
+            // if x > ctx.win.w as i32 - 10 || x < 0 {
+            //     direction_x = -direction_x;
+            // }
+
+            // &ctx.user_data.insert(0, 30); // start for X
+
+            // &ctx.user_data.insert(1, 332);
+
+            // let direction_x= ctx.user_data[0];
+            // let direction_y= ctx.user_data[1];
+
+            clear_screen(ctx);
+
+            let local_frame = frame % ctx.win.w_usize;
+            let win_middle = ctx.win.w_usize / 2;
+
+            let mut direction = 1;
+            if local_frame > win_middle {
+                direction = -1;
+            }
+
+            let x = frame as u32;
+            let y = frame as u32;
+
+            let side = 20;
+
+            draw::rectangle::filled(ctx, &RectArea::square(x, y, side, Some(0xee_44_44_ff)));
+
+            /*
             let c2 = 0x00_00_00_02;
             // With each frame, gradually decrease the Alpha from 0xFF to 0x00
             for pixel in ctx.frame_buf.as_mut() {
                 *pixel = rgba_operation(pixel, &c2, &ColorOperation::Subtract, ctx.use_alpha);
             }
+            */
 
             // Convert the internal RGBA buffer to ABGR and write it to `CANVAS_BUF_ABGR`.
             // JS renders `CANVAS_BUF_ABGR` on the HTML canvas, not `FRAME_BUF`.
