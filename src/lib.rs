@@ -6,11 +6,13 @@ use graph1::graph1_core::context::{GraphContext, WindowContext};
 use graph1::primitives::plane::Dimensions2d;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use wasm_bindgen::prelude::*;
+use crate::demo::x01_bouncy::config::BOUNCY;
 
 pub mod demo {
     pub mod user_data;
     pub mod x01_bouncy {
         pub mod bouncy;
+        pub mod config;
     }
 
 }
@@ -92,13 +94,9 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
                 frame_buf: &mut FRAME_BUF,
                 draft_buf: Some(&mut DRAFT_BUF),
 
+                // Provides storage for arbitrary data that needs to be persisted between frames
                 user_data: Box::new(DemoUserData{
-                    bouncy: Bouncy {
-                        x: 10,
-                        y: 10,
-                        dx: 1,
-                        dy: 1,
-                    }
+                    bouncy: BOUNCY,
                 }),
                 win: &WIN_CTX,
                 default_color: FOREGROUND_COLOR_RGBA,
