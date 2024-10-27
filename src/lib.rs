@@ -1,12 +1,15 @@
 mod utils;
 
+use graph1::graph1_core::alpha::AlphaConfig;
+use graph1::graph1_core::context::{GraphContext, WindowContext};
 use crate::demo::user_data::DemoUserData;
 use crate::demo::x01_bouncy::config::BOUNCY;
-use crate::demo::x01_bouncy::bouncy_alpha;
-use graph1::graph1_core::context::{GraphContext, WindowContext};
+use crate::demo::x01_bouncy::{bouncy, bouncy_alpha_float, bouncy_alpha_int};
+
 use graph1::primitives::plane::Dimensions2d;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use wasm_bindgen::prelude::*;
+use crate::utils::console_log;
 
 /// A collection of demo modules
 pub mod demo {
@@ -16,8 +19,10 @@ pub mod demo {
     pub mod x01_bouncy {
         /// A minimal example of displaying and animating a square on the screen
         pub mod bouncy;
-        /// Explanation on how to use the alpha channel in rendering
-        pub mod bouncy_alpha;
+        /// Demo of fast but less accurate Integer alpha blending
+        pub mod bouncy_alpha_int;
+        /// Demo of slower but more accurate Float alpha blending
+        pub mod bouncy_alpha_float;
         pub mod config;
     }
 
@@ -45,10 +50,12 @@ static mut DRAFT_BUF: [u32; BUF_SIZE] = [BACKGROUND_COLOR_RGBA; BUF_SIZE];
 /// JS renders `CANVAS_BUF_ABGR` on the HTML canvas, not `FRAME_BUF` directly.
 static mut CANVAS_BUF_ABGR: [u32; BUF_SIZE] = [0xff_ff_00_ff; BUF_SIZE];
 
+static mut ACTIVE_DEMO_ID: u32 = 0;
+
 /// Window context, a sub-context of the `GraphContext`
 const WIN_CTX: WindowContext = WindowContext {
     w: WIN_WIDTH,
-    h: WIN_WIDTH,
+    h: WIN_HEIGHT,
     w_usize: WIN_WIDTH as usize,
     h_usize: WIN_HEIGHT as usize,
     w_i32: WIN_WIDTH as i32,
@@ -108,7 +115,7 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
                 default_color: FOREGROUND_COLOR_RGBA,
                 bezier: None,
                 frame_count: frame,
-                use_alpha: true,
+                alpha: AlphaConfig::default(),
             };
 
             // Place the context into the global container
@@ -125,6 +132,14 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
     DEFAULT_INIT_RESULT
 }
 
+#[wasm_bindgen]
+/// Tell the app which frame to render
+pub  fn set_active_demo(id: u32) {
+    console_log(format!("WASM: set_active_demo(), id:{}", id).as_str());
+    unsafe{
+        ACTIVE_DEMO_ID = id;
+    }
+}
 
 #[wasm_bindgen]
 /// Tell the app which frame to render
@@ -133,8 +148,13 @@ pub fn update_frame(frame: usize) {
         if let Some(mut ctx) = CONTEXT_CONTAINER.as_mut() {
             ctx.frame_count = frame;
 
-            // bouncy::render_frame(&mut ctx);
-            bouncy_alpha::render_frame(&mut ctx);
+
+            match ACTIVE_DEMO_ID {
+                1 => bouncy::render_frame(&mut ctx),
+                2 => bouncy_alpha_int::render_frame(&mut ctx),
+                3 => bouncy_alpha_float::render_frame(&mut ctx),
+                _ => bouncy::render_frame(&mut ctx),
+            }
 
 
             /*

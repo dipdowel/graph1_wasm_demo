@@ -43,7 +43,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         //  By setting `use_alpha` to `true`, we instruct Graph1 to use alpha blending
         //  with each tool that supports it. Think of drawing rectangles, circles, lines, etc.
         // =====================================================================================
-        ctx.use_alpha = true;
+        ctx.alpha.enabled = true;
 
         // Set the starting `x` and `y` for Bouncy.
         ctx.user_data.bouncy.x = 0;
@@ -69,7 +69,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if x + dx > (ctx.win.w_i32 - SQUARE_SIDE_PX) || x + dx < 0 {
         dx = -dx;
         // If Bouncy hits the wall on the right or left, toggle the `use_alpha` flag!
-        ctx.use_alpha = !ctx.use_alpha;
+        ctx.alpha.enabled = !ctx.alpha.enabled;
     }
 
     // Don't let Bouncy go off-screen vertically
