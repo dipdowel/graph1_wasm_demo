@@ -5,22 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rust + WebAssembly Demo</title>
     <style>
-        /* Base styles for a clean, modern look */
+        /* Base styling for a retro-futuristic cyberpunk look */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Overall body styling */
+        /* Body styling with a gradient background for a softer cyberpunk look */
         body {
-            background: #1e1e2e; /* Dark, muted background for easy readability */
-            font-family: Arial, sans-serif;
-            color: #f5f5f5;
+            background: linear-gradient(135deg, #0f0f1f, #1a1a3a);
+            font-family: "Courier New", Courier, monospace; /* Retro monospace font */
+            color: #a8ff60; /* Softer neon green */
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
+        }
+
+        h2 {
+            color: #ffbf00; /* Warm neon amber for headers */
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px rgba(255, 191, 0, 0.5);
         }
 
         /* Styling for content container */
@@ -29,37 +36,52 @@
             max-width: 600px;
             text-align: center;
             padding: 20px;
-            background-color: #2e2e3a;
+            background: rgba(20, 20, 50, 0.85); /* Transparent background for a glassy look */
+            border: 1px solid #a8ff60;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(168, 255, 96, 0.3);
         }
 
-        /* Styling for buttons and dropdown */
+        p {
+            color: #99ffcc; /* Lighter neon color for paragraph text */
+            line-height: 1.5;
+        }
+
+        /* Button and dropdown styling with cyberpunk neon effects */
         button,
         select {
             margin: 5px;
             padding: 10px 20px;
             font-size: 1rem;
             border-radius: 5px;
-            border: none;
+            border: 1px solid #00ffcc;
+            background-color: #222244;
+            color: #a8ff60;
             cursor: pointer;
-            color: #ffffff;
-            background-color: #4a90e2;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
         }
 
         button:hover,
         select:hover {
-            background-color: #357ab8;
+            background-color: #333366;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
         }
 
-        /* Ensure pixel-perfect rendering by setting max dimensions */
+        /* Canvas styling with soft neon border for retro-futuristic look */
         canvas {
-            box-sizing: content-box;
-            image-rendering: high-quality;
-            /*image-rendering: pixelated;*/
-            border: 1px solid #4a90e2;
+            image-rendering: high-quality; /* Smooth display for canvas */
+            border: 1px solid #333333; /* Subtle dark border for definition */
+            background-color: #0f0f1f; /* Dark background to enhance glow */
+
+            /* CRT glow effect with box-shadow */
+            box-shadow:
+                    0 0 20px rgba(0, 255, 0, 0.2),   /* Outer green glow */
+                    0 0 40px rgba(0, 255, 0, 0.15),  /* Extended green glow */
+                    inset 0 0 10px rgba(0, 255, 0, 0.3), /* Inner shadow for edge fade */
+                    inset 0 0 20px rgba(0, 255, 0, 0.1); /* Deep inner shadow */
+
             margin-bottom: 20px;
         }
     </style>
@@ -104,14 +126,18 @@
     demoSelector.onchange = () => {
         console.log("Changing demo to: " + demoSelector.value);
         frame_count = 0;
-        if (isPaused) togglePauseState(); // Resume if paused
+        if (isPaused) {
+            togglePauseState(); // Resume if paused
+        }
         setActiveDemoFunction(parseInt(demoSelector.value));
     };
 
     restartButton.onclick = () => {
         console.log("Restarting...");
         frame_count = 0;
-        if (isPaused) togglePauseState(); // Resume if paused
+        if (isPaused) {
+            togglePauseState(); // Resume if paused
+        }
     };
 
     pauseButton.onclick = () => {
@@ -122,7 +148,9 @@
     function togglePauseState() {
         isPaused = !isPaused;
         pauseButton.innerText = isPaused ? "Resume" : "Pause";
-        if (!isPaused) requestAnimationFrame(renderFunction); // Resume animation
+        if (!isPaused) {
+            requestAnimationFrame(renderFunction); // Resume animation
+        }
     }
 
     // WebAssembly Initialization and Rendering Setup
@@ -152,7 +180,9 @@
 
         // Main render loop
         function render() {
-            if (isPaused) return;
+            if (isPaused) {
+                return;
+            }
 
             update_frame(frame_count);
             const bufferView = new Uint8Array(wasmModule.memory.buffer, bufPointer, bufSize);
