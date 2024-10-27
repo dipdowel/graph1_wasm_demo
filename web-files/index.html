@@ -23,6 +23,9 @@
         body {
             background: linear-gradient(135deg, #0f0f1f, #1a1a3a);
             font-family: 'Inconsolata', monospace, "Courier New", Courier;
+            font-size: 1.1rem;
+            line-height: 1.2;
+            /*letter-spacing: 1px;*/
             color: #a8ff60;
             display: flex;
             flex-direction: column;
@@ -35,14 +38,15 @@
         h1, h2, h3, h4, h5, h6 {
             text-transform: uppercase;
             text-shadow: 0 0 5px rgba(255, 191, 0, 0.5);
-            margin-bottom: 10px;
+            margin-top: 10px;
+            margin-bottom: 8px;
             font-family: 'Orbitron', sans-serif, "Courier New", Courier;
         }
 
         h1 { color: #ff77ff; text-shadow: 0 0 8px rgba(255, 119, 255, 0.7); }
         h2 { color: #ffbf00; text-shadow: 0 0 8px rgba(255, 191, 0, 0.7); }
-        h3 { color: #a8ff60; text-shadow: 0 0 8px rgba(168, 255, 96, 0.7); }
-        h4 { color: #33ccff; text-shadow: 0 0 8px rgba(51, 204, 255, 0.7); }
+        h3 { color: #33ccff; text-shadow: 0 0 8px rgba(51, 204, 255, 0.7); }
+        h4 { color: #a8ff60; text-shadow: 0 0 8px rgba(168, 255, 96, 0.7); }
         h5 { color: #ff6666; text-shadow: 0 0 8px rgba(255, 102, 102, 0.7); }
         h6 { color: #99ffcc; text-shadow: 0 0 8px rgba(153, 255, 204, 0.7); }
 
@@ -57,9 +61,16 @@
             margin-bottom: 20px;
             margin-top: 20px;
             box-shadow: 0 0 10px rgba(168, 255, 96, 0.3);
-
-
         }
+
+        #content img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
 
         @-moz-document url-prefix() {
             /* Firefox-specific scrollbar styling */
@@ -68,13 +79,11 @@
                 scrollbar-width: thin; /* Options: auto | thin | none */
                 scrollbar-color: #33ccff #1a1a3a; /* Thumb color and track color */
             }
-
             /* Any other Firefox-specific styles */
             /*body { }*/
         }
 
         .button-container {
-
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
@@ -90,6 +99,10 @@
             cursor: pointer;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+        }
+
+        button {
+            min-width: 175px;
         }
 
         button:hover, select:hover {
@@ -117,7 +130,8 @@
 
         /* Custom scrollbar styling */
         ::-webkit-scrollbar {
-            width: 4px;
+            width: 8px; /* Vertical scrollbar width */
+            height: 8px; /* Horizontal scrollbar height */
         }
 
         ::-webkit-scrollbar-track {
@@ -138,6 +152,81 @@
             box-shadow: 0 0 5px rgba(51, 204, 255, 0.7), 0 0 5px rgba(255, 119, 255, 0.7);
         }
 
+        /* Links */
+        a {
+            color: #33ccff; /* Base neon color */
+            text-decoration: none;
+            font-weight: bold;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #ff77ff; /* Hover neon color */
+            text-shadow:
+                    0 0 5px rgba(255, 119, 255, 0.6),
+                    0 0 10px rgba(255, 119, 255, 0.4),
+                    0 0 15px rgba(255, 119, 255, 0.3);
+        }
+
+        a::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            height: 2px;
+            width: 100%;
+            background: linear-gradient(90deg, #33ccff, #ff77ff);
+            box-shadow:
+                    0 0 5px rgba(51, 204, 255, 0.7),
+                    0 0 10px rgba(255, 119, 255, 0.6);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: scaleX(0);
+            transform-origin: left;
+        }
+
+        a:hover::after {
+            opacity: 1;
+            transform: scaleX(1); /* Expands the underline */
+        }
+
+        /* LISTS! */
+        ul{
+            padding-left: 10px; /* Adds internal spacing to align bullets/numbers */
+            color: #a8ff60; /* Neon green text color to match theme */
+            list-style-type: none; /* Removes default bullets and numbering */
+            list-style-position: inside;
+            line-height: 1.5;
+        }
+        ul li::before {
+            content: "✧"; /* My custom bullet character! */
+            color: #33ccff; /* Neon blue for bullets */
+            text-shadow: 0 0 5px rgba(51, 204, 255, 0.7);
+            margin-right: 8px; /* Add some space between bullet and text */
+        }
+
+        ol {
+            list-style-type: none; /* Removes default numbering */
+            padding-left: 20px; /* Adds space for custom numbers */
+            counter-reset: custom-counter; /* Resets the counter */
+        }
+
+        ol li {
+            counter-increment: custom-counter;
+            display: flex; /* Ensures the number and content are on the same line */
+            align-items: center; /* Vertically aligns number and content */
+        }
+
+        ol li::before {
+            content: counter(custom-counter) ". "; /* Custom number style */
+            color: #ffbf00;
+            text-shadow: 0 0 5px rgba(255, 191, 0, 0.7);
+            font-weight: bold;
+            margin-right: 8px; /* Adds spacing after the number */
+        }
+
+
 
 
     </style>
@@ -155,6 +244,7 @@
     <option value="1">1.1 - Bouncy</option>
     <option value="2">1.2 - Bouncy with Alpha (Integer)</option>
     <option value="3">1.3 - Bouncy with Alpha (Integer vs. Float)</option>
+    <option value="999">999 - Test card</option>
 </select>
 
 <div id="content">
@@ -209,23 +299,18 @@
         }
     }
 
+    function getDocUrl(demoIndex) {
+        return `docs/content${demoIndex.toString().padStart(3,'0')}.md`;
+    }
+
     /**
      * Handles demo selection changes from the dropdown.
      * Sets the active demo in the WASM module and loads corresponding Markdown content.
      */
-    demoSelector.onchange = function () {
+    demoSelector.onchange = async function () {
         const selectedValue = this.value;
-        const markdownFiles = [
-            "docs/content000.md",
-            "docs/content001.md",
-            "docs/content002.md",
-            "docs/content003.md"
-        ];
-
-        const fileToLoad = markdownFiles[selectedValue];
-        if (fileToLoad) {
-            loadMarkdownContent(fileToLoad, parseInt(selectedValue));
-        }
+        const fileToLoad = getDocUrl(selectedValue);
+        await loadMarkdownContent(fileToLoad, parseInt(selectedValue));
     };
 
     /**
@@ -333,11 +418,16 @@
         const demoParam = urlParams.get("demo");
         const initialDemo = demoParam ? parseInt(demoParam) : 0;
         demoSelector.value = initialDemo;
-        await loadMarkdownContent(`docs/content00${initialDemo}.md`, initialDemo);
+        await loadMarkdownContent(getDocUrl(initialDemo), initialDemo);
         render();
     }
 
     run();
 </script>
+<footer>
+    Graph1, a Rust graphic library | graph1.codument.com | All rights reserved
+</footer>
+
+
 </body>
 </html>
