@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
 
+    <!-- Prism.js for syntax highlighting -->
+    <link href="prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="prism.min.js"></script>
+    <script src="prism-rust.min.js"></script>
+
     <!-- Local Showdown library for Markdown to HTML conversion -->
     <script src="showdown.min.js"></script>
 
@@ -42,7 +47,7 @@
         #content {
             width: 100%;
             max-width: 766px;
-            text-align: center;
+            text-align: left;
             padding: 20px;
             background: rgba(20, 20, 50, 0.85);
             border: 1px solid #a8ff60;
@@ -73,6 +78,12 @@
         button:hover, select:hover {
             background-color: #333366;
             box-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
+        }
+
+        pre {
+            border: solid 1px #222244;
+            border-radius: 5px;
+
         }
 
         canvas {
@@ -124,7 +135,7 @@
     const converter = new showdown.Converter();
 
     /**
-     * Function to load, convert, and display Markdown content.
+     * Function to load, convert, and display Markdown content with syntax highlighting.
      * Also updates the URL with the current content file.
      * @param {string} file - Path to the Markdown file.
      * @param {number} demoIndex - Index for the WASM module demo.
@@ -136,6 +147,9 @@
                 const markdownContent = await response.text();
                 const htmlContent = converter.makeHtml(markdownContent);
                 contentContainer.innerHTML = htmlContent;
+
+                // Apply syntax highlighting with Prism.js
+                Prism.highlightAll();
 
                 // Update the URL to reflect the current file, for bookmarking
                 const newUrl = `${window.location.pathname}?demo=${demoIndex}`;
