@@ -1,15 +1,16 @@
 mod utils;
 
-use graph1::graph1_core::alpha::AlphaConfig;
-use graph1::graph1_core::context::{GraphContext, WindowContext};
 use crate::demo::user_data::DemoUserData;
 use crate::demo::x01_bouncy::config::BOUNCY;
 use crate::demo::x01_bouncy::{bouncy, bouncy_alpha_float, bouncy_alpha_int};
+use graph1::graph1_core::alpha::AlphaConfig;
+use graph1::graph1_core::context::{GraphContext, WindowContext};
 
+use crate::utils::console_log;
 use graph1::primitives::plane::Dimensions2d;
 use graph1::utils::color::adapters::rgba_to_abgr;
+use graph1::utils::color::palettes::RetroNeon;
 use wasm_bindgen::prelude::*;
-use crate::utils::console_log;
 
 /// A collection of demo modules
 pub mod demo {
@@ -35,9 +36,10 @@ const WIN_HEIGHT: u32 = 240;
 /// Framebuffer size, in bytes
 const BUF_SIZE: usize = 4 * (WIN_WIDTH * WIN_HEIGHT) as usize;
 
-const FOREGROUND_COLOR_RGBA: u32 = 0x11_ff_22_ff;
+// const FOREGROUND_COLOR_RGBA: u32 = RetroNeon::LASER_LIME;
+const FOREGROUND_COLOR_RGBA: u32 = RetroNeon::LASER_LIME;
 
-const BACKGROUND_COLOR_RGBA: u32 = 0x00_23_00_ff;
+const BACKGROUND_COLOR_RGBA: u32 = RetroNeon::CYBER_BLUE;
 
 /// Frame buffer, gets rendered on the HTML canvas
 static mut FRAME_BUF: [u32; BUF_SIZE] = [BACKGROUND_COLOR_RGBA; BUF_SIZE];

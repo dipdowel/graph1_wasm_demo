@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rust + WebAssembly Demo</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
         /* Base styling for a retro-futuristic cyberpunk look */
         * {
@@ -15,20 +19,28 @@
         /* Body styling with a gradient background for a softer cyberpunk look */
         body {
             background: linear-gradient(135deg, #0f0f1f, #1a1a3a);
-            font-family: "Courier New", Courier, monospace; /* Retro monospace font */
-            color: #a8ff60; /* Softer neon green */
+            font-family: 'Inconsolata', monospace, "Courier New", Courier;
+            color: #a8ff60;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
         }
 
-        h2 {
-            color: #ffbf00; /* Warm neon amber for headers */
-            margin-bottom: 10px;
+        /* Heading styles for a cyberpunk neon effect */
+        h1, h2, h3, h4, h5, h6 {
             text-transform: uppercase;
             text-shadow: 0 0 5px rgba(255, 191, 0, 0.5);
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif, "Courier New", Courier;
         }
+
+        h1 { color: #ff77ff; text-shadow: 0 0 8px rgba(255, 119, 255, 0.7); }
+        h2 { color: #ffbf00; text-shadow: 0 0 8px rgba(255, 191, 0, 0.7); }
+        h3 { color: #a8ff60; text-shadow: 0 0 8px rgba(168, 255, 96, 0.7); }
+        h4 { color: #33ccff; text-shadow: 0 0 8px rgba(51, 204, 255, 0.7); }
+        h5 { color: #ff6666; text-shadow: 0 0 8px rgba(255, 102, 102, 0.7); }
+        h6 { color: #99ffcc; text-shadow: 0 0 8px rgba(153, 255, 204, 0.7); }
 
         /* Styling for content container */
         #content {
@@ -36,22 +48,33 @@
             max-width: 600px;
             text-align: center;
             padding: 20px;
-            background: rgba(20, 20, 50, 0.85); /* Transparent background for a glassy look */
+            background: rgba(20, 20, 50, 0.85);
             border: 1px solid #a8ff60;
             border-radius: 8px;
             margin-bottom: 20px;
+            margin-top: 20px;
             box-shadow: 0 0 10px rgba(168, 255, 96, 0.3);
+            /*font-size: 0.8rem;*/
         }
 
         p {
-            color: #99ffcc; /* Lighter neon color for paragraph text */
+            color: #99ffcc;
             line-height: 1.5;
         }
 
         /* Button and dropdown styling with cyberpunk neon effects */
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button{
+            min-width: 180px;
+        }
+
         button,
         select {
-            margin: 5px;
             padding: 10px 20px;
             font-size: 1rem;
             border-radius: 5px;
@@ -63,25 +86,26 @@
             box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
         }
 
+        select{
+            min-width: 480px;
+        }
+
         button:hover,
         select:hover {
             background-color: #333366;
             box-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
         }
 
-        /* Canvas styling with soft neon border for retro-futuristic look */
+        /* Canvas styling with CRT glow effect */
         canvas {
-            image-rendering: high-quality; /* Smooth display for canvas */
-            border: 1px solid #333333; /* Subtle dark border for definition */
-            background-color: #0f0f1f; /* Dark background to enhance glow */
-
-            /* CRT glow effect with box-shadow */
+            image-rendering: high-quality;
+            border: 1px solid #333333;
+            background-color: #0f0f1f;
             box-shadow:
-                    0 0 20px rgba(0, 255, 0, 0.2),   /* Outer green glow */
-                    0 0 40px rgba(0, 255, 0, 0.15),  /* Extended green glow */
-                    inset 0 0 10px rgba(0, 255, 0, 0.3), /* Inner shadow for edge fade */
-                    inset 0 0 20px rgba(0, 255, 0, 0.1); /* Deep inner shadow */
-
+                    0 0 20px rgba(0, 255, 0, 0.2),
+                    0 0 40px rgba(0, 255, 0, 0.15),
+                    inset 0 0 10px rgba(0, 255, 0, 0.3),
+                    inset 0 0 20px rgba(0, 255, 0, 0.1);
             margin-bottom: 20px;
         }
     </style>
@@ -90,10 +114,13 @@
 <!-- Main Canvas for WebAssembly Rendering -->
 <canvas id="myCanvas"></canvas>
 
-<!-- UI Controls for Demo Selection and Controls -->
-<button id="restart">Restart</button>
-<button id="pause">Pause</button>
+<!-- Container for aligned buttons with emojis -->
+<div class="button-container">
+    <button id="restart">🔄 Restart</button>
+    <button id="pause">⏸️ Pause</button>
+</div>
 
+<!-- Dropdown for demo selection -->
 <select id="demo_selector">
     <option value="0">0.0 - Intro</option>
     <option value="1">1.1 - Bouncy</option>
@@ -103,31 +130,28 @@
 
 <!-- Descriptive content for the demo -->
 <div id="content">
+    <h1>Graph1</h1>
     <h2>WebAssembly Demo</h2>
     <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     </p>
 </div>
 
 <script type="module">
-    // Variables for managing application state
     let isPaused = false;
     let frame_count = 0;
-
-    // References to UI elements
     const pauseButton = document.getElementById("pause");
     const restartButton = document.getElementById("restart");
     const demoSelector = document.getElementById("demo_selector");
 
-    let renderFunction; // Stores the render function
-    let setActiveDemoFunction; // Stores WASM demo selector function
+    let renderFunction;
+    let setActiveDemoFunction;
 
-    // Set up button and selector event listeners
     demoSelector.onchange = () => {
         console.log("Changing demo to: " + demoSelector.value);
         frame_count = 0;
         if (isPaused) {
-            togglePauseState(); // Resume if paused
+            togglePauseState();
         }
         setActiveDemoFunction(parseInt(demoSelector.value));
     };
@@ -136,7 +160,7 @@
         console.log("Restarting...");
         frame_count = 0;
         if (isPaused) {
-            togglePauseState(); // Resume if paused
+            togglePauseState();
         }
     };
 
@@ -144,61 +168,73 @@
         togglePauseState();
     };
 
-    // Toggles between pause and resume states
     function togglePauseState() {
         isPaused = !isPaused;
-        pauseButton.innerText = isPaused ? "Resume" : "Pause";
+        pauseButton.innerText = isPaused ? "▶️ Resume" : "⏸️ Pause";
         if (!isPaused) {
-            requestAnimationFrame(renderFunction); // Resume animation
+            requestAnimationFrame(renderFunction);
         }
     }
 
-    // WebAssembly Initialization and Rendering Setup
     import init, { init_state, update_frame, set_active_demo } from "./graph1_web_demo.js";
-
     const canvas = document.getElementById("myCanvas");
     const ctx = canvas.getContext("2d");
 
     async function run() {
-        // Load and initialize the WebAssembly module
         const wasmModule = await init();
         const initResult = init_state(0);
-
-        // Destructure to get canvas dimensions from WASM
         const { pointer: bufPointer, buf_size: bufSize, width, height } = initResult;
 
-        // Configure pixel-perfect rendering by setting max and actual dimensions
         canvas.style.maxWidth = `${width}px`;
         canvas.style.maxHeight = `${height}px`;
         canvas.width = width;
         canvas.height = height;
 
         const imageData = ctx.createImageData(width, height);
-
-        // Set global WASM-related functions
         setActiveDemoFunction = set_active_demo;
 
-        // Main render loop
-        function render() {
-            if (isPaused) {
-                return;
+        function getAverageCanvasColor() {
+            const data = ctx.getImageData(0, 0, width, height).data;
+            let r = 0, g = 0, b = 0;
+
+            for (let i = 0; i < data.length; i += 4) {
+                r += data[i];
+                g += data[i + 1];
+                b += data[i + 2];
             }
 
-            update_frame(frame_count);
-            const bufferView = new Uint8Array(wasmModule.memory.buffer, bufPointer, bufSize);
+            const pixelCount = width * height;
+            return `rgb(${Math.floor(r / pixelCount)}, ${Math.floor(g / pixelCount)}, ${Math.floor(b / pixelCount)})`;
+        }
 
+        function applyGlowEffect() {
+            const glowColor = getAverageCanvasColor();
+            canvas.style.boxShadow = `
+                    0 0 20px ${glowColor},
+                    0 0 40px ${glowColor},
+                    inset 0 0 10px ${glowColor},
+                    inset 0 0 20px ${glowColor}`;
+        }
+
+        function render() {
+            if (isPaused) return;
+
+            update_frame(frame_count);
+
+            const bufferView = new Uint8Array(wasmModule.memory.buffer, bufPointer, bufSize);
             imageData.data.set(bufferView);
             ctx.putImageData(imageData, 0, 0);
+
+            applyGlowEffect();
 
             frame_count++;
             requestAnimationFrame(render);
         }
 
-        renderFunction = render; // Store render function globally
+        renderFunction = render;
         render();
     }
 
-    // Start the WebAssembly and rendering process
     run();
 </script>
 </body>
