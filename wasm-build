@@ -11,7 +11,7 @@ wasm-pack build --target web --out-name graph1_web_demo  --no-default-features
 
 
 # Make sure our custom `index.html` is there.
-cp ./web-files/index.html ./pkg/
+cp -R ./web-files/* ./pkg/
 # Kill the previous PPython3 webserver, if any
 #PID=$(ps aux | grep "python3 -m http.server 8080 --directory ./pkg/" | grep -v grep | awk '{print $2}')
 PID=$(ps aux | grep "python3 graph1_demo_serve.py" | grep -v grep | awk '{print $2}')
