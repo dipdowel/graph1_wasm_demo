@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Prism.js for syntax highlighting -->
-    <link href="prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="prism-tomorrow.css" rel="stylesheet" />
     <script src="prism.min.js"></script>
     <script src="prism-rust.min.js"></script>
 
@@ -29,6 +29,8 @@
             align-items: center;
             padding: 20px;
         }
+
+
 
         h1, h2, h3, h4, h5, h6 {
             text-transform: uppercase;
@@ -55,9 +57,24 @@
             margin-bottom: 20px;
             margin-top: 20px;
             box-shadow: 0 0 10px rgba(168, 255, 96, 0.3);
+
+
+        }
+
+        @-moz-document url-prefix() {
+            /* Firefox-specific scrollbar styling */
+            #content {
+                /* Custom scrollbar styles for Firefox */
+                scrollbar-width: thin; /* Options: auto | thin | none */
+                scrollbar-color: #33ccff #1a1a3a; /* Thumb color and track color */
+            }
+
+            /* Any other Firefox-specific styles */
+            /*body { }*/
         }
 
         .button-container {
+
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
@@ -97,6 +114,32 @@
                     inset 0 0 20px rgba(0, 255, 0, 0.1);
             margin-bottom: 20px;
         }
+
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(25, 25, 50, 0.85);
+            border-radius: 5px;
+            box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0077aa, #bb33bb);
+            box-shadow: 0 0 5px rgba(51, 204, 255, 0.7), 0 0 5px rgba(255, 119, 255, 0.7);
+            border-radius: 5px;
+
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #11aaee, #ff77ff);
+            box-shadow: 0 0 5px rgba(51, 204, 255, 0.7), 0 0 5px rgba(255, 119, 255, 0.7);
+        }
+
+
+
     </style>
 </head>
 <body>
@@ -157,6 +200,7 @@
 
                 // Call WASM module to set active demo
                 setActiveDemoFunction(demoIndex);
+                resetFrameCount();
             } else {
                 console.error("Error loading Markdown content:", response.statusText);
             }
@@ -185,14 +229,21 @@
     };
 
     /**
+     * Resets the frame count to 0 and resumes the animation if paused.
+     */
+    function resetFrameCount() {
+        frame_count = 0;
+        if(isPaused){
+            togglePauseState();
+        }
+    }
+
+    /**
      * Restarts the current demo and resets the frame count.
      */
     restartButton.onclick = () => {
         console.log("Restarting...");
-        frame_count = 0;
-        if (isPaused) {
-            togglePauseState();
-        }
+        resetFrameCount();
     };
 
     /**
@@ -276,14 +327,14 @@
         }
 
         renderFunction = render;
-        render();
 
         // Load initial content based on URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const demoParam = urlParams.get("demo");
         const initialDemo = demoParam ? parseInt(demoParam) : 0;
         demoSelector.value = initialDemo;
-        loadMarkdownContent(`docs/content00${initialDemo}.md`, initialDemo);
+        await loadMarkdownContent(`docs/content00${initialDemo}.md`, initialDemo);
+        render();
     }
 
     run();

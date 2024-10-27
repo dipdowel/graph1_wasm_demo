@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+      <html lang="en">
+      <head>
+      <meta charset="UTF-8">
+      <title>Canvas Test Card</title>
+  <style>
+    body, html {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #222;
+    }
+    canvas {
+      border: 4px solid #000;
+      background: #222;
+    }
+  </style>
+</head>
+<body>
+<canvas id="testCardCanvas" width="640" height="480"></canvas>
+
+<script>
+  const canvas = document.getElementById("testCardCanvas");
+  const ctx = canvas.getContext("2d");
+
+  // Draw color bars
+  function drawColorBars() {
+    const colors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ffffff"];
+    const barWidth = canvas.width / colors.length;
+    colors.forEach((color, i) => {
+      ctx.fillStyle = color;
+      ctx.fillRect(i * barWidth, 0, barWidth, canvas.height * 0.4);
+    });
+  }
+
+  // Draw grayscale bars
+  function drawGrayscaleBars() {
+    const shades = [0, 51, 102, 153, 204, 255];
+    const barWidth = canvas.width / shades.length;
+    shades.forEach((shade, i) => {
+      ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+      ctx.fillRect(i * barWidth, canvas.height * 0.4, barWidth, canvas.height * 0.2);
+    });
+  }
+
+  // Draw central circle
+  function drawCentralCircle() {
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height * 0.75;
+    const radius = canvas.height * 0.1;
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+  }
+
+  // Draw crosshair lines
+  function drawCrosshair() {
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const lineLength = 20;
+
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+
+    // Vertical line
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY - lineLength);
+    ctx.lineTo(centerX, centerY + lineLength);
+    ctx.stroke();
+
+    // Horizontal line
+    ctx.beginPath();
+    ctx.moveTo(centerX - lineLength, centerY);
+    ctx.lineTo(centerX + lineLength, centerY);
+    ctx.stroke();
+  }
+
+  // Draw the full test card
+  function drawTestCard() {
+    drawColorBars();
+    drawGrayscaleBars();
+    drawCentralCircle();
+    drawCrosshair();
+  }
+
+  drawTestCard();
+</script>
+</body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>

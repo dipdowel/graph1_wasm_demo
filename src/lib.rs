@@ -11,6 +11,7 @@ use graph1::primitives::plane::Dimensions2d;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use graph1::utils::color::palettes::RetroNeon;
 use wasm_bindgen::prelude::*;
+use crate::demo::screen_saver;
 
 /// A collection of demo modules
 pub mod demo {
@@ -26,6 +27,7 @@ pub mod demo {
         pub mod bouncy_alpha_float;
         pub mod config;
     }
+    pub mod screen_saver;
 
 }
 
@@ -155,7 +157,8 @@ pub fn update_frame(frame: usize) {
                 1 => bouncy::render_frame(&mut ctx),
                 2 => bouncy_alpha_int::render_frame(&mut ctx),
                 3 => bouncy_alpha_float::render_frame(&mut ctx),
-                _ => bouncy::render_frame(&mut ctx),
+                // FIXME: rename `screen_saver` to `test_card`
+                _ => screen_saver::render_frame(&mut ctx),
             }
 
 
