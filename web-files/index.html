@@ -1,126 +1,145 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
     <meta charset="UTF-8" />
-    <title>My Rust + Webpack project!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rust + WebAssembly Demo</title>
     <style>
-      body {
-        background: #000;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        font-family: Arial, sans-serif;
-          color:blanchedalmond;
-      }
-      canvas {
-        width: 100vw;
-        height: 100vh;
-        image-rendering: crisp-edges;
-        image-rendering: pixelated;
-        object-fit: contain;
-      }
-      #content {
-          width: 50%;
-          /* TODO: center vertically! */
-      }
+        /* Base styles for a clean, modern look */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        /* Overall body styling */
+        body {
+            background: #1e1e2e; /* Dark, muted background for easy readability */
+            font-family: Arial, sans-serif;
+            color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Styling for content container */
+        #content {
+            width: 60%;
+            max-width: 600px;
+            text-align: center;
+            padding: 20px;
+            background-color: #2e2e3a;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        /* Styling for buttons and dropdown */
+        button,
+        select {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            color: #ffffff;
+            background-color: #4a90e2;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover,
+        select:hover {
+            background-color: #357ab8;
+        }
+
+        /* Ensure pixel-perfect rendering by setting max dimensions */
+        canvas {
+            box-sizing: content-box;
+            image-rendering: high-quality;
+            /*image-rendering: pixelated;*/
+            border: 1px solid #4a90e2;
+            margin-bottom: 20px;
+        }
     </style>
-  </head>
-  <body>
-    <canvas style="border: solid 0 white" id="myCanvas"></canvas>
+</head>
+<body>
+<!-- Main Canvas for WebAssembly Rendering -->
+<canvas id="myCanvas"></canvas>
 
-    <button id="restart">Restart</button>
-    <button id="pause">Pause</button>
+<!-- UI Controls for Demo Selection and Controls -->
+<button id="restart">Restart</button>
+<button id="pause">Pause</button>
 
-    <select id="demo_selector">
-        <option value="0">0.0 - Intro</option>
-        <option value="1">1.1 - Bouncy</option>
-        <option value="2">1.2 - Bouncy with Alpha (Integer)</option>
-        <option value="3">1.3 - Bouncy with Alpha (Integer vs. Float)</option>
-    </select>
+<select id="demo_selector">
+    <option value="0">0.0 - Intro</option>
+    <option value="1">1.1 - Bouncy</option>
+    <option value="2">1.2 - Bouncy with Alpha (Integer)</option>
+    <option value="3">1.3 - Bouncy with Alpha (Integer vs. Float)</option>
+</select>
 
-    <br />
-    <br />
+<!-- Descriptive content for the demo -->
+<div id="content">
+    <h2>WebAssembly Demo</h2>
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    </p>
+</div>
 
+<script type="module">
+    // Variables for managing application state
+    let isPaused = false;
+    let frame_count = 0;
 
-    <div id="content">
-        <H2>WebAssembly Demo</H2>
-        <p>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        </p>
-    </div>
-    <script type="module">
-      let isPaused = false;
-      const pauseButton = document.getElementById("pause");
-      const restartButton = document.getElementById("restart");
-      const demoSelector = document.getElementById("demo_selector");
+    // References to UI elements
+    const pauseButton = document.getElementById("pause");
+    const restartButton = document.getElementById("restart");
+    const demoSelector = document.getElementById("demo_selector");
 
-      demoSelector.onchange = () => {
+    let renderFunction; // Stores the render function
+    let setActiveDemoFunction; // Stores WASM demo selector function
+
+    // Set up button and selector event listeners
+    demoSelector.onchange = () => {
         console.log("Changing demo to: " + demoSelector.value);
         frame_count = 0;
-        if (isPaused) {
-          isPaused = false;
-          pauseButton.innerText = "Pause"; // Change text to Pause
-          requestAnimationFrame(renderFunction);
-        }
+        if (isPaused) togglePauseState(); // Resume if paused
         setActiveDemoFunction(parseInt(demoSelector.value));
-      }
+    };
 
-
-      let renderFunction;
-      let setActiveDemoFunction
-
-      restartButton.onclick = () => {
+    restartButton.onclick = () => {
         console.log("Restarting...");
         frame_count = 0;
-        if (isPaused) {
-          isPaused = false;
-          pauseButton.innerText = "Pause"; // Change text to Pause
-          requestAnimationFrame(renderFunction);
-        }
-      };
+        if (isPaused) togglePauseState(); // Resume if paused
+    };
 
-      pauseButton.onclick = () => {
-        if (isPaused) {
-          // Code to resume action here
-          console.log("Resuming...");
-          pauseButton.innerText = "Pause"; // Change text to Pause
-          requestAnimationFrame(renderFunction);
-        } else {
-          // Code to pause action here
-          console.log("Pausing...");
-          pauseButton.innerText = "Resume"; // Change text to Resume
-        }
-        isPaused = !isPaused; // Toggle state
-      };
+    pauseButton.onclick = () => {
+        togglePauseState();
+    };
 
-      // Import the WASM stuff
-      import init, { init_state, update_frame, set_active_demo } from "./graph1_web_demo.js";
+    // Toggles between pause and resume states
+    function togglePauseState() {
+        isPaused = !isPaused;
+        pauseButton.innerText = isPaused ? "Resume" : "Pause";
+        if (!isPaused) requestAnimationFrame(renderFunction); // Resume animation
+    }
 
-      setActiveDemoFunction = set_active_demo;
-      // Prepare the 2D-canvas
-      const canvas = document.getElementById("myCanvas");
-      const ctx = canvas.getContext("2d");
+    // WebAssembly Initialization and Rendering Setup
+    import init, { init_state, update_frame, set_active_demo } from "./graph1_web_demo.js";
 
-      // Count of frames in the demo
-      let frame_count = 0;
+    const canvas = document.getElementById("myCanvas");
+    const ctx = canvas.getContext("2d");
 
-      async function run() {
-        // Load the WASM module
+    async function run() {
+        // Load and initialize the WebAssembly module
         const wasmModule = await init();
-
-        // Initialise the inner state of the WASM module
         const initResult = init_state(0);
-        const bufPointer = initResult.pointer;
-        const bufSize = initResult.buf_size;
-        const width = initResult.width;
-        const height = initResult.height;
-        // console.log("bufPtr: " + bufPointer + ", bufSize: " + bufSize);
 
-        // // Get access to WASM memory
-        // let memory = wasmModule.memory.buffer;
+        // Destructure to get canvas dimensions from WASM
+        const { pointer: bufPointer, buf_size: bufSize, width, height } = initResult;
 
-        // Configure dimensions of the canvas according to the WASM module's state
+        // Configure pixel-perfect rendering by setting max and actual dimensions
         canvas.style.maxWidth = `${width}px`;
         canvas.style.maxHeight = `${height}px`;
         canvas.width = width;
@@ -128,28 +147,29 @@
 
         const imageData = ctx.createImageData(width, height);
 
-        let bufferView;
-        let wasmMemory;
+        // Set global WASM-related functions
+        setActiveDemoFunction = set_active_demo;
 
+        // Main render loop
         function render() {
-          if (isPaused) {
-            return;
-          }
-          update_frame(frame_count);
+            if (isPaused) return;
 
-          // Re-reference the latest WASM memory buffer on each frame
-          wasmMemory = wasmModule.memory.buffer;
-          bufferView = new Uint8Array(wasmMemory, bufPointer, bufSize);
-          imageData.data.set(bufferView);
-          ctx.putImageData(imageData, 0, 0);
-          frame_count++;
-          requestAnimationFrame(render);
+            update_frame(frame_count);
+            const bufferView = new Uint8Array(wasmModule.memory.buffer, bufPointer, bufSize);
+
+            imageData.data.set(bufferView);
+            ctx.putImageData(imageData, 0, 0);
+
+            frame_count++;
+            requestAnimationFrame(render);
         }
 
-        renderFunction = render;
+        renderFunction = render; // Store render function globally
         render();
-      }
-      run();
-    </script>
-  </body>
+    }
+
+    // Start the WebAssembly and rendering process
+    run();
+</script>
+</body>
 </html>
