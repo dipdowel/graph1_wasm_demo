@@ -139,10 +139,10 @@
             border: 1px solid #333333;
             background-color: #0f0f1f;
             box-shadow:
-                    0 0 20px rgba(0, 255, 0, 0.2),
-                    0 0 40px rgba(0, 255, 0, 0.15),
-                    inset 0 0 10px rgba(0, 255, 0, 0.3),
-                    inset 0 0 20px rgba(0, 255, 0, 0.1);
+                    0 0 20px rgba(255, 255, 255, 0),
+                    0 0 40px rgba(255, 255, 255, 0),
+                    inset 0 0 10px rgba(255, 255, 255, 0),
+                    inset 0 0 20px rgba(255, 255, 255, 0);
             margin-bottom: 20px;
         }
 
@@ -385,27 +385,22 @@
         const imageData = ctx.createImageData(width, height);
         setActiveDemoFunction = set_active_demo;
 
-        /**
-         * Calculates the average RGB color of the canvas content to create a dynamic glow effect.
-         * @returns {string} - RGB color string representing the average color.
-         */
-        function getAverageCanvasColor() {
-            const data = ctx.getImageData(0, 0, width, height).data;
-            let r = 0, g = 0, b = 0;
-            for (let i = 0; i < data.length; i += 4) {
-                r += data[i];
-                g += data[i + 1];
-                b += data[i + 2];
-            }
-            const pixelCount = width * height;
-            return `rgb(${Math.floor(r / pixelCount)}, ${Math.floor(g / pixelCount)}, ${Math.floor(b / pixelCount)})`;
-        }
+        const alphaThreshold = 25;
 
         /**
          * Applies a CRT-style glow effect to the canvas using the average canvas color.
          */
-        function applyGlowEffect() {
-            const glowColor = getAverageCanvasColor();
+        function applyGlowEffect(pixel_stats) {
+            const { average_red, average_green, average_blue, average_intensity } = pixel_stats;
+
+            let glowColor;
+            // Supress the glow effect if the average colors are too dark
+            if(average_red <alphaThreshold && average_green<alphaThreshold && average_blue < alphaThreshold){
+                glowColor = "rgba(0,0,0,0)";
+            } else {
+                glowColor = `rgba(${average_red}, ${average_green}, ${average_blue}, ${average_intensity})`;
+            }
+
             canvas.style.boxShadow = `
                 0 0 20px ${glowColor},
                 0 0 40px ${glowColor},
@@ -419,12 +414,15 @@
         function render() {
             if (isPaused) return;
 
-            update_frame(frame_count);
+            const pixel_stats = update_frame(frame_count);
+
+
             const bufferView = new Uint8Array(wasmModule.memory.buffer, bufPointer, bufSize);
             imageData.data.set(bufferView);
             ctx.putImageData(imageData, 0, 0);
 
-            applyGlowEffect();
+            applyGlowEffect(pixel_stats);
+
             frame_count++;
             requestAnimationFrame(render);
         }

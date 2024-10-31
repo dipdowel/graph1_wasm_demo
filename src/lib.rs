@@ -6,12 +6,13 @@ use crate::demo::x01_bouncy::{bouncy, bouncy_alpha_float, bouncy_alpha_int};
 use graph1::graph1_core::alpha::AlphaConfig;
 use graph1::graph1_core::context::{GraphContext, WindowContext};
 
+use crate::demo::screen_saver;
 use crate::utils::console_log;
 use graph1::primitives::plane::Dimensions2d;
+use graph1::utils::color;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use graph1::utils::color::palettes::RetroNeon;
 use wasm_bindgen::prelude::*;
-use crate::demo::screen_saver;
 
 /// A collection of demo modules
 pub mod demo {
@@ -146,8 +147,19 @@ pub  fn set_active_demo(id: u32) {
 }
 
 #[wasm_bindgen]
+pub struct PixelStats {
+    pub average_red: u32,
+    pub average_green: u32,
+    pub average_blue: u32,
+    pub average_color: u32,
+    pub average_luminance: u32,
+    pub average_intensity: u32,
+}
+
+#[wasm_bindgen]
 /// Tell the app which frame to render
-pub fn update_frame(frame: usize) {
+pub fn update_frame(frame: usize) -> PixelStats {
+
     unsafe {
         if let Some(mut ctx) = CONTEXT_CONTAINER.as_mut() {
             ctx.frame_count = frame;
@@ -172,7 +184,28 @@ pub fn update_frame(frame: usize) {
 
             // Convert the internal RGBA buffer to ABGR and write it to `CANVAS_BUF_ABGR`.
             // JS renders `CANVAS_BUF_ABGR` on the HTML canvas, not `FRAME_BUF`.
-            rgba_to_abgr(&mut CANVAS_BUF_ABGR, &ctx.frame_buf);
+            let stats = rgba_to_abgr(&mut CANVAS_BUF_ABGR, &ctx.frame_buf, true).unwrap();
+
+            return PixelStats{
+                average_red: stats.average_red,
+                average_green: stats.average_green,
+                average_blue: stats.average_blue,
+                average_color: stats.average_color.clone(),
+                // average_luminance: graph1::utils::color::properties::luminance::rgba_buffer_luminance(&ctx.frame_buf),
+                // average_luminance: graph1::utils::color::properties::luminance::rgba_pixel_luminance(ctx.frame_buf[0]),
+                average_luminance: color::properties::luminance::rgba_pixel_luminance(stats.average_color) as u32,
+                average_intensity: color::properties::intensity::rgba_pixel_intensity(stats.average_color) as u32,
+            }
+
         }
+    }
+
+    PixelStats{
+        average_red: 0,
+        average_green: 0,
+        average_blue: 0,
+        average_color: 0,
+        average_luminance: 0,
+        average_intensity: 0,
     }
 }
