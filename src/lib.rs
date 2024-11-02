@@ -13,7 +13,8 @@ use graph1::utils::color;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use graph1::utils::color::palettes::RetroNeon;
 use wasm_bindgen::prelude::*;
-use crate::demo::color_props::intensity_vs_luminance;
+use crate::demo::color_props::luminance_vs_intensity;
+use crate::demo::shapes::circles;
 
 /// A collection of demo modules
 pub mod demo {
@@ -30,8 +31,13 @@ pub mod demo {
         pub mod config;
     }
     pub mod color_props {
-        pub mod intensity_vs_luminance;
+        pub mod luminance_vs_intensity;
     }
+
+    pub mod shapes {
+        pub mod circles;
+    }
+
     pub mod screen_saver;
 
 }
@@ -170,12 +176,14 @@ pub fn update_frame(frame: usize) -> PixelStats {
 
 
             match ACTIVE_DEMO_ID {
+                0 => bouncy::render_frame(&mut ctx),
                 1 => bouncy::render_frame(&mut ctx),
                 2 => bouncy_alpha_int::render_frame(&mut ctx),
                 3 => bouncy_alpha_float::render_frame(&mut ctx),
-                4 => intensity_vs_luminance::render_frame(&mut ctx),
+                4 => luminance_vs_intensity::render_frame(&mut ctx),
+                5 => circles::render_frame(&mut ctx),
                 // FIXME: rename `screen_saver` to `test_card`
-                _ => intensity_vs_luminance::render_frame(&mut ctx),
+                _ => bouncy::render_frame(&mut ctx),
             }
 
 
@@ -199,7 +207,7 @@ pub fn update_frame(frame: usize) -> PixelStats {
                 // average_luminance: graph1::utils::color::properties::luminance::rgba_buffer_luminance(&ctx.frame_buf),
                 // average_luminance: graph1::utils::color::properties::luminance::rgba_pixel_luminance(ctx.frame_buf[0]),
                 average_luminance: color::properties::luminance::rgba_pixel_luminance(stats.average_color) as u32,
-                average_intensity: color::properties::intensity::rgba_pixel_intensity(stats.average_color) as u32,
+                average_intensity: color::properties::intensity::rgba_pixel_intensity(stats.average_color, false) as u32,
             }
 
         }
