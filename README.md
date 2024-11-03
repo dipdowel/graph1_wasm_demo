@@ -2,4 +2,5 @@
 Demo(s) for Graph1 library
 
 # TODO:
- Move the `getAverageCanvasColor()` function to Rust from JS!!!
+ - [ ] In `luminance_vs_intensity.rs`, add convertion of the 4th row of colors to quadratic intensity!    
+ - [ ] Modify text in `web-files/docs/content004.md` to reflect the changes in the code.
