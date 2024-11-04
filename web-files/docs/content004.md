@@ -1,5 +1,34 @@
 # Colors 
-## Luminance and Intensity 
+## Desaturation
+
+If you need to desaturate (convert to grayscale) an image, a region of an image, or a single pixel , 
+`Graph1` provides two modules for that:
+- `utils::color::desaturate::intensity`
+- `utils::color::desaturate::luminance`
+
+###  Intensity vs. Luminance
+Functions from `desaturate::intensity` module provide the most performant desaturation. It may be suitable for some purposes,
+especially where the speed is crucial. 
+
+However, the human eye perceives light differently.
+
+For instance, colors of the first two columns are **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>**. 
+They are very similar in terms of physical intensity. The lower grayscale region represents them as the same shade of gray. 
+
+however, it is not as accurate as the luminance method.
+
+but we might want to apply some adjustments when converting both to grayscale (desaturating), because the human eye perceives yellow as brighter!
+
+
+
+
+
+
+
+
+
+There are two approaches to desaturate an image (to convert a color pixels to grayscale):
+
 <br />
 [Luminance](https://en.wikipedia.org/wiki/Luminance) and intensity are both used in simulating lighting in computer graphics. 
 They contribute to different aspects of how light interacts with objects and how brightness is perceived by humans. 
@@ -13,8 +42,8 @@ In the demo above, we have 8 vertical color bars, they are intersected by two ho
 <br /><br />
 ### Luminance
 In graphics, we use [luminance](https://en.wikipedia.org/wiki/Luminance) to mimic how humans perceive light in real-world scenes.
-For instance, a **<span style="color:blue;">blue</span>** and a **<span style="color:yellow;">yellow</span>** pixels might have the same physical intensity, 
-but we might want to calculate different luminance values for them, because the human eye perceives yellow as brighter!
+For instance, a **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and a **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>** pixels might have the same physical intensity, 
+but we might want to apply some adjustments when converting both to grayscale (desaturating), because the human eye perceives yellow as brighter!
 In `Graph1` we calculate luminance by performing the following multiplications on the RGB channels:
 <br />
 ```rust
@@ -28,19 +57,9 @@ B * 0.0722
 Those constants are called [luma coefficients](https://en.wikipedia.org/wiki/Rec._709#Luma_coefficients). <br />
 They are described in [Rec. 709 standard](https://en.wikipedia.org/wiki/Rec._709) for HDTV.
 - - - - -
-Check [graph1::utils::color::properties::luminance](https://docs.rs/graph1/latest/graph1/utils/color/properties/fn.luminance.html) 
+Check [graph1::utils::color::desaturate::luminance](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/desaturate/luminance_vs_intensity.rs)
+<!-- Check [graph1::utils::color::properties::luminance](https://docs.rs/graph1/latest/graph1/utils/color/properties/fn.luminance.html) -->
 for all the available methods.
 
 <br /><br />
-
-###  Intensity
-Intensity can be thought of as the average of the RGB components of a light source if we're treating them equally without
-weighting for perception. Here’s one common approach:
-
-
-
-
-
-
-
 
