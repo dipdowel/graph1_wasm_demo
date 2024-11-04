@@ -13,7 +13,7 @@ use graph1::utils::color;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use graph1::utils::color::palettes::RetroNeon;
 use wasm_bindgen::prelude::*;
-use crate::demo::color_props::luminance_vs_intensity;
+use crate::demo::desaturate::luminance_vs_intensity;
 use crate::demo::shapes::circles;
 
 /// A collection of demo modules
@@ -30,7 +30,7 @@ pub mod demo {
         pub mod bouncy_alpha_float;
         pub mod config;
     }
-    pub mod color_props {
+    pub mod desaturate {
         pub mod luminance_vs_intensity;
     }
 
@@ -204,10 +204,8 @@ pub fn update_frame(frame: usize) -> PixelStats {
                 average_green: stats.average_green,
                 average_blue: stats.average_blue,
                 average_color: stats.average_color.clone(),
-                // average_luminance: graph1::utils::color::properties::luminance::rgba_buffer_luminance(&ctx.frame_buf),
-                // average_luminance: graph1::utils::color::properties::luminance::rgba_pixel_luminance(ctx.frame_buf[0]),
-                average_luminance: color::properties::luminance::rgba_pixel_luminance(stats.average_color) as u32,
-                average_intensity: color::properties::intensity::rgba_pixel_intensity(stats.average_color, false) as u32,
+                average_luminance: color::desaturate::luminance::rgba_pixel_luminance(stats.average_color) as u32,
+                average_intensity: color::desaturate::intensity::rgba_pixel_intensity(stats.average_color, false) as u32,
             }
 
         }

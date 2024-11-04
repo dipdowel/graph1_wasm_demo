@@ -3,8 +3,8 @@ use graph1::draw::rectangle;
 use graph1::graph1_core::context::GraphContext;
 use graph1::primitives::plane::RectArea;
 use graph1::utils::color::palettes;
-use graph1::utils::color::properties::intensity::rgba_region_intensity;
-use graph1::utils::color::properties::luminance::rgba_region_luminance;
+use graph1::utils::color::desaturate::intensity::rgba_region_intensity;
+use graph1::utils::color::desaturate::luminance::rgba_region_luminance;
 
 /// Side of Bouncy, in pixels
 // const SQUARE_SIDE_PX: i32 = 96;
