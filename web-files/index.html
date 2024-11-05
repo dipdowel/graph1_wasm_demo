@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rust + WebAssembly Demo</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Prism.js for syntax highlighting -->
     <link href="prism-tomorrow.css" rel="stylesheet" />
@@ -17,378 +23,468 @@
     <script src="showdown.min.js"></script>
 
     <style>
-        /* Base styling for a retro-futuristic cyberpunk look */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+      /* Base styling for a retro-futuristic cyberpunk look */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            background: linear-gradient(135deg, #0f0f1f, #1a1a3a);
-            min-height: 100vh;
-            height: 100%;
-            font-family: 'Inconsolata', monospace, "Courier New", Courier;
-            font-size: 1.1rem;
-            line-height: 1.2;
-            /*letter-spacing: 1px;*/
-            color: #a8ff60;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-        }
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+      body {
+        background: linear-gradient(135deg, #0f0f1f, #1a1a3a);
+        min-height: 100vh;
+        height: 100%;
+        font-family: "Inconsolata", monospace, "Courier New", Courier;
+        font-size: 1.1rem;
+        line-height: 1.2;
+        /*letter-spacing: 1px;*/
+        color: #a8ff60;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+      }
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
 
-            background-image: url('bg8.webp');
-            background-size: auto;
-            background-repeat: repeat;
-            background-blend-mode: difference;
-            opacity: 0.008; /* Make the bg barely visible */
-            z-index: -1; /* Places the background behind all other content */
-        }
+        background-image: url("bg8.webp");
+        background-size: auto;
+        background-repeat: repeat;
+        background-blend-mode: difference;
+        opacity: 0.008; /* Make the bg barely visible */
+        z-index: -1; /* Places the background behind all other content */
+      }
 
-        code{
-            color: #ffbf00;
-        }
+      code {
+        color: #ffbf00;
+      }
 
-        hr {
-            border: 1px solid #99ffcc;
-            width: 100%;
-            margin: 20px 0;
-        }
+      hr {
+        border: 1px solid #99ffcc;
+        width: 100%;
+        margin: 20px 0;
+      }
 
-        h1, h2, h3, h4, h5, h6 {
-            text-transform: uppercase;
-            text-shadow: 0 0 5px rgba(255, 191, 0, 0.5);
-            margin-top: 12px;
-            margin-bottom: 8px;
-            font-family: 'Orbitron', sans-serif, "Courier New", Courier;
-        }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        text-transform: uppercase;
+        text-shadow: 0 0 5px rgba(255, 191, 0, 0.5);
+        margin-top: 12px;
+        margin-bottom: 8px;
+        font-family: "Orbitron", sans-serif, "Courier New", Courier;
+      }
 
-        h1 { color: #ff77ff; text-shadow: 0 0 8px rgba(255, 119, 255, 0.7); }
-        h2 { color: #ffbf00; text-shadow: 0 0 8px rgba(255, 191, 0, 0.7); }
-        h3 { color: #33ccff; text-shadow: 0 0 8px rgba(51, 204, 255, 0.7); }
-        h4 { color: #a8ff60; text-shadow: 0 0 8px rgba(168, 255, 96, 0.7); }
-        h5 { color: #ff6666; text-shadow: 0 0 8px rgba(255, 102, 102, 0.7); }
-        h6 { color: #99ffcc; text-shadow: 0 0 8px rgba(153, 255, 204, 0.7); }
+      h1 {
+        color: #ff77ff;
+        text-shadow: 0 0 8px rgba(255, 119, 255, 0.7);
+      }
+      h2 {
+        color: #ffbf00;
+        text-shadow: 0 0 8px rgba(255, 191, 0, 0.7);
+      }
+      h3 {
+        color: #33ccff;
+        text-shadow: 0 0 8px rgba(51, 204, 255, 0.7);
+      }
+      h4 {
+        color: #a8ff60;
+        text-shadow: 0 0 8px rgba(168, 255, 96, 0.7);
+      }
+      h5 {
+        color: #ff6666;
+        text-shadow: 0 0 8px rgba(255, 102, 102, 0.7);
+      }
+      h6 {
+        color: #99ffcc;
+        text-shadow: 0 0 8px rgba(153, 255, 204, 0.7);
+      }
 
+      #content {
+        width: 100%;
+        max-width: 766px;
+        text-align: left;
+        padding: 20px;
+        background: rgba(20, 20, 50, 0.85);
+        border: 1px solid #a8ff60;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        margin-top: 20px;
+        box-shadow: 0 0 10px rgba(168, 255, 96, 0.3);
+      }
+
+      #content img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      @-moz-document url-prefix() {
+        /* Firefox-specific scrollbar styling */
         #content {
-            width: 100%;
-            max-width: 766px;
-            text-align: left;
-            padding: 20px;
-            background: rgba(20, 20, 50, 0.85);
-            border: 1px solid #a8ff60;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            margin-top: 20px;
-            box-shadow: 0 0 10px rgba(168, 255, 96, 0.3);
+          /* Custom scrollbar styles for Firefox */
+          scrollbar-width: thin; /* Options: auto | thin | none */
+          scrollbar-color: #33ccff #1a1a3a; /* Thumb color and track color */
         }
+        /* Any other Firefox-specific styles */
+        /*body { }*/
+      }
 
-        #content img {
-            display: block;
-            max-width: 100%;
-            height: auto;
-            margin-left: auto;
-            margin-right: auto;
-        }
+      .button-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
 
+      button,
+      select {
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        border: 1px solid #00ffcc;
+        background-color: #222244;
+        color: #a8ff60;
+        cursor: pointer;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+      }
 
-        @-moz-document url-prefix() {
-            /* Firefox-specific scrollbar styling */
-            #content {
-                /* Custom scrollbar styles for Firefox */
-                scrollbar-width: thin; /* Options: auto | thin | none */
-                scrollbar-color: #33ccff #1a1a3a; /* Thumb color and track color */
-            }
-            /* Any other Firefox-specific styles */
-            /*body { }*/
-        }
+      button {
+        min-width: 175px;
+      }
 
-        .button-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+      button:hover,
+      select:hover {
+        background-color: #333366;
+        box-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
+      }
 
-        button, select {
-            padding: 10px 20px;
-            font-size: 1rem;
-            border-radius: 5px;
-            border: 1px solid #00ffcc;
-            background-color: #222244;
-            color: #a8ff60;
-            cursor: pointer;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
-        }
+      pre {
+        border: solid 1px #222244;
+        border-radius: 5px;
+      }
 
-        button {
-            min-width: 175px;
-        }
+      canvas {
+        image-rendering: high-quality;
+        border: 1px solid #333333;
+        border-radius: 6px;
+        background-color: #0f0f1f;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0),
+          0 0 40px rgba(255, 255, 255, 0), inset 0 0 10px rgba(255, 255, 255, 0),
+          inset 0 0 20px rgba(255, 255, 255, 0);
+        margin-bottom: 20px;
+      }
 
-        button:hover, select:hover {
-            background-color: #333366;
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
-        }
+      /* Custom scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 8px; /* Vertical scrollbar width */
+        height: 8px; /* Horizontal scrollbar height */
+      }
 
-        pre {
-            border: solid 1px #222244;
-            border-radius: 5px;
+      ::-webkit-scrollbar-track {
+        background: rgba(25, 25, 50, 0.85);
+        border-radius: 5px;
+        box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.2);
+      }
 
-        }
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #0077aa, #bb33bb);
+        box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
+          0 0 5px rgba(255, 119, 255, 0.7);
+        border-radius: 5px;
+      }
 
-        canvas {
-            image-rendering: high-quality;
-            border: 1px solid #333333;
-            border-radius: 6px;
-            background-color: #0f0f1f;
-            box-shadow:
-                    0 0 20px rgba(255, 255, 255, 0),
-                    0 0 40px rgba(255, 255, 255, 0),
-                    inset 0 0 10px rgba(255, 255, 255, 0),
-                    inset 0 0 20px rgba(255, 255, 255, 0);
-            margin-bottom: 20px;
-        }
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #11aaee, #ff77ff);
+        box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
+          0 0 5px rgba(255, 119, 255, 0.7);
+      }
 
-        /* Custom scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 8px; /* Vertical scrollbar width */
-            height: 8px; /* Horizontal scrollbar height */
-        }
+      /* Links */
+      a {
+        color: #33ccff; /* Base neon color */
+        text-decoration: none;
+        font-weight: bold;
+        position: relative;
+        transition: color 0.3s ease;
+      }
 
-        ::-webkit-scrollbar-track {
-            background: rgba(25, 25, 50, 0.85);
-            border-radius: 5px;
-            box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.2);
-        }
+      a:hover {
+        color: #ff77ff; /* Hover neon color */
+        text-shadow: 0 0 5px rgba(255, 119, 255, 0.6),
+          0 0 10px rgba(255, 119, 255, 0.4), 0 0 15px rgba(255, 119, 255, 0.3);
+      }
 
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #0077aa, #bb33bb);
-            box-shadow: 0 0 5px rgba(51, 204, 255, 0.7), 0 0 5px rgba(255, 119, 255, 0.7);
-            border-radius: 5px;
+      a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        height: 2px;
+        width: 100%;
+        background: linear-gradient(90deg, #33ccff, #ff77ff);
+        box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
+          0 0 10px rgba(255, 119, 255, 0.6);
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        transform: scaleX(0);
+        transform-origin: left;
+      }
 
-        }
+      a:hover::after {
+        opacity: 1;
+        transform: scaleX(1); /* Expands the underline */
+      }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #11aaee, #ff77ff);
-            box-shadow: 0 0 5px rgba(51, 204, 255, 0.7), 0 0 5px rgba(255, 119, 255, 0.7);
-        }
+      /* LISTS! */
+      ul {
+        padding-left: 10px; /* Adds internal spacing to align bullets/numbers */
+        margin-top: 10px;
+        margin-bottom: 12px;
+        color: #a8ff60; /* Neon green text color to match theme */
+        list-style-type: none; /* Removes default bullets and numbering */
+        list-style-position: inside;
+        line-height: 1.5;
+      }
+      ul li::before {
+        content: "✧"; /* My custom bullet character! */
+        color: #33ccff; /* Neon blue for bullets */
+        text-shadow: 0 0 5px rgba(51, 204, 255, 0.7);
+        margin-right: 8px; /* Add some space between bullet and text */
+      }
 
-        /* Links */
-        a {
-            color: #33ccff; /* Base neon color */
-            text-decoration: none;
-            font-weight: bold;
-            position: relative;
-            transition: color 0.3s ease;
-        }
+      ol {
+        list-style-type: none; /* Removes default numbering */
+        padding-left: 20px; /* Adds space for custom numbers */
+        counter-reset: custom-counter; /* Resets the counter */
+      }
 
-        a:hover {
-            color: #ff77ff; /* Hover neon color */
-            text-shadow:
-                    0 0 5px rgba(255, 119, 255, 0.6),
-                    0 0 10px rgba(255, 119, 255, 0.4),
-                    0 0 15px rgba(255, 119, 255, 0.3);
-        }
+      ol li {
+        counter-increment: custom-counter;
+        display: flex; /* Ensures the number and content are on the same line */
+        align-items: center; /* Vertically aligns number and content */
+      }
 
-        a::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            bottom: -2px;
-            height: 2px;
-            width: 100%;
-            background: linear-gradient(90deg, #33ccff, #ff77ff);
-            box-shadow:
-                    0 0 5px rgba(51, 204, 255, 0.7),
-                    0 0 10px rgba(255, 119, 255, 0.6);
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            transform: scaleX(0);
-            transform-origin: left;
-        }
+      ol li::before {
+        content: counter(custom-counter) ". "; /* Custom number style */
+        color: #ffbf00;
+        text-shadow: 0 0 5px rgba(255, 191, 0, 0.7);
+        font-weight: bold;
+        margin-right: 8px; /* Adds spacing after the number */
+      }
 
-        a:hover::after {
-            opacity: 1;
-            transform: scaleX(1); /* Expands the underline */
-        }
+      /* Table styling for retro-futuristic cyberpunk theme */
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          background: rgba(25, 25, 50, 0.95);
+          border: 1px solid #a8ff60;
+          border-radius: 8px;
+          box-shadow: 0 0 10px rgba(168, 255, 96, 0.3), 0 0 5px rgba(51, 204, 255, 0.3);
+          margin: 20px 0;
+      }
 
-        /* LISTS! */
-        ul{
-            padding-left: 10px; /* Adds internal spacing to align bullets/numbers */
-            margin-top: 10px;
-            margin-bottom: 12px;
-            color: #a8ff60; /* Neon green text color to match theme */
-            list-style-type: none; /* Removes default bullets and numbering */
-            list-style-position: inside;
-            line-height: 1.5;
-        }
-        ul li::before {
-            content: "✧"; /* My custom bullet character! */
-            color: #33ccff; /* Neon blue for bullets */
-            text-shadow: 0 0 5px rgba(51, 204, 255, 0.7);
-            margin-right: 8px; /* Add some space between bullet and text */
-        }
+      table th, table td {
+          padding: 12px;
+          text-align: left;
+          font-family: "Inconsolata", monospace;
+          color: #a8ff60;
+          border-bottom: 1px solid rgba(168, 255, 96, 0.2);
+      }
 
-        ol {
-            list-style-type: none; /* Removes default numbering */
-            padding-left: 20px; /* Adds space for custom numbers */
-            counter-reset: custom-counter; /* Resets the counter */
-        }
+      table th {
+          background: rgba(51, 204, 255, 0.15);
+          color: #33ccff;
+          text-transform: uppercase;
+          text-shadow: 0 0 5px rgba(51, 204, 255, 0.7);
+      }
 
-        ol li {
-            counter-increment: custom-counter;
-            display: flex; /* Ensures the number and content are on the same line */
-            align-items: center; /* Vertically aligns number and content */
-        }
+      table td {
+          background: rgba(25, 25, 50, 0.85);
+      }
 
-        ol li::before {
-            content: counter(custom-counter) ". "; /* Custom number style */
-            color: #ffbf00;
-            text-shadow: 0 0 5px rgba(255, 191, 0, 0.7);
-            font-weight: bold;
-            margin-right: 8px; /* Adds spacing after the number */
-        }
+      table tr:hover td {
+          background: rgba(51, 204, 255, 0.15);
+          color: #ffbf00;
+          transition: background-color 0.3s ease, color 0.3s ease;
+      }
 
-
+      table caption {
+          font-size: 1.2rem;
+          color: #ff77ff;
+          text-shadow: 0 0 5px rgba(255, 119, 255, 0.5);
+          padding: 10px;
+          font-family: "Orbitron", sans-serif;
+          text-align: center;
+      }
 
 
     </style>
-</head>
-<body>
-<canvas id="myCanvas"></canvas>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
 
-<div class="button-container">
-    <button id="restart">🔄 Restart</button>
-    <button id="pause">⏸️ Pause</button>
-</div>
+    <div class="button-container">
+      <button id="restart">🔄 Restart</button>
+      <button id="pause">⏸️ Pause</button>
+    </div>
 
-<select id="demo_selector">
-    <option value="0">0.0 - Intro</option>
-    <option value="1">1.1 - Bouncy</option>
-    <option value="2">1.2 - Bouncy with Alpha (Integer)</option>
-    <option value="3">1.3 - Bouncy with Alpha (Integer vs. Float)</option>
-    <option value="4">x.x - Colors: desaturate</option>
-    <option value="5">x.x - Circles ( )</option>
-    <option value="999">999 - Test card</option>
-</select>
+    <select id="demo_selector">
+      <option value="0">0.0 - Intro</option>
+      <option value="1">1.1 - Bouncy</option>
+      <option value="2">1.2 - Bouncy with Alpha (Integer)</option>
+      <option value="3">1.3 - Bouncy with Alpha (Integer vs. Float)</option>
+      <option value="4">x.x - Colors: desaturate</option>
+      <option value="5">x.x - Circles ( )</option>
+      <option value="999">999 - Test card</option>
+    </select>
 
-<div id="content">
-    <h1>Graph1</h1>
-    <h2>WebAssembly Demo</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-</div>
+    <div id="content">
+      <h1>Graph1</h1>
+      <h2>WebAssembly Demo</h2>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua.
+      </p>
+    </div>
 
-<script type="module">
-    let isPaused = false;
-    let frame_count = 0;
-    const pauseButton = document.getElementById("pause");
-    const restartButton = document.getElementById("restart");
-    const demoSelector = document.getElementById("demo_selector");
-    const contentContainer = document.getElementById("content");
+    <script type="module">
+      let isPaused = false;
+      let frame_count = 0;
+      const pauseButton = document.getElementById("pause");
+      const restartButton = document.getElementById("restart");
+      const demoSelector = document.getElementById("demo_selector");
+      const contentContainer = document.getElementById("content");
 
-    let renderFunction;
-    let setActiveDemoFunction;
+      let renderFunction;
+      let setActiveDemoFunction;
 
-    // Initialize Showdown Markdown converter
-    const converter = new showdown.Converter();
+      showdown.setFlavor('github');
+      // Initialize Showdown Markdown converter
+      const converter = new showdown.Converter({
+         strikethrough: true, tables: true,
+        tasklists: true,
+        simpleLineBreaks: true,
+        openLinksInNewWindow: true,
+        emoji:true,
+      });
 
-    /**
-     * Function to load, convert, and display Markdown content with syntax highlighting.
-     * Also updates the URL with the current content file.
-     * @param {string} file - Path to the Markdown file.
-     * @param {number} demoIndex - Index for the WASM module demo.
-     */
-    async function loadMarkdownContent(file, demoIndex) {
+
+
+      /**
+       * Function to load, convert, and display Markdown content with syntax highlighting.
+       * Also updates the URL with the current content file.
+       * @param {string} file - Path to the Markdown file.
+       * @param {number} demoIndex - Index for the WASM module demo.
+       */
+      async function loadMarkdownContent(file, demoIndex) {
         try {
-            const response = await fetch(file);
-            if (response.ok) {
-                const markdownContent = await response.text();
-                const htmlContent = converter.makeHtml(markdownContent);
-                contentContainer.innerHTML = htmlContent;
+          const response = await fetch(file);
+          if (response.ok) {
+            const markdownContent = await response.text();
+            const htmlContent = converter.makeHtml(markdownContent);
+            contentContainer.innerHTML = htmlContent;
 
-                // Apply syntax highlighting with Prism.js
-                Prism.highlightAll();
+            // Apply syntax highlighting with Prism.js
+            Prism.highlightAll();
 
-                // Update the URL to reflect the current file, for bookmarking
-                const newUrl = `${window.location.pathname}?demo=${demoIndex}`;
-                history.replaceState(null, "", newUrl);
+            // Update the URL to reflect the current file, for bookmarking
+            const newUrl = `${window.location.pathname}?demo=${demoIndex}`;
+            history.replaceState(null, "", newUrl);
 
-                // Call WASM module to set active demo
-                setActiveDemoFunction(demoIndex);
-                resetFrameCount();
-            } else {
-                console.error("Error loading Markdown content:", response.statusText);
-            }
+            // Call WASM module to set active demo
+            setActiveDemoFunction(demoIndex);
+            resetFrameCount();
+          } else {
+            console.error(
+              "Error loading Markdown content:",
+              response.statusText
+            );
+          }
         } catch (error) {
-            console.error("Failed to fetch Markdown content:", error);
+          console.error("Failed to fetch Markdown content:", error);
         }
-    }
+      }
 
-    function getDocUrl(demoIndex) {
-        return `docs/content${demoIndex.toString().padStart(3,'0')}.md`;
-    }
+      function getDocUrl(demoIndex) {
+        return `docs/content${demoIndex.toString().padStart(3, "0")}.md`;
+      }
 
-    /**
-     * Handles demo selection changes from the dropdown.
-     * Sets the active demo in the WASM module and loads corresponding Markdown content.
-     */
-    demoSelector.onchange = async function () {
+      /**
+       * Handles demo selection changes from the dropdown.
+       * Sets the active demo in the WASM module and loads corresponding Markdown content.
+       */
+      demoSelector.onchange = async function () {
         const selectedValue = this.value;
         const fileToLoad = getDocUrl(selectedValue);
         await loadMarkdownContent(fileToLoad, parseInt(selectedValue));
-    };
+      };
 
-    /**
-     * Resets the frame count to 0 and resumes the animation if paused.
-     */
-    function resetFrameCount() {
+      /**
+       * Resets the frame count to 0 and resumes the animation if paused.
+       */
+      function resetFrameCount() {
         frame_count = 0;
-        if(isPaused){
-            togglePauseState();
+        if (isPaused) {
+          togglePauseState();
         }
-    }
+      }
 
-    /**
-     * Restarts the current demo and resets the frame count.
-     */
-    restartButton.onclick = () => {
+      /**
+       * Restarts the current demo and resets the frame count.
+       */
+      restartButton.onclick = () => {
         console.log("Restarting...");
         resetFrameCount();
-    };
+      };
 
-    /**
-     * Toggles between pause and resume states for the animation.
-     */
-    pauseButton.onclick = () => {
+      /**
+       * Toggles between pause and resume states for the animation.
+       */
+      pauseButton.onclick = () => {
         togglePauseState();
-    };
+      };
 
-    /**
-     * Toggles the pause state of the animation and updates button text.
-     */
-    function togglePauseState() {
+      /**
+       * Toggles the pause state of the animation and updates button text.
+       */
+      function togglePauseState() {
         isPaused = !isPaused;
         pauseButton.innerText = isPaused ? "▶️ Resume" : "⏸️ Pause";
         if (!isPaused) {
-            requestAnimationFrame(renderFunction);
+          requestAnimationFrame(renderFunction);
         }
-    }
+      }
 
-    // Import and initialize WebAssembly module functions
-    import init, { init_state, update_frame, set_active_demo } from "./graph1_web_demo.js";
-    const canvas = document.getElementById("myCanvas");
-    const ctx = canvas.getContext("2d");
+      // Import and initialize WebAssembly module functions
+      import init, {
+        init_state,
+        update_frame,
+        set_active_demo,
+      } from "./graph1_web_demo.js";
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
 
-    async function run() {
+      async function run() {
         const wasmModule = await init();
         const initResult = init_state(0);
-        const { pointer: bufPointer, buf_size: bufSize, width, height } = initResult;
+        const {
+          pointer: bufPointer,
+          buf_size: bufSize,
+          width,
+          height,
+        } = initResult;
 
         canvas.style.maxWidth = `${width}px`;
         canvas.style.maxHeight = `${height}px`;
@@ -404,17 +500,26 @@
          * Applies a CRT-style glow effect to the canvas using the average canvas color.
          */
         function applyGlowEffect(pixel_stats) {
-            const { average_red, average_green, average_blue, average_intensity } = pixel_stats;
+          const {
+            average_red,
+            average_green,
+            average_blue,
+            average_intensity,
+          } = pixel_stats;
 
-            let glowColor;
-            // Supress the glow effect if the average colors are too dark
-            if(average_red <alphaThreshold && average_green<alphaThreshold && average_blue < alphaThreshold){
-                glowColor = "rgba(0,0,0,0)";
-            } else {
-                glowColor = `rgba(${average_red}, ${average_green}, ${average_blue}, ${average_intensity})`;
-            }
+          let glowColor;
+          // Supress the glow effect if the average colors are too dark
+          if (
+            average_red < alphaThreshold &&
+            average_green < alphaThreshold &&
+            average_blue < alphaThreshold
+          ) {
+            glowColor = "rgba(0,0,0,0)";
+          } else {
+            glowColor = `rgba(${average_red}, ${average_green}, ${average_blue}, ${average_intensity})`;
+          }
 
-            canvas.style.boxShadow = `
+          canvas.style.boxShadow = `
                 0 0 20px ${glowColor},
                 0 0 40px ${glowColor},
                 inset 0 0 10px ${glowColor},
@@ -425,19 +530,22 @@
          * Main rendering function, updates the canvas content, applies glow effect, and increments frame count.
          */
         function render() {
-            if (isPaused) return;
+          if (isPaused) return;
 
-            const pixel_stats = update_frame(frame_count);
+          const pixel_stats = update_frame(frame_count);
 
+          const bufferView = new Uint8Array(
+            wasmModule.memory.buffer,
+            bufPointer,
+            bufSize
+          );
+          imageData.data.set(bufferView);
+          ctx.putImageData(imageData, 0, 0);
 
-            const bufferView = new Uint8Array(wasmModule.memory.buffer, bufPointer, bufSize);
-            imageData.data.set(bufferView);
-            ctx.putImageData(imageData, 0, 0);
+          applyGlowEffect(pixel_stats);
 
-            applyGlowEffect(pixel_stats);
-
-            frame_count++;
-            requestAnimationFrame(render);
+          frame_count++;
+          requestAnimationFrame(render);
         }
 
         renderFunction = render;
@@ -449,14 +557,12 @@
         demoSelector.value = initialDemo;
         await loadMarkdownContent(getDocUrl(initialDemo), initialDemo);
         render();
-    }
+      }
 
-    run();
-</script>
-<footer>
-    Graph1, a Rust graphic library | graph1.codument.com | All rights reserved
-</footer>
-
-
-</body>
+      run();
+    </script>
+    <footer>
+      Graph1, a Rust graphic library | graph1.codument.com | All rights reserved
+    </footer>
+  </body>
 </html>
