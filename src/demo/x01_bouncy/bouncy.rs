@@ -19,8 +19,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>){
 
         // Set the starting per-frame position increments for `x` and `y`
         // So on each frame we'll be changing `x` and `y` by `dx` and `dy` correspondingly.
-        ctx.user_data.bouncy.dx = 1;
-        ctx.user_data.bouncy.dy = 1;
+        ctx.user_data.bouncy.dx = 2;
+        ctx.user_data.bouncy.dy = 2;
     }
 
     // Read the animation values from the context
