@@ -1,14 +1,46 @@
-# Colors 
-## Desaturation
+# Colors, Desaturation
 
-If you need to desaturate (convert to grayscale) an image, a region of an image, or a single pixel , 
-`Graph1` provides two modules for that:
-- `utils::color::desaturate::intensity`
-- `utils::color::desaturate::luminance`
 
-###  Intensity vs. Luminance
+| <!-- -->    | <!-- -->                                                                                                      |
+|-------------|---------------------------------------------------------------------------------------------------------------|
+| :bulb:         | `Desaturation` in the context of Graph1 is removing of color from an image, making it effectively grayscale. |
+
+If you need to desaturate an image, a region of an image, or a single pixel, Graph1 provides two modules for that:
+- `utils::color::desaturate::intensity` -- performant but less accurate
+- `utils::color::desaturate::luminance` -- accurate but less performant
+
+##  Intensity 
+In the demo, colors of the first two columns  are **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>**.
+When desaturated using _intensity_, they are represented as the same shade of gray (see the lower grayscale region).
+### Basic intensity
+Intensity comes in two flavors, the fastest of the two is calculated with a simple formula and just integer numbers: 
+```rust
+let basic_intensity = (r + g + b) / 3.0;
+```
+### Physical intensity
+Physical intensity of a color is a little bit slower as it involves calculating the root mean square (RMS) of RGB values:
+```rust
+let physical_intensity =((r * r + g * g + b * b) / 3.0).sqrt();
+```
+If you want to use the physical intensity, set `square` parameter to `true` when calling functions in the `intensity` module:
+```rust
+let squared = true;
+rgba_region_intensity(ctx, &img_region, squared);
+```
+
+| Basic intensity | Physical intensity |
+| :--------------: | :--------------: |
+| ![basic-intensity](/docs/media/intensity-luminance/intensity-basic.png)   | ![basic-intensity](/docs/media/intensity-luminance/intensity-squared.png) |
+
+
+
+
+
+vs. Luminance
 Functions from `desaturate::intensity` module provide the most performant desaturation. It may be suitable for some purposes,
 especially where the speed is crucial. 
+
+
 
 However, the human eye perceives light differently.
 
