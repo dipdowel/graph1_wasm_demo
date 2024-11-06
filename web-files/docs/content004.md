@@ -1,97 +1,50 @@
-# Colors, Desaturation
+# Colors
+## Desaturation
 
 
-| <!-- -->    | <!-- -->                                                                                                      |
-|-------------|---------------------------------------------------------------------------------------------------------------|
-| :bulb:         | `Desaturation` in the context of Graph1 is removing of color from an image, making it effectively grayscale. |
+| <!-- -->    | <!-- -->                                                                                                         |
+|-------------|------------------------------------------------------------------------------------------------------------------|
+| :bulb:         | `Desaturation` in the context of Graph1 means removing of colors from an image, making it effectively grayscale. |
 
 If you need to desaturate an image, a region of an image, or a single pixel, Graph1 provides two modules for that:
-- `utils::color::desaturate::intensity` -- performant but less accurate
-- `utils::color::desaturate::luminance` -- accurate but less performant
+- [utils::color::desaturate::intensity](https://github.com/dipdowel/graph1/blob/rgba/src/utils/color/desaturate/intensity.rs)
+- [utils::color::desaturate::luminance](https://github.com/dipdowel/graph1/blob/rgba/src/utils/color/desaturate/luminance.rs)
 
-##  Intensity 
-In the demo, colors of the first two columns  are **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>**.
-When desaturated using _intensity_, they are represented as the same shade of gray (see the lower grayscale region).
-### Basic intensity
-Intensity comes in two flavors, the fastest of the two is calculated with a simple formula and just integer numbers: 
+The demo above shows 4 ghosts of different colors moving along colorful lanes.  
+The 3 vertical grayscale regions illustrate 3 ways of desaturation.
+<br />
+###  Intensity vs. Luminance
+|                           (1) Basic intensity                           |                             (2) Quadratic intensity                             |                                   (3) Luminance                                    
+|:-----------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|:--------------:|
+| ![basic-intensity](/docs/media/intensity-luminance/intensity-basic.png) | ![quadratic-intensity](/docs/media/intensity-luminance/intensity-quadratic.png) | ![luminance](/docs/media/intensity-luminance/luminance.png) |
+
+Colors **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>**  have a similar physical intensity, so when desaturated using _intensity_, they result in similar shades of gray. At the same time, the _luminance_ method provides two distinct shades of gray for these colors.
+<br />
+### Basic intensity 
+- See the left-most grayscale region in the animated demo above.
+The fastest desaturation, calculated with a simple formula:
 ```rust
 let basic_intensity = (r + g + b) / 3.0;
 ```
-### Physical intensity
-Physical intensity of a color is a little bit slower as it involves calculating the root mean square (RMS) of RGB values:
-```rust
-let physical_intensity =((r * r + g * g + b * b) / 3.0).sqrt();
-```
-If you want to use the physical intensity, set `square` parameter to `true` when calling functions in the `intensity` module:
-```rust
-let squared = true;
-rgba_region_intensity(ctx, &img_region, squared);
-```
-
-| Basic intensity | Physical intensity |
-| :--------------: | :--------------: |
-| ![basic-intensity](/docs/media/intensity-luminance/intensity-basic.png)   | ![basic-intensity](/docs/media/intensity-luminance/intensity-squared.png) |
-
-
-
-
-
-vs. Luminance
-Functions from `desaturate::intensity` module provide the most performant desaturation. It may be suitable for some purposes,
-especially where the speed is crucial. 
-
-
-
-However, the human eye perceives light differently.
-
-For instance, colors of the first two columns are **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>**. 
-They are very similar in terms of physical intensity. The lower grayscale region represents them as the same shade of gray. 
-
-however, it is not as accurate as the luminance method.
-
-but we might want to apply some adjustments when converting both to grayscale (desaturating), because the human eye perceives yellow as brighter!
-
-
-
-
-
-
-
-
-
-There are two approaches to desaturate an image (to convert a color pixels to grayscale):
-
 <br />
-[Luminance](https://en.wikipedia.org/wiki/Luminance) and intensity are both used in simulating lighting in computer graphics. 
-They contribute to different aspects of how light interacts with objects and how brightness is perceived by humans. 
-Both can be used for converting color images to grayscale, but they yield different results.
-<br /><br />
+### Quadratic intensity  
+- See the middle grayscale region in the animated demo above.
 
-In the demo above, we have 8 vertical color bars, they are intersected by two horizontal grayscale regions:
-- The top grayscale region was computed with `rgba_region_luminance()`
-- The bottom grayscale region was computed with `rgba_region_intensity()`
-
-<br /><br />
+A bit slower than the basic intensity, but more "physically" accurate. It involves calculating the root mean square (RMS) of RGB values:
+```rust
+let quadratic_intensity =((r * r + g * g + b * b) / 3.0).sqrt();
+```
+<br />
 ### Luminance
-In graphics, we use [luminance](https://en.wikipedia.org/wiki/Luminance) to mimic how humans perceive light in real-world scenes.
-For instance, a **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and a **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>** pixels might have the same physical intensity, 
-but we might want to apply some adjustments when converting both to grayscale (desaturating), because the human eye perceives yellow as brighter!
-In `Graph1` we calculate luminance by performing the following multiplications on the RGB channels:
-<br />
-```rust
-// Luma coefficients for RGB channels:
+- See the right-most grayscale region in the animated demo above.
+In graphics, we use [luminance](https://en.wikipedia.org/wiki/Luminance) to mimic how humans perceive light in real-world scenes, so this way of desaturating an image provides the most human-eye-friendly results. In Graph1 we calculate luminance by performing the following multiplications on the RGB channels:
 
-R * 0.2126 
-G * 0.7152
-B * 0.0722
+```rust
+// `r`, `g` and `b` are floats
+let luminance = (0.299 * r + 0.587 * g + 0.114 * b).round() as u8;
 ```
 
-Those constants are called [luma coefficients](https://en.wikipedia.org/wiki/Rec._709#Luma_coefficients). <br />
-They are described in [Rec. 709 standard](https://en.wikipedia.org/wiki/Rec._709) for HDTV.
-- - - - -
-Check [graph1::utils::color::desaturate::luminance](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/desaturate/luminance_vs_intensity.rs)
-<!-- Check [graph1::utils::color::properties::luminance](https://docs.rs/graph1/latest/graph1/utils/color/properties/fn.luminance.html) -->
-for all the available methods.
+The constants `0.299`, `0.587` and `0.114` are called [luma coefficients](https://en.wikipedia.org/wiki/Rec._709#Luma_coefficients).  They are described in [Rec. 709 standard](https://en.wikipedia.org/wiki/Rec._709) for HDTV.
 
 <br /><br />
-
+<!-- Check [graph1::utils::color::properties::luminance](https://docs.rs/graph1/latest/graph1/utils/color/properties/fn.luminance.html) -->
