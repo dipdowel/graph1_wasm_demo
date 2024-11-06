@@ -1,6 +1,6 @@
 mod utils;
 
-use crate::demo::user_data::DemoUserData;
+use crate::demo::user_data::{DemoUserData, Ghosts};
 use crate::demo::x01_bouncy::config::BOUNCY;
 use crate::demo::x01_bouncy::{bouncy, bouncy_alpha_float, bouncy_alpha_int};
 use graph1::graph1_core::alpha::AlphaConfig;
@@ -9,6 +9,7 @@ use graph1::graph1_core::context::{GraphContext, WindowContext};
 use crate::demo::screen_saver;
 use crate::utils::console_log;
 use graph1::primitives::plane::Dimensions2d;
+use graph1::primitives::point::Point;
 use graph1::utils::color;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use graph1::utils::color::palettes::RetroNeon;
@@ -125,6 +126,10 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
                 // Provides storage for arbitrary data that needs to be persisted between frames
                 user_data: Box::new(DemoUserData{
                     bouncy: BOUNCY,
+                    ghosts: Ghosts{
+                        direction: Point{ x: 0, y: 0 },
+                        current_point: Point{ x: 0, y: 0 },
+                    }
                 }),
                 win: &WIN_CTX,
                 default_color: FOREGROUND_COLOR_RGBA,
