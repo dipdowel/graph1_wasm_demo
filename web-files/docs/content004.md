@@ -2,9 +2,9 @@
 ## Desaturation
 
 
-| <!-- -->    | <!-- -->                                                                                                         |
-|-------------|------------------------------------------------------------------------------------------------------------------|
-| :bulb:         | `Desaturation` in the context of Graph1 means removing of colors from an image, making it effectively grayscale. |
+| <!-- -->    | <!-- -->                                                                                                           |
+|-------------|--------------------------------------------------------------------------------------------------------------------|
+| :bulb:         | `Desaturation` in the context of Graph1 means removing colors from <br/>an image, making it effectively grayscale. |
 
 If you need to desaturate an image, a region of an image, or a single pixel, Graph1 provides two modules for that:
 - [utils::color::desaturate::intensity](https://github.com/dipdowel/graph1/blob/rgba/src/utils/color/desaturate/intensity.rs)
