@@ -397,12 +397,8 @@
       demos.forEach(demo => {
         const option = document.createElement("option");
         option.value = demo.value;
-
-
         const numPrefix = padNumber(demo.value);
-
         option.textContent = `${numPrefix} - ${demo.label}`;
-
         demoSelector.appendChild(option);
       });
 
