@@ -332,6 +332,13 @@
           text-align: center;
       }
 
+      #bottom-page-navigation{
+        text-align: center;
+        /*border: solid 1px red;*/
+        min-width:  766px;
+        font-size: 1.0rem;
+      }
+
 
     </style>
   </head>
@@ -343,16 +350,7 @@
       <button id="pause">⏸️ Pause</button>
     </div>
 
-    <select id="demo_selector">
-      <option value="0">000 - Intro</option>
-      <option value="1">001 - Basic concepts pt.1</option>
-      <option value="2">002 - Basic concepts pt.2</option>
-      <option value="3">003 - Bouncy with Alpha (Integer)</option>
-      <option value="4">004 - Bouncy with Alpha (Integer vs. Float)</option>
-      <option value="5">005 - Colors: desaturate</option>
-      <option value="6">006 - Circles ( )</option>
-      <option value="999">999 - Test card</option>
-    </select>
+    <select id="demo_selector"></select>
 
     <div id="content"></div>
 
@@ -377,6 +375,75 @@
         emoji:true,
       });
 
+
+      function padNumber(num) {
+        return num.toString().padStart(3, "0");
+      }
+
+
+      // ========== [Navigation configuration] =========================================================================
+      const demos = [
+        { value: "0", label: "Intro" },
+        { value: "1", label: "Basic concepts pt.1" },
+        { value: "2", label: "Basic concepts pt.2" },
+        { value: "3", label: "Bouncy with Alpha (Integer)" },
+        { value: "4", label: "Bouncy with Alpha (Integer vs. Float)" },
+        { value: "5", label: "Colors: desaturate" },
+        { value: "6", label: "Circles ( )" },
+        { value: "999", label: "Test card" }
+      ];
+
+      // Populate the <select /> element
+      demos.forEach(demo => {
+        const option = document.createElement("option");
+        option.value = demo.value;
+
+
+        const numPrefix = padNumber(demo.value);
+
+        option.textContent = `${numPrefix} - ${demo.label}`;
+
+        demoSelector.appendChild(option);
+      });
+
+      function createNavigationLinks() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentDemo = parseInt(urlParams.get("demo"), 10);
+
+        // Find the current demo index in the configuration array
+        const currentIndex = demos.findIndex(demo => parseInt(demo.value) === currentDemo);
+        const navContainer = document.getElementById("bottom-page-navigation");
+        navContainer.innerHTML = "";
+
+        if (currentIndex > 0) {
+          // Create previous link if it exists
+          const prevDemo = demos[currentIndex - 1];
+          const prevLink = document.createElement("a");
+          prevLink.href = `/?demo=${prevDemo.value}`;
+          prevLink.textContent = `◄◄ ${prevDemo.label} - ${padNumber(prevDemo.value)}`;
+
+          navContainer.appendChild(prevLink);
+        }
+
+        if (currentIndex < demos.length - 1) {
+          // Create next link if it exists
+          const nextDemo = demos[currentIndex + 1];
+          const nextLink = document.createElement("a");
+          nextLink.href = `/?demo=${nextDemo.value}`;
+          nextLink.textContent = `${padNumber(nextDemo.value)} - ${nextDemo.label} ►►`;
+
+          // Add a separator if there's also a previous link
+          if (navContainer.children.length > 0) {
+            navContainer.appendChild(document.createTextNode(" | "));
+          }
+
+          navContainer.appendChild(nextLink);
+        }
+      }
+
+
+
+      //================================================================================================================
 
 
       /**
@@ -403,6 +470,10 @@
             // Call WASM module to set active demo
             setActiveDemoFunction(demoIndex);
             resetFrameCount();
+
+            // Generate the navigation links
+            createNavigationLinks();
+
           } else {
             console.error(
               "Error loading Markdown content:",
@@ -415,7 +486,7 @@
       }
 
       function getDocUrl(demoIndex) {
-        return `docs/content${demoIndex.toString().padStart(3, "0")}.md`;
+        return `docs/content${padNumber(demoIndex)}.md`;
       }
 
       /**
@@ -559,6 +630,8 @@
       run();
     </script>
     <footer>
+      <div id="bottom-page-navigation"></div>
+      <hr />
       Graph1, a Rust graphic library | graph1.codument.com | All rights reserved
     </footer>
   </body>
