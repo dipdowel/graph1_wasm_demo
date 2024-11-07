@@ -1,11 +1,12 @@
 mod utils;
+mod drafts;
 
 use crate::demo::user_data::{DemoUserData, Ghosts};
 use crate::demo::x01_bouncy::config::BOUNCY;
 use crate::demo::x01_bouncy::{bouncy, bouncy_alpha_float, bouncy_alpha_int};
-use graph1::graph1_core::alpha::AlphaConfig;
-use graph1::graph1_core::context::{GraphContext, WindowContext};
-
+use graph1::core::alpha::AlphaConfig;
+use graph1::core::context::{GraphContext, WindowContext};
+use graph1::core::default_colors;
 use crate::demo::screen_saver;
 use crate::utils::console_log;
 use graph1::primitives::plane::Dimensions2d;
@@ -76,8 +77,8 @@ const WIN_CTX: WindowContext = WindowContext {
     h_usize: WIN_HEIGHT as usize,
     w_i32: WIN_WIDTH as i32,
     h_i32: WIN_HEIGHT as i32,
-    size: BUF_SIZE,
     background_color: BACKGROUND_COLOR_RGBA,
+    foreground_color: FOREGROUND_COLOR_RGBA,
     dimensions: Dimensions2d {
         w: WIN_WIDTH,
         h: WIN_HEIGHT,
@@ -179,7 +180,6 @@ pub fn update_frame(frame: usize) -> PixelStats {
         if let Some(mut ctx) = CONTEXT_CONTAINER.as_mut() {
             ctx.frame_count = frame;
 
-
             match ACTIVE_DEMO_ID {
                 0 => bouncy::render_frame(&mut ctx),
                 1 => bouncy::render_frame(&mut ctx),
@@ -225,3 +225,4 @@ pub fn update_frame(frame: usize) -> PixelStats {
         average_intensity: 0,
     }
 }
+

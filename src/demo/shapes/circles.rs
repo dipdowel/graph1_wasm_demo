@@ -1,7 +1,7 @@
 use graph1::draw;
 use graph1::draw::tools::fill;
 use crate::demo::user_data::DemoUserData;
-use graph1::graph1_core::context::GraphContext;
+use graph1::core::context::GraphContext;
 use graph1::primitives::Pixel;
 use graph1::primitives::plane::RectArea;
 

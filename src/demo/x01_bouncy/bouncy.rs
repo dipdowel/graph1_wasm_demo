@@ -1,9 +1,9 @@
-use crate::demo::user_data::{Bouncy, DemoUserData};
-use crate::utils::clear_screen;
 use graph1::draw;
-use graph1::graph1_core::context::GraphContext;
+use graph1::core::context::GraphContext;
 use graph1::primitives::plane::RectArea;
+use graph1::utils::clear_screen;
 
+use crate::demo::user_data::{Bouncy, DemoUserData};
 /// Side of Bouncy, in pixels
 const SQUARE_SIDE_PX:i32 = 16;
 
