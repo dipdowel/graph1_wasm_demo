@@ -1,4 +1,4 @@
-# Basic concepts
+# Basic concepts pt.1
 ## The contexts
 Struct `GraphContext` is the heart of Graph1. It contains all the core properties that allow to draw on the screen, keep track of the animation, etc. <br />
 `GraphContext`  references some 'sub-contexts', such as:
