@@ -19,14 +19,14 @@ The 3 vertical grayscale regions illustrate 3 ways of desaturation.
 | ![basic-intensity](/docs/media/intensity-luminance/intensity-basic.png) | ![quadratic-intensity](/docs/media/intensity-luminance/intensity-quadratic.png) | ![luminance](/docs/media/intensity-luminance/luminance.png) |
 
 Colors **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>**  have a similar physical intensity, so when desaturated using _intensity_, they result in similar shades of gray. At the same time, the _luminance_ method provides two distinct shades of gray for these colors.
-<br />
+
 ### Basic intensity 
 - See the left-most grayscale region in the animated demo above.
 The fastest desaturation, calculated with a simple formula:
 ```rust
 let basic_intensity = (r + g + b) / 3.0;
 ```
-<br />
+
 ### Quadratic intensity  
 - See the middle grayscale region in the animated demo above.
 
@@ -34,7 +34,7 @@ A bit slower than the basic intensity, but more "physically" accurate. It involv
 ```rust
 let quadratic_intensity =((r * r + g * g + b * b) / 3.0).sqrt();
 ```
-<br />
+
 ### Luminance
 - See the right-most grayscale region in the animated demo above.
 In graphics, we use [luminance](https://en.wikipedia.org/wiki/Luminance) to mimic how humans perceive light in real-world scenes, so this way of desaturating an image provides the most human-eye-friendly results. In Graph1 we calculate luminance by performing the following multiplications on the RGB channels:
