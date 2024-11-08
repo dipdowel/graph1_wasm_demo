@@ -1,21 +1,17 @@
 mod utils;
 mod drafts;
 
+use crate::demo::desaturate::luminance_vs_intensity;
+use crate::demo::shapes::circles;
+use crate::demo::user_data::DemoUserData;
 use crate::demo::x01_bouncy::{bouncy, bouncy_alpha_float, bouncy_alpha_int};
-use graph1::core::alpha::AlphaConfig;
-use graph1::core::context::{GraphContext, WindowContext};
-use graph1::core::default_colors;
-use crate::demo::screen_saver;
 use crate::utils::console_log;
+use graph1::core::context::{GraphContext, WindowContext};
 use graph1::primitives::plane::Dimensions2d;
-use graph1::primitives::point::Point;
 use graph1::utils::color;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use graph1::utils::color::palettes::RetroNeon;
 use wasm_bindgen::prelude::*;
-use crate::demo::desaturate::luminance_vs_intensity;
-use crate::demo::shapes::circles;
-use crate::demo::user_data::DemoUserData;
 
 /// A collection of demo modules
 pub mod demo {
