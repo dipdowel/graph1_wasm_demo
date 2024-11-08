@@ -1,5 +1,62 @@
-# Basic concepts pt.2
+# Basic concepts, pt.2
 ## Graph Context
+
+The `GraphContext` struct is essential for all drawing operations. 
+Let's look at the minimal setup to get a working `GraphContext` instance.
+
+
+ 
+```rust
+use graph1::core::context::{GraphContext, WindowContext};
+use graph1::primitives::plane::RectArea;
+use graph1::utils::color::palettes::RetroNeon;
+use graph1::draw;
+
+const WIN_WIDTH: u32 = 640;
+const WIN_HEIGHT: u32 = 480;
+
+// Each RGBA-pixel needs 4 bytes, 
+// hence `4 * width * height` bytes for the whole buffer 
+const BUF_SIZE: usize = 4 * (WIN_WIDTH * WIN_HEIGHT) as usize;
+
+fn main() {
+  // The window context
+  let win_ctx = WindowContext::new(
+    WIN_WIDTH,
+    WIN_HEIGHT,
+    Some(RetroNeon::CYBER_BLUE),
+    Some(RetroNeon::LASER_LIME),
+  );
+
+  // The frame buffer is a memory region that gets rendered onto the screen
+  let mut frame_buf: [u32; BUF_SIZE] = [win_ctx.background_color; BUF_SIZE];
+
+  // Graph context
+  let mut ctx = GraphContext::new(&win_ctx, &mut frame_buf, true, None);
+
+  // Draw a rectangle of size 40x20 at the top-left corner of the window
+  draw::rectangle::filled(&mut ctx, &RectArea::new(0, 0, 40, 20, None));
+}
+
+```
+# BIG QUESTION!!!!!
+### How to have a dynamic frame buffer (e.g. if we resuze the window)?
+
+<br />
+<br />
+<br />
+<br />
+<br />
+
+#### NB: Why window context and not canvas or stage or something like that?
+Because Graph1 was created with a focus on native applications, where the window is the main drawing area. 
+ 
+
+It represents a 2D drawing area where you can draw shapes, images, and text. The `Canvas` is a pixel buffer that you can draw on using various methods. 
+`Canvas` struct. It represents a 2D drawing area where you can draw shapes, images, and text. The `Canvas` is a pixel buffer that you can draw on using various methods.
+
+
+
 Struct `GraphContext` is the heart of Graph1. It contains all the core properties that allow to draw on the screen, keep track of the animation, etc. <br />
 `GraphContext`  references some 'sub-contexts', such as:
 - `WindowContext` -- all the window-related properties
