@@ -1,6 +1,7 @@
+use graph1::core::context::alpha::AlphaMethod;
 use crate::demo::user_data::DemoUserData;
 use graph1::draw::rectangle;
-use graph1::core::alpha::AlphaMethod;
+
 use graph1::core::context::GraphContext;
 use graph1::primitives::plane::RectArea;
 use graph1::utils::color::palettes;
