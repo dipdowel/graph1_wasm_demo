@@ -1,8 +1,6 @@
 mod utils;
 mod drafts;
 
-use crate::demo::user_data::{DemoUserData, Ghosts};
-use crate::demo::x01_bouncy::config::BOUNCY;
 use crate::demo::x01_bouncy::{bouncy, bouncy_alpha_float, bouncy_alpha_int};
 use graph1::core::alpha::AlphaConfig;
 use graph1::core::context::{GraphContext, WindowContext};
@@ -17,6 +15,7 @@ use graph1::utils::color::palettes::RetroNeon;
 use wasm_bindgen::prelude::*;
 use crate::demo::desaturate::luminance_vs_intensity;
 use crate::demo::shapes::circles;
+use crate::demo::user_data::DemoUserData;
 
 /// A collection of demo modules
 pub mod demo {
@@ -30,7 +29,6 @@ pub mod demo {
         pub mod bouncy_alpha_int;
         /// Demo of slower but more accurate Float alpha blending
         pub mod bouncy_alpha_float;
-        pub mod config;
     }
     pub mod desaturate {
         pub mod luminance_vs_intensity;
@@ -120,24 +118,19 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
         if CONTEXT_CONTAINER.is_none() {
             // Create the application context,
             // which will be used to pass around the data essential for using `Graph1`
-            let ctx: GraphContext<DemoUserData> = GraphContext {
-                frame_buf: &mut FRAME_BUF,
-                draft_buf: Some(&mut DRAFT_BUF),
 
-                // Provides storage for arbitrary data that needs to be persisted between frames
-                user_data: Box::new(DemoUserData{
-                    bouncy: BOUNCY,
-                    ghosts: Ghosts{
-                        direction: Point{ x: 0, y: 0 },
-                        current_point: Point{ x: 0, y: 0 },
-                    }
-                }),
-                win: &WIN_CTX,
-                default_color: FOREGROUND_COLOR_RGBA,
-                bezier: None,
-                frame_count: frame,
-                alpha: AlphaConfig::default(),
-            };
+            // Create a context with the basic configuration
+            let mut ctx: GraphContext<DemoUserData> = GraphContext::new(
+                &WIN_CTX,
+                &mut FRAME_BUF,
+                true,
+                None,
+            );
+
+            // Apply additional context configuration
+            //----------------------------------------
+            ctx.draft_buf = Some(&mut DRAFT_BUF); // A draft buffer for intermediate graphics operations
+
 
             // Place the context into the global container
             // so that it persists between frames

@@ -1,8 +1,10 @@
-use crate::demo::user_data::{Bouncy, DemoUserData};
+
 use graph1::draw::rectangle;
 use graph1::core::context::GraphContext;
 use graph1::primitives::plane::RectArea;
 use graph1::utils::color::palettes;
+use crate::demo::user_data::DemoUserData;
+use crate::demo::x01_bouncy::bouncy::BouncyUserData;
 
 /// Side of Bouncy, in pixels
 const SQUARE_SIDE_PX: i32 = 96;
@@ -58,7 +60,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     }
 
     // Read the animation values from the context
-    let Bouncy {
+    let BouncyUserData {
         mut x,
         mut y,
         mut dx,

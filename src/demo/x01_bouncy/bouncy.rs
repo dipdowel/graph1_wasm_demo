@@ -3,7 +3,24 @@ use graph1::core::context::GraphContext;
 use graph1::primitives::plane::RectArea;
 use graph1::utils::clear_screen;
 
-use crate::demo::user_data::{Bouncy, DemoUserData};
+use crate::demo::user_data::{ DemoUserData};
+
+//---------------------------------------------------------------------
+// Configure the user data for Bouncy demo
+pub struct BouncyUserData {
+    pub x: i32,
+    pub y: i32,
+    pub dx: i32,
+    pub dy: i32,
+}
+pub const BOUNCY_USER_DATA: BouncyUserData = BouncyUserData {
+    x: 10,
+    y: 10,
+    dx: 1,
+    dy: 1,
+};
+//---------------------------------------------------------------------
+
 /// Side of Bouncy, in pixels
 const SQUARE_SIDE_PX:i32 = 16;
 
@@ -24,7 +41,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>){
     }
 
     // Read the animation values from the context
-    let Bouncy { mut x, mut y, mut dx, mut dy } = ctx.user_data.bouncy;
+    let BouncyUserData { mut x, mut y, mut dx, mut dy } = ctx.user_data.bouncy;
 
     // Don't let Bouncy go off-screen horizontally
     if x+dx > (ctx.win.w_i32 - SQUARE_SIDE_PX) || x + dx < 0{

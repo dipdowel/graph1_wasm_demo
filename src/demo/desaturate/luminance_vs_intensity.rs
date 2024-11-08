@@ -3,10 +3,24 @@ use graph1::draw;
 use graph1::draw::rectangle;
 use graph1::core::context::GraphContext;
 use graph1::primitives::plane::RectArea;
+use graph1::primitives::point::Point;
 use graph1::utils::color::desaturate::intensity::rgba_region_intensity;
 use graph1::utils::color::desaturate::luminance::rgba_region_luminance;
 
 use graph1::utils::color::palettes::{RetroNeon, SunsetGlow};
+
+//---------------------------------------------------------------------
+// Configure the user data for the Ghosts for luminance_vs_intensity demo
+pub struct GhostsUserData {
+    pub direction: Point<i32>,
+    pub current_point: Point<i32>,
+}
+
+pub const GHOSTS_USER_DATA: GhostsUserData = GhostsUserData {
+    direction: Point { x: 0, y: 0 },
+    current_point: Point { x: 0, y: 0 },
+};
+//---------------------------------------------------------------------
 
 /// Number of columns in the background
 const NUM_COLUMNS: u32 = 8;
