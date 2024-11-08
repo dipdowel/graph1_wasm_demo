@@ -332,7 +332,11 @@
           text-align: center;
       }
 
-      #bottom-page-navigation{
+      #top-page-navigation {
+        margin-top: 20px;
+      }
+
+      #top-page-navigation, #bottom-page-navigation{
         text-align: center;
         /*border: solid 1px red;*/
         min-width:  766px;
@@ -351,7 +355,7 @@
     </div>
 
     <select id="demo_selector"></select>
-
+    <div id="top-page-navigation"></div>
     <div id="content"></div>
 
     <script type="module">
@@ -408,8 +412,8 @@
 
         // Find the current demo index in the configuration array
         const currentIndex = demos.findIndex(demo => parseInt(demo.value) === currentDemo);
-        const navContainer = document.getElementById("bottom-page-navigation");
-        navContainer.innerHTML = "";
+        const navContainerBottom = document.getElementById("bottom-page-navigation");
+        navContainerBottom.innerHTML = "";
 
         if (currentIndex > 0) {
           // Create previous link if it exists
@@ -418,7 +422,7 @@
           prevLink.href = `/?demo=${prevDemo.value}`;
           prevLink.textContent = `◄◄ ${prevDemo.label} - ${padNumber(prevDemo.value)}`;
 
-          navContainer.appendChild(prevLink);
+          navContainerBottom.appendChild(prevLink);
         }
 
         if (currentIndex < demos.length - 1) {
@@ -429,12 +433,17 @@
           nextLink.textContent = `${padNumber(nextDemo.value)} - ${nextDemo.label} ►►`;
 
           // Add a separator if there's also a previous link
-          if (navContainer.children.length > 0) {
-            navContainer.appendChild(document.createTextNode(" | "));
+          if (navContainerBottom.children.length > 0) {
+            navContainerBottom.appendChild(document.createTextNode(` | ${padNumber(currentIndex)} | `));
           }
 
-          navContainer.appendChild(nextLink);
+          navContainerBottom.appendChild(nextLink);
         }
+
+        const navContainerTop = document.getElementById("top-page-navigation");
+
+
+        navContainerTop.innerHTML = navContainerBottom.innerHTML;
       }
 
 
