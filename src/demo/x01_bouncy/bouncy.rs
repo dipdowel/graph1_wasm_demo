@@ -63,6 +63,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>){
     ctx.user_data.bouncy.dx = dx;
     ctx.user_data.bouncy.dy = dy;
 
+    // Clearing the screen on every frame is expensive,
+    // and it might now perform well with a large size of the window on all platforms.
+    // However, for the sake of this demo, we'll clear the screen on every frame.
     clear_screen(ctx);
 
     let x = x as u32;
