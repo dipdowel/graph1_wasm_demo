@@ -1,10 +1,9 @@
 mod drafts;
 mod utils;
 
-use crate::demo::desaturate::luminance_vs_intensity;
-use crate::demo::shapes::circles;
+
 use crate::demo::user_data::DemoUserData;
-use crate::demo::x01_bouncy::{bouncy, bouncy_alpha_float, bouncy_alpha_int};
+
 use crate::utils::console_log;
 use graph1::core::context::{GraphContext, WindowContext};
 
@@ -12,29 +11,39 @@ use graph1::utils::color;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use graph1::utils::color::palettes::RetroNeon;
 use wasm_bindgen::prelude::*;
+use crate::demo::{d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_003_bouncy, test_card};
 
 /// A collection of demo modules
 pub mod demo {
+    pub mod d_000_intro;
+    pub mod d_001_basic_concepts_pt1;
+    pub mod d_002_basic_concepts_pt2;
+    /// Bouncy demo. Helps to understand the basics of rendering and animation.
+    pub mod d_003_bouncy;
+    pub mod d_888_luminance_vs_intensity;
+
+    pub mod test_card;
+
     /// User data, used to store arbitrary data that needs to be persisted between frames
     pub mod user_data;
-    /// Bouncy demo. Helps to understand the basics of rendering and animation.
-    pub mod x01_bouncy {
-        /// A minimal example of displaying and animating a square on the screen
-        pub mod bouncy;
-        /// Demo of slower but more accurate Float alpha blending
-        pub mod bouncy_alpha_float;
-        /// Demo of fast but less accurate Integer alpha blending
-        pub mod bouncy_alpha_int;
-    }
-    pub mod desaturate {
-        pub mod luminance_vs_intensity;
-    }
 
-    pub mod shapes {
-        pub mod circles;
-    }
-
-    pub mod screen_saver;
+    // pub mod x01_bouncy {
+    //     /// A minimal example of displaying and animating a square on the screen
+    //     pub mod bouncy;
+    //     /// Demo of slower but more accurate Float alpha blending
+    //     pub mod bouncy_alpha_float;
+    //     /// Demo of fast but less accurate Integer alpha blending
+    //     pub mod bouncy_alpha_int;
+    // }
+    // pub mod desaturate {
+    //     pub mod luminance_vs_intensity;
+    // }
+    //
+    // pub mod shapes {
+    //     pub mod circles;
+    // }
+    //
+    // pub mod screen_saver;
 }
 
 /// Width of the window, in pixels
@@ -136,14 +145,15 @@ pub fn update_frame(frame: usize) -> PixelStats {
             ctx.frame_count = frame;
 
             match ACTIVE_DEMO_ID {
-                0 => bouncy::render_frame(&mut ctx),
-                1 => bouncy::render_frame(&mut ctx),
-                2 => bouncy_alpha_int::render_frame(&mut ctx),
-                3 => bouncy_alpha_float::render_frame(&mut ctx),
-                4 => luminance_vs_intensity::render_frame(&mut ctx),
-                5 => circles::render_frame(&mut ctx),
-                // FIXME: rename `screen_saver` to `test_card`
-                _ => bouncy::render_frame(&mut ctx),
+                0 => d_000_intro::render_frame(&mut ctx),
+                1 => d_001_basic_concepts_pt1::render_frame(&mut ctx),
+                2 => d_002_basic_concepts_pt2::render_frame(&mut ctx),
+                3 => d_003_bouncy::render_frame(&mut ctx),
+                // 4 => luminance_vs_intensity::render_frame(&mut ctx),
+                // 5 => circles::render_frame(&mut ctx),
+
+
+                _ => test_card::render_frame(&mut ctx),
             }
 
             // console_log(&format!("CANVAS_BUF_ABGR size: {:?}", CANVAS_BUF_ABGR.len()));

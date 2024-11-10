@@ -1,5 +1,5 @@
-use crate::demo::desaturate::luminance_vs_intensity::{GhostsUserData, GHOSTS_USER_DATA};
-use crate::demo::x01_bouncy::bouncy::{BouncyUserData, BOUNCY_USER_DATA};
+use crate::demo::d_003_bouncy::{BouncyUserData, BOUNCY_USER_DATA};
+use crate::demo::d_888_luminance_vs_intensity::{GhostsUserData, GHOSTS_USER_DATA};
 
 // Shape the user-defined data, accessible via `ctx.user_data`
 // `ctx.user_data` can be used to store arbitrary data that needs to live as long as the context itself.

@@ -1,6 +1,6 @@
-# Graph1
+# Animation + User Data
 
-## is a library for creating and manipulating graphs
+## The Bouncy
 ### in Rust!
 
 
