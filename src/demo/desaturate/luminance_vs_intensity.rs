@@ -1,7 +1,7 @@
 use crate::demo::user_data::DemoUserData;
+use graph1::core::context::GraphContext;
 use graph1::draw;
 use graph1::draw::rectangle;
-use graph1::core::context::GraphContext;
 use graph1::primitives::plane::RectArea;
 use graph1::primitives::point::Point;
 use graph1::utils::color::desaturate::intensity::rgba_region_intensity;
@@ -23,16 +23,16 @@ pub const GHOSTS_USER_DATA: GhostsUserData = GhostsUserData {
 //---------------------------------------------------------------------
 
 /// Number of columns in the background
-const NUM_COLUMNS: u32 = 8;
+const NUM_LANES: u32 = 4;
 
 fn render_lanes(ctx: &mut GraphContext<DemoUserData>) {
     // make the horizontal lanes where the ghosts will move
     let lane_width = ctx.win.w;
-    let lane_height = ctx.win.h / 4;
+    let lane_height = ctx.win.h / NUM_LANES;
 
     // Choose a color for each lane
-    for i in 0..NUM_COLUMNS {
-        let color = match i % NUM_COLUMNS {
+    for i in 0..NUM_LANES {
+        let color = match i % NUM_LANES {
             0 => SunsetGlow::NIGHTFALL_BLUE,
             1 => SunsetGlow::SOFT_ORANGE,
             2 => SunsetGlow::DUSTY_LAVENDER,
@@ -48,7 +48,9 @@ fn render_lanes(ctx: &mut GraphContext<DemoUserData>) {
     }
 }
 
-const SIDE: u32 = 8; // Pixel size for each square unit
+const GHOST_BLOCK_SIZE: u32 = 8; // Pixel size for each block that ghosts are made of
+const GHOST_HEIGHT: u32 = GHOST_BLOCK_SIZE * 6; // Height of the ghost, in pixels
+
 
 /// Draws a ghost character from Pac-Man using pixel blocks.
 ///
@@ -112,9 +114,9 @@ fn draw_ghost(
         rectangle::filled(
             ctx,
             &RectArea::square(
-                offset_x + dx * SIDE,
-                offset_y + dy * SIDE,
-                SIDE,
+                offset_x + dx * GHOST_BLOCK_SIZE,
+                offset_y + dy * GHOST_BLOCK_SIZE,
+                GHOST_BLOCK_SIZE,
                 Some(body_color),
             ),
         );
@@ -130,9 +132,9 @@ fn draw_ghost(
         rectangle::filled(
             ctx,
             &RectArea::square(
-                offset_x - 2 + dx * SIDE,
-                offset_y + dy * SIDE,
-                SIDE,
+                offset_x - 2 + dx * GHOST_BLOCK_SIZE,
+                offset_y + dy * GHOST_BLOCK_SIZE,
+                GHOST_BLOCK_SIZE,
                 Some(eye_white),
             ),
         );
@@ -151,9 +153,9 @@ fn draw_ghost(
         rectangle::filled(
             ctx,
             &RectArea::square(
-                ((offset_x + dx * SIDE) as i32 + pupil_dx) as u32,
-                offset_y + dy * SIDE + 2,
-                SIDE / 2,
+                ((offset_x + dx * GHOST_BLOCK_SIZE) as i32 + pupil_dx) as u32,
+                offset_y + dy * GHOST_BLOCK_SIZE + 2,
+                GHOST_BLOCK_SIZE / 2,
                 Some(eyes_color),
             ),
         );
@@ -162,7 +164,6 @@ fn draw_ghost(
 
 /// Illustrates how color Intensity and color Luminance are different
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-
     let mut current_frame = ctx.frame_count as i32;
 
     // initialize the data maintained between frames
@@ -176,8 +177,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // Clear the screen
     draw::tools::fill::buffer(&mut ctx.frame_buf, 0xff_00_ff_ff);
-
-
 
     // Change direction when the ghost approaches the edge of the screen
     if current_frame % (ctx.win.w_i32 - 66) == 0 {
@@ -193,17 +192,20 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // Render the background lanes
     render_lanes(ctx);
 
-    let y = ctx.win.h / 4;
+    let y = ctx.win.h / NUM_LANES;
 
     let current_frame = current_frame as u32;
 
     // draw 4 ghosts with a horizontal offset to animate them
 
+    let lane_height = ctx.win.h / NUM_LANES;
+    let y_offset = lane_height / 2 - GHOST_HEIGHT / 2;
+
     draw_ghost(
         ctx,
         current_frame,
         pos_x - 6,
-        0 * y + 6,
+        0 * y + y_offset,
         RetroNeon::NEON_PINK,
         0x000000ff,
         dx,
@@ -212,7 +214,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx,
         current_frame,
         pos_x - 12,
-        1 * y + 6,
+        1 * y + y_offset,
         RetroNeon::CYBER_BLUE,
         0x000000ff,
         dx,
@@ -221,7 +223,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx,
         current_frame,
         pos_x - 18,
-        2 * y + 6,
+        2 * y + y_offset,
         RetroNeon::ELECTRIC_PURPLE,
         0x000000ff,
         dx,
@@ -230,14 +232,15 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx,
         current_frame,
         pos_x - 24,
-        3 * y + 6,
+        3 * y + y_offset,
         RetroNeon::TURQUOISE_TEAL,
         0x000000ff,
         dx,
     );
 
-    // Draw the 3 vertical desaturation sections
+    // DRAW THE 3 VERTICAL DESATURATION SECTIONS
 
+    // width of each desaturated section
     let section_width = ctx.win.w / 5;
 
     // Section one, the basic intensity desaturation
