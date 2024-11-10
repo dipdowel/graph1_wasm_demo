@@ -44,7 +44,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let current_frame = ctx.frame_count as u32;
 
     if current_frame < ctx.win.w {
-        fill::buffer(ctx.frame_buf, 0x00_00_00_ff);
+        fill::buffer(&mut ctx.frame_buf, 0x00_00_00_ff);
     }
 
     let box_width = ctx.win.w / 4;

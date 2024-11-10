@@ -32,7 +32,8 @@ fn main() {
   let mut frame_buf: [u32; BUF_SIZE] = [win_ctx.background_color; BUF_SIZE];
 
   // Graph context
-  let mut ctx = GraphContext::new(&win_ctx, &mut frame_buf, true, None);
+  let mut ctx:GraphContext = GraphContext::new(&win_ctx, &mut frame_buf, true, None);
+
 
   // Draw a rectangle of size 40x20 at the top-left corner of the window
   draw::rectangle::filled(&mut ctx, &RectArea::new(0, 0, 40, 20, None));

@@ -175,7 +175,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     }
 
     // Clear the screen
-    draw::tools::fill::buffer(ctx.frame_buf, 0xff_00_ff_ff);
+    draw::tools::fill::buffer(&mut ctx.frame_buf, 0xff_00_ff_ff);
 
 
 
