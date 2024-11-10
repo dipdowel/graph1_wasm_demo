@@ -41,13 +41,15 @@ pub mod demo {
 const WIN_WIDTH: u32 = 480;
 /// Height of the window, in pixels
 const WIN_HEIGHT: u32 = 240;
+/// Framebuffer size, in pixels (u32)
+const BUF_LEN: usize = (WIN_WIDTH * WIN_HEIGHT) as usize;
 /// Framebuffer size, in bytes
-const BUF_SIZE: usize = 4 * (WIN_WIDTH * WIN_HEIGHT) as usize;
+const BUF_SIZE_BYTES: usize = BUF_LEN * 4;
 
 /// JavaScript and HTML Canvas use ABGR model, hence
 /// the result produced by Graph1 needs to be converted from RGBA to ABGR.
 /// JS renders `CANVAS_BUF_ABGR` on the HTML canvas, not `FRAME_BUF` directly.
-static mut CANVAS_BUF_ABGR: [u32; BUF_SIZE] = [0xff_ff_00_ff; BUF_SIZE];
+static mut CANVAS_BUF_ABGR: [u32; BUF_LEN] = [0xff_ff_00_ff; BUF_LEN];
 
 static mut ACTIVE_DEMO_ID: u32 = 0;
 
@@ -67,7 +69,7 @@ pub struct InitStateResult {
 /// A default instance of `InitStateResult`,
 const DEFAULT_INIT_RESULT: InitStateResult = InitStateResult {
     pointer: std::ptr::null(),
-    buf_size: BUF_SIZE,
+    buf_size: BUF_SIZE_BYTES,
     width: WIN_WIDTH,
     height: WIN_HEIGHT,
 };
@@ -83,7 +85,7 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
     let frame: usize = frame.unwrap_or(0);
     unsafe {
         if CONTEXT_CONTAINER.is_none() {
-            let window_ctx = WindowContext::new(
+            let win_ctx = WindowContext::new(
                 WIN_WIDTH,
                 WIN_HEIGHT,
                 Some(RetroNeon::CYBER_BLUE), // background color RGBA
@@ -91,10 +93,7 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
             );
 
             // Create a context with the basic configuration
-            let mut ctx: GraphContext<DemoUserData> = GraphContext::new(
-                window_ctx, // &mut FRAME_BUF,
-                true, true, None,
-            );
+            let ctx: GraphContext<DemoUserData> = GraphContext::new(win_ctx, true, true, None);
 
             // Place the context into the global container
             // so that it persists between frames
@@ -146,6 +145,9 @@ pub fn update_frame(frame: usize) -> PixelStats {
                 // FIXME: rename `screen_saver` to `test_card`
                 _ => bouncy::render_frame(&mut ctx),
             }
+
+            // console_log(&format!("CANVAS_BUF_ABGR size: {:?}", CANVAS_BUF_ABGR.len()));
+            // console_log(&format!("ctx.frame_buf size: {:?}", ctx.frame_buf.len()));
 
             // Convert the internal RGBA buffer to ABGR and write it to `CANVAS_BUF_ABGR`.
             // JS renders `CANVAS_BUF_ABGR` on the HTML canvas, not `FRAME_BUF`.
