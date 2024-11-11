@@ -13,8 +13,8 @@ use graph1::utils::color::palettes::RetroNeon;
 
 const WIN_WIDTH: u32 = 480;
 const WIN_HEIGHT: u32 = 240;
-fn main() {
-  
+
+fn main() {  
   // The window context
   let win_ctx = WindowContext::new(
     WIN_WIDTH,
@@ -53,8 +53,10 @@ fn main() {
 }
 
 ```
+We'll cover what `user_data = None` means in the [next section](http://localhost:8080/?demo=3).
+
 - - - - 
 Also, see:
 - [Alpha blending](http://localhost:8080/?demo=999) for details on `use_alpha = false`
 - [Draft buffer](http://localhost:8080/?demo=999) for details on `use_draft_buf = false`
-- [User data](http://localhost:8080/?demo=999) for details on `user_data = None`
+

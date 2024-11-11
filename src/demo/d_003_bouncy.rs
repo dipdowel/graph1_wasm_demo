@@ -34,7 +34,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.user_data.bouncy.x = 0;
         ctx.user_data.bouncy.y = 27;
 
-        // Set the starting per-frame position increments for `x` and `y`
         // So on each frame we'll be changing `x` and `y` by `dx` and `dy` correspondingly.
         ctx.user_data.bouncy.dx = 2;
         ctx.user_data.bouncy.dy = 2;
@@ -69,7 +68,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     ctx.user_data.bouncy.dy = dy;
 
     // Clearing the screen on every frame is expensive,
-    // and it might now perform well with a large size of the window on all platforms.
+    // and it might not perform well with a large size of the window on all platforms.
     // However, for the sake of this demo, we'll clear the screen on every frame.
     clear_screen(ctx);
 

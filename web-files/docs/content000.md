@@ -21,10 +21,11 @@ This website is a collection of examples, demos, and explanations that should he
 - Zero dependencies
 - No GPU used, hence can work on low-end platforms
 
-### What Graph1 is not
-- It is not a game engine, though it can be used to develop games.
-- Not A GUI library, though it can be used to create GUIs.
-- Not a 3D graphics library.
+### What Graph1 is not:
+- Not a game engine! Though it can be used to develop games.
+- Not A GUI library! However, you can use it to create simple GUIs.
+- Not a rendering library! You'll need to choose a rendering backend yourself.
+- Not a 3D graphics library, but if you don't mind software rendering and are good with 3D geometry, you can do 3D graphics.
   
 ### WebAssembly / WASM
 Graph1 is not a [WebAssembly](https://webassembly.org/)-specific library, but it can be easily used to target WebAssembly. The demos on this site serve as an example of exactly that.<br />

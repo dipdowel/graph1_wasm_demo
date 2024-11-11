@@ -1,6 +1,6 @@
 # Basic concepts, pt.1
 ## The contexts
-Struct `GraphContext` is the heart of Graph1. It provides access to all the core resources needed to draw on the screen, keep track of the animation, etc. <br />
+Struct `GraphContext` is the heart of Graph1. It provides access to all the core resources needed to draw on the screen, keep track of the animation, apply effects, etc. <br />
 `GraphContext`  references some 'sub-contexts':
 - `AlphaContext` — properties for alpha blending 
 - `BezierContext` — properties for Bézier curves
@@ -11,10 +11,10 @@ Let's skip the `BezierContext` and `AlphaContext` for now as they are not essent
 
 ## The Window Context
 
-It all begins with the `WindowContext` struct. It represents the window where all the graphics is displayed. 
+It all begins with the `WindowContext` struct. It represents the window where all the visual magic happens. 
 - `Q:` But why "window"? Why not "canvas" or "stage"? 
 - `A:` Well, Graph1 was created with native applications in mind,
-  so `WindowContext`  matches the concept of window in [minifb](https://github.com/emoon/rust_minifb) and other similar libraries well.
+  so `WindowContext`  matches the concept of window in [minifb](https://github.com/emoon/rust_minifb) and other similar libraries.
 
 
 
