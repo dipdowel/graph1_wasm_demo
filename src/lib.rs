@@ -1,17 +1,18 @@
 mod drafts;
 mod utils;
 
-
 use crate::demo::user_data::DemoUserData;
 
 use crate::utils::console_log;
 use graph1::core::context::{GraphContext, WindowContext};
 
+use crate::demo::{
+    d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_003_bouncy, test_card,
+};
 use graph1::utils::color;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use graph1::utils::color::palettes::RetroNeon;
 use wasm_bindgen::prelude::*;
-use crate::demo::{d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_003_bouncy, test_card};
 
 /// A collection of demo modules
 pub mod demo {
@@ -151,8 +152,6 @@ pub fn update_frame(frame: usize) -> PixelStats {
                 3 => d_003_bouncy::render_frame(&mut ctx),
                 // 4 => luminance_vs_intensity::render_frame(&mut ctx),
                 // 5 => circles::render_frame(&mut ctx),
-
-
                 _ => test_card::render_frame(&mut ctx),
             }
 

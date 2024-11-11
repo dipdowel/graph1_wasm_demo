@@ -1,9 +1,9 @@
-use graph1::draw;
+use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
+use graph1::draw;
 use graph1::primitives::plane::RectArea;
 use graph1::utils::clear_screen;
 use graph1::utils::color::palettes::RetroNeon;
-use crate::demo::user_data::{ DemoUserData};
 
 //---------------------------------------------------------------------
 // Configure the user data for Bouncy demo
@@ -22,12 +22,11 @@ pub const BOUNCY_USER_DATA: BouncyUserData = BouncyUserData {
 //---------------------------------------------------------------------
 
 /// Side of Bouncy, in pixels
-const SQUARE_SIDE_PX:i32 = 16;
+const SQUARE_SIDE_PX: i32 = 16;
 
 /// Render a frame with Bouncy, who is just a square bouncing on the screen
 /// Bouncy is the hero of this demo.
-pub fn render_frame(ctx: &mut GraphContext<DemoUserData>){
-
+pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // Initialize the animation variables on the zero-th frame
     if ctx.frame_count == 0 {
         ctx.win.background_color = RetroNeon::ELECTRIC_BLUE;
@@ -42,15 +41,20 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>){
     }
 
     // Read the animation values from the context
-    let BouncyUserData { mut x, mut y, mut dx, mut dy } = ctx.user_data.bouncy;
+    let BouncyUserData {
+        mut x,
+        mut y,
+        mut dx,
+        mut dy,
+    } = ctx.user_data.bouncy;
 
     // Don't let Bouncy go off-screen horizontally
-    if x+dx > (ctx.win.w_i32 - SQUARE_SIDE_PX) || x + dx < 0{
+    if x + dx > (ctx.win.w_i32 - SQUARE_SIDE_PX) || x + dx < 0 {
         dx = -dx;
     }
 
     // Don't let Bouncy go off-screen vertically
-    if y + dy > (ctx.win.h_i32 - SQUARE_SIDE_PX) || y + dy < 0{
+    if y + dy > (ctx.win.h_i32 - SQUARE_SIDE_PX) || y + dy < 0 {
         dy = -dy;
     }
 

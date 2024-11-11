@@ -13,7 +13,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
         clear_screen(ctx);
 
-
         // Draw rectangle #1
         // x = 20, y = 20, width = 60, height = 40, default window foreground color
         draw::rectangle::filled(ctx, &RectArea::new(20, 20, 60, 40, None));

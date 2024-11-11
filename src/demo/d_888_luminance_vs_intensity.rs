@@ -51,7 +51,6 @@ fn render_lanes(ctx: &mut GraphContext<DemoUserData>) {
 const GHOST_BLOCK_SIZE: u32 = 8; // Pixel size for each block that ghosts are made of
 const GHOST_HEIGHT: u32 = GHOST_BLOCK_SIZE * 6; // Height of the ghost, in pixels
 
-
 /// Draws a ghost character from Pac-Man using pixel blocks.
 ///
 /// # Arguments
