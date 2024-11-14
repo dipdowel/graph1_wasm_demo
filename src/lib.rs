@@ -3,12 +3,11 @@ mod utils;
 
 use crate::demo::user_data::DemoUserData;
 
-use crate::utils::console_log;
-use graph1::core::context::{GraphContext, WindowContext};
-
 use crate::demo::{
     d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_003_bouncy, test_card,
 };
+use crate::utils::console_log;
+use graph1::core::context::{GraphContext, WindowContext};
 use graph1::utils::color;
 use graph1::utils::color::adapters::rgba_to_abgr;
 use graph1::utils::color::palettes::RetroNeon;
@@ -157,6 +156,7 @@ pub fn update_frame(frame: usize) -> PixelStats {
 
             // console_log(&format!("CANVAS_BUF_ABGR size: {:?}", CANVAS_BUF_ABGR.len()));
             // console_log(&format!("ctx.frame_buf size: {:?}", ctx.frame_buf.len()));
+
 
             // Convert the internal RGBA buffer to ABGR and write it to `CANVAS_BUF_ABGR`.
             // JS renders `CANVAS_BUF_ABGR` on the HTML canvas, not `FRAME_BUF`.

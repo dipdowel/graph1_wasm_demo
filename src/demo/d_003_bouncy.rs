@@ -1,6 +1,7 @@
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
 use graph1::draw;
+use graph1::fx::scanline;
 use graph1::primitives::plane::RectArea;
 use graph1::utils::clear_screen;
 use graph1::utils::color::palettes::RetroNeon;
@@ -78,4 +79,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // Finally, render Bouncy on the window surface
     draw::rectangle::filled(ctx, &RectArea::square(x, y, side, None));
+
+    // apply the scanline effect
+    scanline::buffer(ctx, 2, 0x08);
 }
