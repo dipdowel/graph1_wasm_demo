@@ -60,3 +60,6 @@ Also, see:
 - [Alpha blending](http://localhost:8080/?demo=999) for details on `use_alpha = false`
 - [Draft buffer](http://localhost:8080/?demo=999) for details on `use_draft_buf = false`
 
+<br /><br />
+- - - - 
+- [Code of this demo on Github](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_002_basic_concepts_pt2.rs)
