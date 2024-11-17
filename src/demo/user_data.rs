@@ -1,5 +1,6 @@
 use crate::demo::d_003_bouncy::{BouncyUserData, BOUNCY_USER_DATA};
-use crate::demo::d_888_luminance_vs_intensity::{GhostsUserData, GHOSTS_USER_DATA};
+use crate::demo::d_004_alpha::{AlphaUserData, ALPHA_USER_DATA};
+use crate::demo::d_005_luminance_vs_intensity::{GhostsUserData, GHOSTS_USER_DATA};
 
 // Shape the user-defined data, accessible via `ctx.user_data`
 // `ctx.user_data` can be used to store arbitrary data that needs to live as long as the context itself.
@@ -7,6 +8,7 @@ use crate::demo::d_888_luminance_vs_intensity::{GhostsUserData, GHOSTS_USER_DATA
 // to be persisted between frames.
 pub struct DemoUserData {
     pub bouncy: BouncyUserData,
+    pub alpha: AlphaUserData,
     pub ghosts: GhostsUserData,
 }
 
@@ -15,6 +17,7 @@ impl Default for DemoUserData {
     fn default() -> Self {
         DemoUserData {
             bouncy: BOUNCY_USER_DATA,
+            alpha: ALPHA_USER_DATA,
             ghosts: GHOSTS_USER_DATA,
         }
     }

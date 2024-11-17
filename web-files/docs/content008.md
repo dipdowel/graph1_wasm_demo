@@ -18,16 +18,16 @@ The 3 vertical grayscale regions illustrate 3 ways of desaturation.
 |:-----------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|:--------------:|
 | ![basic-intensity](/docs/media/intensity-luminance/intensity-basic.png) | ![quadratic-intensity](/docs/media/intensity-luminance/intensity-quadratic.png) | ![luminance](/docs/media/intensity-luminance/luminance.png) |
 
-Colors **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>**  have a similar physical intensity, so when desaturated using _intensity_, they result in similar shades of gray. At the same time, the _luminance_ method provides two distinct shades of gray for these colors, which is closer to how the human eye perceives light.
+Colors **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>**  have a similar physical intensity, so when desaturated using _intensity_, they result in similar shades of gray. At the same time, the _luminance_ method provides two distinct shades of gray for these colors, which is closer to how the human eye perceives light. 
 
-### Basic intensity
+### Basic intensity 
 - See the left-most grayscale region in the animated demo above.
-  The fastest desaturation, calculated with a simple formula:
+The fastest desaturation, calculated with a simple formula:
 ```rust
 let basic_intensity = (r + g + b) / 3;
 ```
 
-### Quadratic intensity
+### Quadratic intensity  
 - See the middle grayscale region in the animated demo above.
 
 A bit slower than the basic intensity, but more "physically" accurate. It involves calculating the root mean square (RMS) of RGB values:
@@ -37,7 +37,7 @@ let quadratic_intensity =((r * r + g * g + b * b) / 3.0).sqrt();
 
 ### Luminance
 - See the right-most grayscale region in the animated demo above.
-  In graphics, we use [luminance](https://en.wikipedia.org/wiki/Luminance) to mimic how humans perceive light in real-world scenes, so this way of desaturating an image provides the most human-eye-friendly results. In Graph1 we calculate luminance by performing the following multiplications on the RGB channels:
+In graphics, we use [luminance](https://en.wikipedia.org/wiki/Luminance) to mimic how humans perceive light in real-world scenes, so this way of desaturating an image provides the most human-eye-friendly results. In Graph1 we calculate luminance by performing the following multiplications on the RGB channels:
 
 ```rust
 let luminance = (0.299 * r + 0.587 * g + 0.114 * b).round() as u8;

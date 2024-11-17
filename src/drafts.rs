@@ -1,6 +1,11 @@
 use graph1::core::context::{GraphContext, WindowContext};
 use graph1::draw;
+use graph1::draw::rectangle;
 use graph1::primitives::plane::RectArea;
+use graph1::utils::color::adapters::rgba_to_abgr;
+use graph1::utils::color::palettes;
+use graph1::utils::color::palettes::RetroNeon;
+use crate::{BUF_LEN, CANVAS_BUF_ABGR};
 
 /// Our bouncing hero!
 struct Bouncy {
@@ -71,6 +76,17 @@ pub fn render_frame(ctx: &mut GraphContext<UserData>) {
     ctx.user_data.bouncy.dx = dx;
     ctx.user_data.bouncy.dy = dy;
 
-    // Finally, render Bouncy on the window surface
-    draw::rectangle::filled(ctx, &RectArea::square(x as u32, y as u32, 20, None));
+    // take a blue color `0x00_9a_ff` and
+    // set the alpha channel to `0x70` (112 in decimal)
+    let color:u32 = 0x00_9a_ff_70;
+
+
+
+    draw::rectangle::filled(ctx, &RectArea::square(0, 0, 100, Some(color)));
+
+    let buf_len = ctx.frame_buf.len();
+    let mut canvas_buf_abgr: Vec<u32> = vec![0x00; buf_len];
+    rgba_to_abgr(&mut canvas_buf_abgr, &ctx.frame_buf, true).unwrap();
+
+
 }

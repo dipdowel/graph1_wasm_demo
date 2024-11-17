@@ -1,49 +1,63 @@
-# Colors
-## Desaturation
+# RGBA model + Alpha Context + Color Adapters
+
+## RGBA
+Graph1 supports basic [alpha blending](https://en.wikipedia.org/wiki/Alpha_compositing), which is the process of combining a foreground and background colors based on the transparency ([alpha channel](https://en.wiktionary.org/wiki/alpha_channel)) of the foreground, creating a composite color. <br /><br />
+
+Graph1 internally uses the [RGBA color model](https://en.wikipedia.org/wiki/RGBA_color_model), where each color is composed of four channels: red, green, blue, and alpha. Each channel is 8 bits in size (ranging from 0 to 255), making the complete color a 32-bit integer. In Graph1, the `u32` type is almost always used to represent colors. The alpha channel controls the transparency level, enabling blending and opacity effects. <br /><br />
+
+## Alpha Context
+Let's now look at another subcontext called `AlphaContext`. It's a part of the `GraphContext` struct and is responsible for managing the alpha blending settings. It's probably the simplest subcontext in Graph1, as it only has two properties:
+- `enabled` — a boolean value that turns alpha blending on or off.
+- `method` — an enum that defines the blending method. 
+
+### Blend methods 
+As of 2024, Graph1 supports two blending methods:
+- `AlphaMethod::Int` — uses only integers for all the calculations.
+    - This method is somewhat faster, especially on systems where floating-point operations are expensive.
+    - May introduce minor inaccuracies due to the limited precision of integer division.
+    - Used by default. 
+- `AlphaMethod::Float` — Uses `f32` floating-point arithmetic for calculations.
+    - Provides higher precision and results in somewhat more accurate blending.
+    - May be slower on some systems.
+    - Use it if `AlphaMethod::Int` doesn't provide the desired results. 
 
 
-| <!-- -->    | <!-- -->                                                                                                           |
-|-------------|--------------------------------------------------------------------------------------------------------------------|
-| :bulb:         | In the context of Graph1 `Desaturation` means removing colors from <br/>an image, making it effectively grayscale. |
 
-If you need to desaturate an image or a part thereof, Graph1 provides two modules for that:
-- [utils::color::desaturate::intensity](https://github.com/dipdowel/graph1/blob/rgba/src/utils/color/desaturate/intensity.rs)
-- [utils::color::desaturate::luminance](https://github.com/dipdowel/graph1/blob/rgba/src/utils/color/desaturate/luminance.rs)
-
-The demo above shows 4 ghosts of different colors moving along colorful lanes.  
-The 3 vertical grayscale regions illustrate 3 ways of desaturation.
-<br />
-###  Intensity vs. Luminance
-|                           (1) Basic intensity                           |                             (2) Quadratic intensity                             |                                   (3) Luminance                                    
-|:-----------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|:--------------:|
-| ![basic-intensity](/docs/media/intensity-luminance/intensity-basic.png) | ![quadratic-intensity](/docs/media/intensity-luminance/intensity-quadratic.png) | ![luminance](/docs/media/intensity-luminance/luminance.png) |
-
-Colors **<span style="color:rgb(255, 0, 153);">NEON PINK</span>** and **<span style="color:rgb(0, 154, 255);">CYBER BLUE</span>**  have a similar physical intensity, so when desaturated using _intensity_, they result in similar shades of gray. At the same time, the _luminance_ method provides two distinct shades of gray for these colors, which is closer to how the human eye perceives light. 
-
-### Basic intensity 
-- See the left-most grayscale region in the animated demo above.
-The fastest desaturation, calculated with a simple formula:
+ 
 ```rust
-let basic_intensity = (r + g + b) / 3;
+use graph1::core::context::alpha::AlphaMethod;
+
+// Enable alpha blending
+ctx.alpha.enabled = true;
+
+// Set the blending method
+ctx.alpha.method = AlphaMethod::Int;
+
+// Take an RGB-color `0xff_33_00` and
+// set the alpha channel to `0x85` (133)
+let color:u32 = 0xff_33_00_85;
+
+// Draw a filled square at x=0, y=0, side length = 100 
+// using `color`, which makes it partially transparent
+draw::rectangle::filled(ctx, &RectArea::square(0, 0, 100, Some(color)));
 ```
 
-### Quadratic intensity  
-- See the middle grayscale region in the animated demo above.
 
-A bit slower than the basic intensity, but more "physically" accurate. It involves calculating the root mean square (RMS) of RGB values:
-```rust
-let quadratic_intensity =((r * r + g * g + b * b) / 3.0).sqrt();
-```
-
-### Luminance
-- See the right-most grayscale region in the animated demo above.
-In graphics, we use [luminance](https://en.wikipedia.org/wiki/Luminance) to mimic how humans perceive light in real-world scenes, so this way of desaturating an image provides the most human-eye-friendly results. In Graph1 we calculate luminance by performing the following multiplications on the RGB channels:
+## Color adapters
+The rendering layer of your application may use a color model other than `RGBA`. For example, a rendering & window management library for native apps [minifb](https://github.com/emoon/minifb) uses `0RGBA`. Another example would be copying pixel data from WASM memory to an HTML Canvas in the browser. The `RGBA` bytes then often need to be re-arranged as `ABGR`. To simplify such conversions, Graph1 provides a set of color adapters in the `graph1::utils::color::adapters` module. <br /><br />
 
 ```rust
-let luminance = (0.299 * r + 0.587 * g + 0.114 * b).round() as u8;
+use graph1::utils::color::adapters::rgba_to_abgr;
+ 
+let buf_len = ctx.frame_buf.len();
+
+// Create a buffer for ABGR colors that will be read by the rendering layer
+let mut canvas_buf_abgr: Vec<u32> = vec![0x00; buf_len];
+
+// Convert the frame buffer from RGBA to ABGR 
+// and write the result to `canvas_buf_abgr`
+rgba_to_abgr(&mut canvas_buf_abgr, &ctx.frame_buf, true).unwrap();
 ```
 
-The constants `0.299`, `0.587` and `0.114` are called [luma coefficients](https://en.wikipedia.org/wiki/Rec._709#Luma_coefficients).  They are described in [Rec. 709 standard](https://en.wikipedia.org/wiki/Rec._709) for HDTV.
+If there is no color adapter for your specific use case, you can easily implement one yourself by using the provided adapters as a reference. You can also contribute your adapter to [Graph1 on Github](https://github.com/dipdowel/graph1/) or request it as a feature in the [discussions](https://github.com/dipdowel/graph1/discussions) or [open an issue](https://github.com/dipdowel/graph1/issues).
 
-<br /><br />
-<!-- Check [graph1::utils::color::properties::luminance](https://docs.rs/graph1/latest/graph1/utils/color/properties/fn.luminance.html) -->
