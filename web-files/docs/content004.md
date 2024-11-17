@@ -61,3 +61,6 @@ rgba_to_abgr(&mut canvas_buf_abgr, &ctx.frame_buf, true).unwrap();
 
 If there is no color adapter for your specific use case, you can easily implement one yourself by using the provided adapters as a reference. You can also contribute your adapter to [Graph1 on Github](https://github.com/dipdowel/graph1/) or request it as a feature in the [discussions](https://github.com/dipdowel/graph1/discussions) or [open an issue](https://github.com/dipdowel/graph1/issues).
 
+
+- - - - 
+- [Code of this demo on Github](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_004_alpha.rs)

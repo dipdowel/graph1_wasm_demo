@@ -44,6 +44,10 @@ let luminance = (0.299 * r + 0.587 * g + 0.114 * b).round() as u8;
 ```
 
 The constants `0.299`, `0.587` and `0.114` are called [luma coefficients](https://en.wikipedia.org/wiki/Rec._709#Luma_coefficients).  They are described in [Rec. 709 standard](https://en.wikipedia.org/wiki/Rec._709) for HDTV.
-
 <br /><br />
+- - - - 
+- [Code of this demo on Github](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_005_luminance_vs_intensity.rs)
+
+
+
 <!-- Check [graph1::utils::color::properties::luminance](https://docs.rs/graph1/latest/graph1/utils/color/properties/fn.luminance.html) -->

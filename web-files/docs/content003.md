@@ -1,5 +1,4 @@
 # User Data + Animation
-
 ## Bouncy
 Whenever I start working with a new system capable of animation, I always like to build a demo that I call Bouncy. It's a square that bounces around the screen, just like the one in an episode of [The Office (American TV series)](https://en.wikipedia.org/wiki/The_Office_(American_TV_series)), where everyone was waiting for the 'DVD' logo to end up in a corner of the screen during a boring meeting. <br /><br />
 ![DVD Bouncy from The Office](/docs/media/dvd-bouncy.png)<br />
@@ -79,13 +78,13 @@ pub fn render_frame(ctx: &mut GraphContext<UserData>) {
 }
 
 ```
-<br /> If you got this far, it may be the time to grab [this whole demo project on Github](https://github.com/dipdowel/graph1_wasm_demo). It contains everything you see on this website, including the Bouncy demo. The project can be compiled for Web (WASM) and you can run it locally.
-
-### Bouncy files:
-- [Complete implementation of the Bouncy](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_003_bouncy.rs)
-- [`GraphContext` configuration and the animation loop](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/lib.rs)
  
 ### Native application
 The demos from this website can be compiled as a native application as well. I used [minifb](https://github.com/emoon/minifb) library  for window management and rendering. You may want to check out the [Graph1 minifb demo repo on Github](https://github.com/dipdowel/graph1_minifb_demo). 
 - `NB:` The `minifb` application was tested only on Linux with X11.
 
+<br /> If you got this far, it may be the time to grab [this whole project on Github](https://github.com/dipdowel/graph1_wasm_demo). It contains everything you see on this website, including the Bouncy demo. The project can be compiled for Web (WASM) and you can run it locally.
+
+- - - - 
+- [Code of this demo on Github](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_003_bouncy.rs)
+- [`GraphContext` configuration and the animation loop](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/lib.rs)
