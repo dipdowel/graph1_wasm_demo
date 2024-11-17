@@ -1,16 +1,20 @@
-# RGBA model + Alpha Context + Color Adapters
+# Colors
+## RGBA model + Alpha Context<br />+ Color Adapters
 
-## RGBA
+### RGBA
 Graph1 supports basic [alpha blending](https://en.wikipedia.org/wiki/Alpha_compositing), which is the process of combining a foreground and background colors based on the transparency ([alpha channel](https://en.wiktionary.org/wiki/alpha_channel)) of the foreground, creating a composite color. <br /><br />
 
-Graph1 internally uses the [RGBA color model](https://en.wikipedia.org/wiki/RGBA_color_model), where each color is composed of four channels: red, green, blue, and alpha. Each channel is 8 bits in size (ranging from 0 to 255), making the complete color a 32-bit integer. In Graph1, the `u32` type is almost always used to represent colors. The alpha channel controls the transparency level, enabling blending and opacity effects. <br /><br />
+Graph1 internally uses the [RGBA color model](https://en.wikipedia.org/wiki/RGBA_color_model), where each color is composed of four channels: red, green, blue, and alpha.<br /> 
+Each channel is 8 bits in size (values: 0-255), making the complete color a 32-bit integer. In Graph1, the `u32` type is almost always used to represent colors. The alpha channel controls the transparency level, enabling blending and opacity effects. <br /><br />
 
-## Alpha Context
+### Alpha Context
 Let's now look at another subcontext called `AlphaContext`. It's a part of the `GraphContext` struct and is responsible for managing the alpha blending settings. It's probably the simplest subcontext in Graph1, as it only has two properties:
 - `enabled` — a boolean value that turns alpha blending on or off.
 - `method` — an enum that defines the blending method. 
 
-### Blend methods 
+If alpha is enabled (`AlphaContext::enabled == true`), any function in Graph1 that supports alpha blending will use the alpha channel of a foreground pixel to blend it with the background. If alpha is disabled, the alpha channel is simply ignored.<br /><br />  
+
+#### Blend methods 
 As of 2024, Graph1 supports two blending methods:
 - `AlphaMethod::Int` — uses only integers for all the calculations.
     - This method is somewhat faster, especially on systems where floating-point operations are expensive.
@@ -43,7 +47,7 @@ draw::rectangle::filled(ctx, &RectArea::square(0, 0, 100, Some(color)));
 ```
 
 
-## Color adapters
+### Color adapters
 The rendering layer of your application may use a color model other than `RGBA`. For example, a rendering & window management library for native apps [minifb](https://github.com/emoon/minifb) uses `0RGBA`. Another example would be copying pixel data from WASM memory to an HTML Canvas in the browser. The `RGBA` bytes then often need to be re-arranged as `ABGR`. To simplify such conversions, Graph1 provides a set of color adapters in the `graph1::utils::color::adapters` module. <br /><br />
 
 ```rust
