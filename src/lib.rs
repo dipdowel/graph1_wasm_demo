@@ -9,11 +9,14 @@ use graph1::core::context::{GraphContext, WindowContext};
 use graph1::utils::color;
 use graph1::utils::color::adapters::{rgba_to_abgr, rgba_to_abgr_unsafe};
 use graph1::utils::color::palettes::RetroNeon;
-use wasm_bindgen::prelude::*;
-
 /// A collection of demo modules
 pub mod demo {
     pub mod d_000_intro;
+
+    pub mod common {
+        pub mod basic_concepts;
+
+    }
     pub mod d_001_basic_concepts_pt1;
     pub mod d_002_basic_concepts_pt2;
     /// Bouncy demo. Helps to understand the basics of rendering and animation.
@@ -47,6 +50,8 @@ pub mod demo {
     //
     // pub mod screen_saver;
 }
+
+use wasm_bindgen::prelude::*;
 
 /// Width of the window, in pixels
 const WIN_WIDTH: u32 = 480;
