@@ -35,21 +35,29 @@ fn main() {
   // Graph context
   let mut ctx: GraphContext =
           GraphContext::new(win_ctx, use_alpha, use_draft_buf, user_data);
-
-  // Rectangle #1:
-  // x = 20, y = 20, width = 60, height = 40,
+    
+  // rectangles have the same width  
+  let width = ctx.win.w - 40;
+    
+  // Rectangle #1: 
+  //  x = 20, y = 20, width = 440, height = 20, 
   // `None` =  the default window foreground color
-  let rect_1 = RectArea::new(20, 20, 60, 40, None);
+  let rect_1 = RectArea::new(20, 20, width, 20, None);
 
   // Rectangle #2:
-  // x = 80, y = 60, width = 60, height = 40, vibrant cyan color
-  let rect_2 = RectArea::new(80, 60, 60, 40, Some(RetroNeon::VIBRANT_CYAN));
+  // x = 20, y = 200, width = 440, height = 20, 
+  // vibrant cyan color 
+  let color_2 = Some(RetroNeon::VIBRANT_CYAN);
+  let rect_2 = RectArea::new(20, ctx.win.h - 40, width, 20, color_2);
 
   // Draw both rectangles on the screen
   draw::rectangle::filled(&mut ctx, &rect_1);
   draw::rectangle::filled(&mut ctx, &rect_2);
 
-  // Screen rendering code is omitted for brevity
+  // The code that displays the text 
+  // and renders the screen was omitted for brevity    
+    
+  
 }
 
 ```

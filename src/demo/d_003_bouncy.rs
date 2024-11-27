@@ -31,6 +31,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // Initialize the animation variables on the zero-th frame
     if ctx.frame_count == 0 {
         ctx.win.background_color = RetroNeon::ELECTRIC_BLUE;
+        ctx.win.foreground_color = RetroNeon::LASER_LIME;
         // Set the starting `x` and `y` for Bouncy.
         ctx.user_data.bouncy.x = 0;
         ctx.user_data.bouncy.y = 27;
