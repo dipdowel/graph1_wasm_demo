@@ -43,7 +43,9 @@ fn main() {
         GraphContext::new(WindowContext::default(),
                           false,
                           false,
-                          bouncy_user_data
+                          bouncy_user_data,
+                          1
+
         );
 
     // Here should be the animation loop, which calls `render_frame()`
