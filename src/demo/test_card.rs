@@ -38,7 +38,7 @@ use graph1::primitives::plane::RectArea;
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // Initialize the animation variables on the zero-th frame
     // if ctx.frame_count == 0 {
-    fill::buffer(&mut ctx.frame_buf, 0x00_00_00_ff);
+    fill::buffer(&mut ctx.frame_buf, 0x00_00_00_ff, ctx.num_threads);
     graph1::draw::rectangle::filled(
         ctx,
         &RectArea::new(
