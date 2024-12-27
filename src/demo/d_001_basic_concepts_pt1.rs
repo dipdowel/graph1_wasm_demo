@@ -54,5 +54,5 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     draw::rectangle::filled(ctx, &RectArea::new(400, 104, 12, 28, Some(color)));
 
     // apply the scanline effect
-    scanline::buffer(ctx, 1, 0x25);
+    scanline::window(ctx, 1, 0x25);
 }
