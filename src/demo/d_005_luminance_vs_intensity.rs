@@ -178,7 +178,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     draw::tools::fill::buffer(&mut ctx.frame_buf, 0xff_00_ff_ff, ctx.num_threads);
 
     // Change direction when the ghost approaches the edge of the screen
-    if current_frame % (ctx.win.w_i32 - 76) == 0 {
+    if current_frame % (ctx.win.w_i32 - 106) == 0 {
         ctx.user_data.ghosts.direction.x *= -1;
     }
 
@@ -200,10 +200,17 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let lane_height = ctx.win.h / NUM_LANES;
     let y_offset = lane_height / 2 - GHOST_HEIGHT / 2;
 
+    // NB: Number of threads is relevant for non-web environments.
+    // NB: Currently, only 1 thread is expected to be used in the browser.
+    // Temporarily set the number of threads to 1, since we draw many small rectangles.
+    // It's faster to use a single thread to avoid all the thread creation overhead in such case.
+    let num_threads = ctx.num_threads;
+    ctx.num_threads = 1;
+
     draw_ghost(
         ctx,
         current_frame,
-        pos_x - 6,
+        pos_x + 6,
         0 * y + y_offset,
         RetroNeon::NEON_PINK,
         0x000000ff,
@@ -212,7 +219,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     draw_ghost(
         ctx,
         current_frame,
-        pos_x - 12,
+        pos_x + 12,
         1 * y + y_offset,
         RetroNeon::CYBER_BLUE,
         0x000000ff,
@@ -221,7 +228,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     draw_ghost(
         ctx,
         current_frame,
-        pos_x - 18,
+        pos_x + 18,
         2 * y + y_offset,
         RetroNeon::ELECTRIC_PURPLE,
         0x000000ff,
@@ -230,12 +237,16 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     draw_ghost(
         ctx,
         current_frame,
-        pos_x - 24,
+        pos_x + 24,
         3 * y + y_offset,
         RetroNeon::TURQUOISE_TEAL,
         0x000000ff,
         dx,
     );
+
+    // Done drawing many small rectangles (the ghosts), restore the number of threads
+    ctx.num_threads = num_threads;
+
 
     // DRAW THE 3 VERTICAL DESATURATION SECTIONS
 
