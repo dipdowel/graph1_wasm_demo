@@ -1,70 +1,90 @@
-# Colors
-## RGBA model + Alpha Context<br />+ Color Adapters
+# User Data + Animation
+## Bouncy
+Whenever I start working with a new system capable of animation, I always like to build a demo that I call Bouncy. It's a square that bounces around the screen, just like the one in an episode of [The Office (American TV series)](https://en.wikipedia.org/wiki/The_Office_(American_TV_series)), where everyone was waiting for the 'DVD' logo to end up in a corner of the screen during a boring meeting. <br /><br />
+![DVD Bouncy from The Office](/docs/media/dvd-bouncy.png)<br />
 
-### RGBA
-Graph1 supports basic [alpha blending](https://en.wikipedia.org/wiki/Alpha_compositing), which is the process of combining a foreground and background colors based on the transparency ([alpha channel](https://en.wiktionary.org/wiki/alpha_channel)) of the foreground, creating a composite color. <br /><br />
-
-Graph1 internally uses the [RGBA color model](https://en.wikipedia.org/wiki/RGBA_color_model), where each color is composed of four channels: red, green, blue, and alpha.<br /> 
-Each channel is 8 bits in size (values: 0-255), making the complete color a 32-bit integer. In Graph1, the `u32` type is almost always used to represent colors. The alpha channel controls the transparency level, enabling blending and opacity effects. <br /><br />
-
-### Alpha Context
-Let's now look at another subcontext called `AlphaContext`. It's a part of the `GraphContext` struct and is responsible for managing the alpha blending settings. It's probably the simplest subcontext in Graph1, as it only has two properties:
-- `enabled` — a boolean value that turns alpha blending on or off.
-- `method` — an enum that defines the blending method. 
-
-If alpha is enabled (`AlphaContext::enabled == true`), any function in Graph1 that supports alpha blending will use the alpha channel of a foreground pixel to blend it with the background. If alpha is disabled, the alpha channel is simply ignored.<br /><br />  
-
-#### Blend methods 
-As of 2024, Graph1 supports two blending methods:
-- `AlphaMethod::Int` — uses only integers for all the calculations.
-    - This method is somewhat faster, especially on systems where floating-point operations are expensive.
-    - May introduce minor inaccuracies due to the limited precision of integer division.
-    - Used by default. 
-- `AlphaMethod::Float` — Uses `f32` floating-point arithmetic for calculations.
-    - Provides higher precision and results in somewhat more accurate blending.
-    - May be slower on some systems.
-    - Use it if `AlphaMethod::Int` doesn't provide the desired results. 
-
-
-
- 
-```rust
-use graph1::core::context::alpha::AlphaMethod;
-
-// Enable alpha blending
-ctx.alpha.enabled = true;
-
-// Set the blending method
-ctx.alpha.method = AlphaMethod::Int;
-
-// Take an RGB-color `0xff_33_00` and
-// set the alpha channel to `0x85` (133)
-let color:u32 = 0xff_33_00_85;
-
-// Draw a filled square at x=0, y=0, side length = 100 
-// using `color`, which makes it partially transparent
-draw::rectangle::filled(ctx, &RectArea::square(0, 0, 100, Some(color)));
-```
-
-
-### Color adapters
-The rendering layer of your application may use a color model other than `RGBA`. For example, a rendering & window management library for native apps [minifb](https://github.com/emoon/minifb) uses `0RGBA`. Another example would be copying pixel data from WASM memory to an HTML Canvas in the browser. The `RGBA` bytes then often need to be re-arranged as `ABGR`. To simplify such conversions, Graph1 provides a set of color adapters in the `graph1::utils::color::adapters` module. <br /><br />
+I, however, got inspired by early computer games and not by the series.
+Anyway, Bouncy is a simple animation that takes very little code to implement. Nevertheless, it requires to maintain some application state, e.g. position of the floating square on the current frame needs to be updated and passed to the next frame. That's where `GraphContext::user_data` comes in handy.  
 
 ```rust
-use graph1::utils::color::adapters::rgba_to_abgr;
- 
-let buf_len = ctx.frame_buf.len();
-
-// Create a buffer for ABGR colors that will be read by the rendering layer
-let mut canvas_buf_abgr: Vec<u32> = vec![0x00; buf_len];
-
-// Convert the frame buffer from RGBA to ABGR 
-// and write the result to `canvas_buf_abgr`
-rgba_to_abgr(&mut canvas_buf_abgr, &ctx.frame_buf, true).unwrap();
+// What the `user_data` looks like in the `GraphContext` struct
+pub struct GraphContext<UserData = Vec<i32>> {
+    // properties omitted for brevity
+    pub user_data: Box<UserData>,
+}
 ```
+`GraphContext` accepts a type parameter `UserData`, so you can configure the shape of the data in a way that suits your needs. 
 
-If there is no color adapter for your specific use case, you can easily implement one yourself by using the provided adapters as a reference. You can also contribute your adapter to [Graph1 on Github](https://github.com/dipdowel/graph1/) or request it as a feature in the [discussions](https://github.com/dipdowel/graph1/discussions) or [open an issue](https://github.com/dipdowel/graph1/issues).
 
+#### Conceptual example of Bouncy
+```rust
+use graph1::utils::clear_screen;
+use graph1::core::context::{GraphContext, WindowContext};
+use graph1::draw;
+use graph1::primitives::plane::RectArea;
+
+/// Our bouncing hero!
+struct Bouncy {    
+    pub x:  i32, // starting position, x-coordinate    
+    pub y:  i32, // starting position, y-coordinate    
+    pub dx: i32, // starting direction and speed, x-axis    
+    pub dy: i32, // starting direction and speed, y-axis
+}
+
+// The user data type must implement `Default` trait!
+struct UserData { bouncy: Bouncy }
+
+impl Default for UserData {
+    fn default() -> Self {
+        Self { bouncy: Bouncy { x: 10, y: 10, dx: 1, dy: 1 }
+        }
+    }
+}
+
+fn main() {
+    let bouncy_user_data = Some(UserData::default());
+    let mut ctx: GraphContext<UserData> =
+        GraphContext::new(WindowContext::default(),
+                          false,
+                          false,
+                          bouncy_user_data
+        );
+
+    // Here should be the animation loop, which calls `render_frame()`.
+    // Please read on for details.
+}
+
+const SQUARE_SIDE_PX: i32 = 16;
+
+/// Render a frame with Bouncy, who is just a square bouncing on the screen
+pub fn render_frame(ctx: &mut GraphContext<UserData>) {
+    
+    // Read the animation values from the user data in the context
+    let Bouncy { mut x, mut y, mut dx, mut dy } = ctx.user_data.bouncy;
+    
+    // Move Bouncy by 1 step.    
+    x = x + dx;
+    y = y + dy;
+
+    // Write the updated animation values back to the context.
+    ctx.user_data.bouncy.x = x;
+    ctx.user_data.bouncy.y = y;
+
+    clear_screen(ctx);
+    
+    // Finally, render Bouncy on the window surface
+    let bouncy = RectArea::square(x as u32, y as u32, 20, None);    
+    draw::rectangle::filled(ctx, &bouncy);
+}
+
+```
+ 
+### Native application
+The demos from this website can be compiled as a native application as well. I used [minifb](https://github.com/emoon/minifb) library  for window management and rendering. You may want to check out the [Graph1 minifb demo repo on Github](https://github.com/dipdowel/graph1_minifb_demo). 
+- `NB:` The `minifb` application was tested only on Linux with X11.
+
+<br /> If you got this far, it may be the time to grab [this whole project on Github](https://github.com/dipdowel/graph1_wasm_demo). It contains everything you see on this website, including the Bouncy demo. The project can be compiled for Web (WASM) and you can run it locally.
 
 - - - - 
-- [Code of this demo on Github](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_004_alpha.rs)
+- [Code of this demo on Github](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_003_bouncy.rs)
+- [`GraphContext` configuration and the animation loop](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/lib.rs)

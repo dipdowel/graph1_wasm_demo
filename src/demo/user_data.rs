@@ -1,7 +1,7 @@
 use crate::demo::common::basic_concepts::{BasicConceptsUserData, BASIC_CONCEPTS_USER_DATA};
-use crate::demo::d_003_bouncy::{BouncyUserData, BOUNCY_USER_DATA};
-use crate::demo::d_004_alpha::{AlphaUserData, ALPHA_USER_DATA};
-use crate::demo::d_005_luminance_vs_intensity::{GhostsUserData, GHOSTS_USER_DATA};
+use crate::demo::d_004_bouncy::{BouncyUserData, BOUNCY_USER_DATA};
+use crate::demo::d_005_alpha::{AlphaUserData, ALPHA_USER_DATA};
+use crate::demo::d_006_luminance_vs_intensity::{GhostsUserData, GHOSTS_USER_DATA};
 
 // Shape the user-defined data, accessible via `ctx.user_data`
 // `ctx.user_data` can be used to store arbitrary data that needs to live as long as the context itself.
