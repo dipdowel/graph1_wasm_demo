@@ -43,7 +43,7 @@ println!(
 ```
 
 
-Output: 
+##### Output: 
 ```text
 point_f64: Point { x: -10.0123456789, y: 20.987654321 }
 point_f32: Point { x: -10.012345, y: 20.987654 }
@@ -53,13 +53,47 @@ another_point_u32: Point { x: 0, y: 21 }
 ```
 
 ### struct `Pixel`
-Struct `Pixel` is similar to `Point`, but its `x` and `y` coordinates are always `u32`. It also has `color` property, 
-also a `u32`. 
+Struct `Pixel` has 3 properties of type `u32`: `x`, `y` and `color`. `Pixel` represents a physical pixel on the screen, hence coordinates are unsigned integers. The `color` property is a 32-bit integer that encodes a color in `RGBA` format.   
 
-// TODO: write about conversion from `Pixel` to `Point` and back
+#### Convert `Pixel` to `Point`
+
+A `Pixel` instance can be converted into a `Point<T>` instance. The value of `color` is dropped during the conversion.
+```rust
+let pixel = Pixel {
+    x: 10,
+    y: 20,
+    color: 0xff_ff_ff_ff,
+};
+
+let point_f64: Point<f64> = pixel.into();
+println!("{:?}", point_f64);
+```
+##### Output:
+```text
+Point { x: 10.0, y: 20.0 }
+```
+#### Convert `Point` to `Pixel` 
+A `Point<T>` instance can be converted into a `Pixel` instance. The value of `color` is added during the conversion as follows:
+
+
+```rust
+let point = Point { x: 10_f32, y: 20_f32 };
+let pixel = point.to_pixel(0xff_00_ff_00);
+println!("{:?}", pixel);
+```
+##### Output:
+```text
+Pixel { x: 10, y: 20, color: 0xff00ff00 }
+
+```
 
 ### struct  `Dimensions2d`
+```text
+TODO: describe the struct!
+```
 
 ### struct  `RectArea`
-
+```text
+TODO: describe the struct!
+```
 
