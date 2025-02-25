@@ -1,11 +1,9 @@
+use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
 use graph1::draw::polygons;
-use graph1::draw::polygons::{closed_perimeter, PolygonProperties};
-use graph1::primitives::Pixel;
-use graph1::primitives::point::Point;
+use graph1::draw::polygons::{PolygonProperties, StarProperties};
 use graph1::utils::clear_screen;
-use graph1::utils::color::palettes::{Grayscale, RetroNeon, SunsetGlow};
-use crate::demo::user_data::DemoUserData;
+use graph1::utils::color::palettes::{RetroNeon, SunsetGlow};
 
 //---------------------------------------------------------------------
 // Configure the user data
@@ -20,29 +18,14 @@ use crate::demo::user_data::DemoUserData;
 // };
 //---------------------------------------------------------------------
  
-/// Illustrates how color Intensity and color Luminance are different
+/// Illustrate the use of polygons and stars
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-    let mut current_frame = ctx.frame_count as i32;
+    let current_frame = ctx.frame_count as i32;
+    let current_frame_f64 = ctx.frame_count as f64;
 
-
-
-
-    // initialize the data maintained between frames
+    // initialize the context
     if current_frame == 0 {
         ctx.win.background_color = SunsetGlow::GENTLE_INDIGO;
-        /*
-        let vertices = &vec![
-            Point { x: 210, y: 110 },
-            Point { x: 250, y: 110 },
-            Point { x: 270, y: 145 },
-            Point { x: 250, y: 180 },
-            Point { x: 210, y: 180 },
-            Point { x: 190, y: 145 }
-        ];
-
-        closed_perimeter(ctx, &vertices, None);
-        return;
-         */
     }
 
     // Clear the screen
@@ -51,19 +34,19 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
         polygons::polygon(ctx, &PolygonProperties{
             center: ctx.win.center.to_pixel(RetroNeon::HOT_PINK),
-            num_sides: 3,
-            radius: 60,
-            rotation_angle: current_frame as f64 * 2.5,
+            num_sides: 5,
+            radius: 80,
+            rotation_angle: current_frame_f64 * 1.8,
             skip_rendering: false,
         });
 
-
-
-
-
-
-    // Change direction when the ghost approaches the edge of the screen
-    // if current_frame % (ctx.win.w_i32 - 106) == 0 {
-    //     ctx.user_data.ghosts.direction.x *= -1;
-    // } 
+    polygons::star(ctx, &StarProperties{
+        center: ctx.win.center.to_pixel(RetroNeon::HOT_PINK),
+        num_rays: 5,
+        inner_radius: 28,
+        outer_radius: 60,
+        rotation_angle: current_frame_f64 * 1.2,
+        skip_rendering: false,
+    });
+  
 }
