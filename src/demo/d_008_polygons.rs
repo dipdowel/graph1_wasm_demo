@@ -4,11 +4,77 @@ use graph1::draw::polygons::{PolygonProperties, StarProperties};
 use graph1::draw::tools::fill;
 use graph1::draw::{polygons, rectangle};
 use graph1::primitives::plane::RectArea;
+use graph1::primitives::Pixel;
 use graph1::utils::clear_screen;
 use graph1::utils::color::math::gradient;
 use graph1::utils::color::palettes::{RetroNeon, SunsetGlow};
 
 const NUM_GRADIENT_STEPS: usize = 120;
+
+fn make_polygons(ctx: &mut GraphContext<DemoUserData>, color1: u32, color2: u32) {
+    let small_polygon_step: u32 = ctx.win.h / 7;
+
+    let mut polygon_props = PolygonProperties {
+        center: Pixel {
+            color: color1,
+            x: ctx.win.w - small_polygon_step + 8,
+            y: small_polygon_step - 8,
+        },
+
+        num_sides: 3,
+        radius: 15,
+        rotation_angle: 0.0,
+        skip_rendering: false,
+    };
+
+    for i in 0..6 {
+        polygon_props.center.color = color2;
+        polygon_props.radius = 20;
+        polygons::polygon(ctx, &polygon_props);
+        polygon_props.center.color = color1;
+        polygon_props.radius = 16;
+        polygons::polygon(ctx, &polygon_props);
+        polygon_props.num_sides += 1;
+        polygon_props.center.y += small_polygon_step + i * 2;
+    }
+}
+
+fn make_stars(ctx: &mut GraphContext<DemoUserData>, color1: u32) {
+    let small_star_step: u32 = ctx.win.h / 7;
+
+    let mut star_props = StarProperties {
+        center: Pixel {
+            color: color1,
+            x: small_star_step - 10,
+            y: small_star_step - 8,
+        },
+
+        num_rays: 3,
+        inner_radius: 0,
+        outer_radius: 0,
+        rotation_angle: 0.0,
+        skip_rendering: false,
+    };
+
+    for i in 0..6 {
+        star_props.inner_radius = 3 + i;
+        star_props.outer_radius = 16;
+        polygons::star(ctx, &star_props);
+        star_props.num_rays += 1;
+        star_props.center.y += small_star_step + i * 2;
+        if i == 1 {
+            star_props.center.y += 5;
+        }
+
+        if i == 2 {
+            star_props.center.y -= 3;
+        }
+
+        if i == 4 {
+            star_props.center.y -= 3;
+        }
+    }
+}
 
 /// Illustrate the use of polygons and stars
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
@@ -28,6 +94,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     let light_pink: u32 = gradient::single_step(RetroNeon::MAGENTA_GLOW, 0xff_ff_ff_ff, 40, 24);
     let light_pink_2: u32 = gradient::single_step(RetroNeon::MAGENTA_GLOW, 0xff_ff_ff_ff, 40, 26);
+    let light_pink_3: u32 = gradient::single_step(RetroNeon::NEON_PINK, 0xff_ff_ff_ff, 40, 9);
     let gradient = gradient::simple(light_pink, RetroNeon::NEON_PINK, NUM_GRADIENT_STEPS);
 
     for i in 0..NUM_GRADIENT_STEPS {
@@ -85,4 +152,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         star_props.inner_radius += 3;
         star_props.outer_radius += i * 4;
     }
+
+    make_polygons(ctx, 0xff_ff_ff_ff, light_pink);
+    make_stars(ctx, light_pink_3);
 }
