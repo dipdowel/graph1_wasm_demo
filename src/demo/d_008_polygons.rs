@@ -6,7 +6,7 @@ use graph1::draw::{polygons, rectangle};
 use graph1::primitives::plane::RectArea;
 use graph1::primitives::Pixel;
 use graph1::utils::clear_screen;
-use graph1::utils::color::math::gradient;
+use graph1::utils::color::gradient;
 use graph1::utils::color::palettes::{RetroNeon, SunsetGlow};
 
 const NUM_GRADIENT_STEPS: usize = 120;
@@ -62,6 +62,8 @@ fn make_stars(ctx: &mut GraphContext<DemoUserData>, color1: u32) {
         polygons::star(ctx, &star_props);
         star_props.num_rays += 1;
         star_props.center.y += small_star_step + i * 2;
+
+        // Adjust the Y coordinate of some stars
         if i == 1 {
             star_props.center.y += 5;
         }
@@ -92,10 +94,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // Width of each column in the background is 20% of the window width
     let column_width = (ctx.win.w as f64 / NUM_GRADIENT_STEPS as f64) as u32;
 
-    let light_pink: u32 = gradient::single_step(RetroNeon::MAGENTA_GLOW, 0xff_ff_ff_ff, 40, 24);
-    let light_pink_2: u32 = gradient::single_step(RetroNeon::MAGENTA_GLOW, 0xff_ff_ff_ff, 40, 26);
-    let light_pink_3: u32 = gradient::single_step(RetroNeon::NEON_PINK, 0xff_ff_ff_ff, 40, 9);
-    let gradient = gradient::simple(light_pink, RetroNeon::NEON_PINK, NUM_GRADIENT_STEPS);
+    let light_pink: u32 = gradient::linear_step(RetroNeon::MAGENTA_GLOW, 0xff_ff_ff_ff, 40, 24);
+    let light_pink_2: u32 = gradient::linear_step(RetroNeon::MAGENTA_GLOW, 0xff_ff_ff_ff, 40, 26);
+    let light_pink_3: u32 = gradient::linear_step(RetroNeon::NEON_PINK, 0xff_ff_ff_ff, 40, 9);
+    let gradient = gradient::linear(light_pink, RetroNeon::NEON_PINK, NUM_GRADIENT_STEPS);
 
     for i in 0..NUM_GRADIENT_STEPS {
         rectangle::filled(
@@ -148,7 +150,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     for i in 0..4 {
         polygons::star(ctx, &star_props);
         star_props.center.color =
-            gradient::single_step(0xff_ff_ff_ff, RetroNeon::NEON_PINK, 40, 10 * i as usize);
+            gradient::linear_step(0xff_ff_ff_ff, RetroNeon::NEON_PINK, 40, 10 * i as usize);
         star_props.inner_radius += 3;
         star_props.outer_radius += i * 4;
     }
