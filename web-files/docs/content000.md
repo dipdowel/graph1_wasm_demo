@@ -28,6 +28,6 @@ This website is a collection of examples, demos, and explanations that should he
 - Not a 3D graphics library, but if you don't mind software rendering and are good with 3D geometry, you can do 3D graphics.
   
 ### WebAssembly / WASM
-Graph1 is not a [WebAssembly](https://webassembly.org/)-specific library, but it can be easily used to target WebAssembly. The demos on this site serve as an example of exactly that.<br />
+Graph1 is not a [WebAssembly](https://webassembly.org/)-specific library, but it can be easily used to target WebAssembly. The demos on this site were compiled into WASM.<br />
 For WebAssembly-first development I could recommend [AssemblyScript](https://www.assemblyscript.org/), especially if you are a web developer.
 
