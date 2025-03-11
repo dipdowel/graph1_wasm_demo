@@ -22,7 +22,8 @@ Here's the minimal setup to draw a pentagon:
         rotation_angle: 0.0,
         skip_rendering: false,
     };
-    polygons::polygon(ctx, &polygon_props);
+    
+    polygons::polygon(ctx, &polygon_props); // Draw the polygon 
 ```
 
 
@@ -44,7 +45,8 @@ Here's the minimal setup to draw a penta-star:
         rotation_angle: 0.0,
         skip_rendering: false,
     };
-    polygons::star(ctx, &star_props);
+    
+    polygons::star(ctx, &star_props); // Draw the star
 ```
 <br />
 Both `polygons::polygon()` and `polygons::star()` return vectors of points representing their vertices. This can be useful for further calculations or for creating custom shapes, based on the coordinates of the vertices.
