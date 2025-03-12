@@ -36,7 +36,9 @@ pub mod demo {
     /// User data, used to store arbitrary data that needs to be persisted between frames
     pub mod user_data;
 
-    // pub mod x01_bouncy {
+    pub mod elements {
+        pub mod cube;
+    }
     //     /// A minimal example of displaying and animating a square on the screen
     //     pub mod bouncy;
     //     /// Demo of slower but more accurate Float alpha blending
