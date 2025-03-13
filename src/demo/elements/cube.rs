@@ -1,7 +1,9 @@
+use crate::utils::console_log;
 use graph1::core::context::GraphContext;
 use graph1::draw::line;
 use graph1::primitives::point::{Point, Point3D};
 use graph1::primitives::Pixel;
+use graph1::utils::math::oscillator;
 use std::f64::consts::PI;
 
 #[rustfmt::skip]
@@ -30,11 +32,6 @@ pub struct Cube {
     /// vertices
     vertices: Vec<Point3D<f64>>,
 
-    // Animation values
-    time_delta: f64,
-    time_last: f64,
-    time_now: f64,
-
     /// Start point of an edge + color
     cube_pixel: Pixel,
     /// End point of an edge
@@ -59,18 +56,15 @@ impl Cube {
             cube_point: Point { x: 0, y: 0 },
 
             // size,
-            time_delta: 0.0,
-            time_now: 0.0,
-            time_last: 0.0,
             vertices: Vec::new(),
         };
 
         let Cube { cx, cy, cz, .. } = cube;
 
         // TODO: If we want to change the size during rendering (in runtime),
-        // TODO: `vertices` will have to be re-calculated.
+        // TODO: `vertices` will have to be recalculated.
         // TODO: Should the code below go into a separate function
-        // TODO: that can be called also from `render_frame()`?
+        // TODO: that can be called also from `render()`?
 
         #[rustfmt::skip]
             let  vertices: Vec<Point3D<f64>> = vec![
@@ -83,26 +77,19 @@ impl Cube {
             Point3D { x: cx + size, y: cy + size, z: cz + size },
             Point3D { x: cx - size, y: cy + size, z: cz + size },
         ];
-
         cube.vertices = vertices;
-
-        return cube;
+        cube
     }
 
     pub fn render<DemoUserData>(
         &mut self,
-
         ctx: &mut GraphContext<DemoUserData>,
         translation: Option<&Point3D<f64>>,
     ) {
-        self.time_now = ctx.frame_count as f64;
-
-        // calculate the time difference
-        self.time_delta = self.time_now - self.time_last;
-        self.time_last = self.time_now;
+        let rotation = oscillator::sine(ctx.frame_count as f64, 0.0003789, -1008.0, 1021.0);
 
         // rotate the cube along the Z axis
-        let angle = self.time_delta * 0.001 * self.speed_z * PI * 2_f64;
+        let angle = rotation * 0.001 * self.speed_z * PI * 2_f64;        
         let mut cx = self.cx; /* + oscillator; */
         let mut cy = self.cy; /* + oscillator; */
         let mut cz = self.cz; /*+ oscillator as f64; */
@@ -127,7 +114,7 @@ impl Cube {
         }
 
         // rotate the cube along the X axis
-        let angle = self.time_delta * 0.001 * self.speed_x * PI * 2_f64;
+        let angle = rotation * 0.001 * self.speed_x * PI * 2_f64;        
         for v in &mut self.vertices {
             let dy = v.y - cy;
             let dz = v.z - cz;
@@ -138,7 +125,7 @@ impl Cube {
         }
 
         // rotate the cube along the Y axis
-        let angle = self.time_delta * 0.001 * self.speed_y * PI * 2_f64;
+        let angle = rotation * 0.001 * self.speed_y * PI * 2_f64;        
         for v in &mut self.vertices {
             let dx = v.x - cx;
             let dz = v.z - cz;
