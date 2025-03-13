@@ -1,9 +1,8 @@
-
-use std::f32::consts::PI;
 use graph1::core::context::GraphContext;
 use graph1::draw::line;
-use graph1::primitives::Pixel;
 use graph1::primitives::point::{Point, Point3D};
+use graph1::primitives::Pixel;
+use std::f64::consts::PI;
 
 #[rustfmt::skip]
 static EDGES: [[usize; 2]; 12] = [
@@ -15,26 +14,26 @@ static EDGES: [[usize; 2]; 12] = [
 pub struct Cube {
     #[rustfmt::skip]
     /// X-rotation speed (RPS)
-    speed_x: f32,
+    speed_x: f64,
     /// Y-rotation speed (RPS)
-    speed_y: f32,
+    speed_y: f64,
     /// Z-rotation speed (RPS)
-    speed_z: f32,
+    speed_z: f64,
     /// X-center (the location of the cube on the X axis)
-    cx: f32,
+    cx: f64,
     /// Y-center (the location of the cube on the Y axis)
-    cy: f32,
+    cy: f64,
     /// Z-center (the location of the cube on the Z axis)
-    cz: f32,
+    cz: f64,
     /// Length of the cube's edge
-    // size: f32,
+    // size: f64,
     /// vertices
-    vertices: Vec<Point3D<f32>>,
+    vertices: Vec<Point3D<f64>>,
 
     // Animation values
-    time_delta: f32,
-    time_last: f32,
-    time_now: f32,
+    time_delta: f64,
+    time_last: f64,
+    time_now: f64,
 
     /// Start point of an edge + color
     cube_pixel: Pixel,
@@ -43,7 +42,7 @@ pub struct Cube {
 }
 
 impl Cube {
-    pub fn new(speed: Point3D<f32>, center: Point3D<f32>, size: f32, color: u32) -> Cube {
+    pub fn new(speed: Point3D<f64>, center: Point3D<f64>, size: f64, color: u32) -> Cube {
         let mut cube = Cube {
             speed_x: speed.x,
             speed_y: speed.y,
@@ -60,9 +59,9 @@ impl Cube {
             cube_point: Point { x: 0, y: 0 },
 
             // size,
-            time_delta: 0_f32,
-            time_now: 0_f32,
-            time_last: 0_f32,
+            time_delta: 0.0,
+            time_now: 0.0,
+            time_last: 0.0,
             vertices: Vec::new(),
         };
 
@@ -74,7 +73,7 @@ impl Cube {
         // TODO: that can be called also from `render_frame()`?
 
         #[rustfmt::skip]
-            let  vertices: Vec<Point3D<f32>> = vec![
+            let  vertices: Vec<Point3D<f64>> = vec![
             Point3D { x: cx - size, y: cy - size, z: cz - size },
             Point3D { x: cx + size, y: cy - size, z: cz - size },
             Point3D { x: cx + size, y: cy + size, z: cz - size },
@@ -90,28 +89,27 @@ impl Cube {
         return cube;
     }
 
-    pub fn render_frame<DemoUserData>(
+    pub fn render<DemoUserData>(
         &mut self,
-        
+
         ctx: &mut GraphContext<DemoUserData>,
-        translation: Option<&Point3D<f32>>,
+        translation: Option<&Point3D<f64>>,
     ) {
-        self.time_now = ctx.frame_count as f32;
+        self.time_now = ctx.frame_count as f64;
 
         // calculate the time difference
         self.time_delta = self.time_now - self.time_last;
         self.time_last = self.time_now;
 
         // rotate the cube along the Z axis
-        let angle = self.time_delta * 0.001 * self.speed_z * PI * 2_f32;
+        let angle = self.time_delta * 0.001 * self.speed_z * PI * 2_f64;
         let mut cx = self.cx; /* + oscillator; */
         let mut cy = self.cy; /* + oscillator; */
-        let mut cz = self.cz; /*+ oscillator as f32; */
-
+        let mut cz = self.cz; /*+ oscillator as f64; */
 
         // apply translations only if provided.
         match translation {
-            Some(delta) =>{
+            Some(delta) => {
                 cx = cx + delta.x;
                 cy = cy + delta.y;
                 cz = cz + delta.z;
@@ -119,34 +117,33 @@ impl Cube {
             None => (),
         }
 
-
         for v in &mut self.vertices {
-            let dx: f32 = v.x - cx;
+            let dx: f64 = v.x - cx;
             let dy = v.y - cy;
-            let x = dx * f32::cos(angle) - dy * f32::sin(angle);
-            let y = dx * f32::sin(angle) + dy * f32::cos(angle);
+            let x = dx * f64::cos(angle) - dy * f64::sin(angle);
+            let y = dx * f64::sin(angle) + dy * f64::cos(angle);
             v.x = x + cx;
             v.y = y + cy;
         }
 
         // rotate the cube along the X axis
-        let angle = self.time_delta * 0.001 * self.speed_x * PI * 2_f32;
+        let angle = self.time_delta * 0.001 * self.speed_x * PI * 2_f64;
         for v in &mut self.vertices {
             let dy = v.y - cy;
             let dz = v.z - cz;
-            let y = dy * f32::cos(angle) - dz * f32::sin(angle);
-            let z = dy * f32::sin(angle) + dz * f32::cos(angle);
+            let y = dy * f64::cos(angle) - dz * f64::sin(angle);
+            let z = dy * f64::sin(angle) + dz * f64::cos(angle);
             v.y = y + cy;
             v.z = z + cz;
         }
 
         // rotate the cube along the Y axis
-        let angle = self.time_delta * 0.001 * self.speed_y * PI * 2_f32;
+        let angle = self.time_delta * 0.001 * self.speed_y * PI * 2_f64;
         for v in &mut self.vertices {
             let dx = v.x - cx;
             let dz = v.z - cz;
-            let x = dz * f32::sin(angle) + dx * f32::cos(angle);
-            let z = dz * f32::cos(angle) - dx * f32::sin(angle);
+            let x = dz * f64::sin(angle) + dx * f64::cos(angle);
+            let z = dz * f64::cos(angle) - dx * f64::sin(angle);
             v.x = x + cx;
             v.z = z + cz;
         }

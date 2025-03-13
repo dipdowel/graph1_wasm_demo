@@ -1,6 +1,7 @@
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
 use graph1::draw::rectangle;
+use graph1::fx::scanline;
 use graph1::primitives::plane::RectArea;
 use graph1::utils::color::palettes;
 
@@ -115,5 +116,5 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // Finally, render Alpha Bouncy on the window surface
     rectangle::filled(ctx, &RectArea::square(x, y, side, Some(BOUNCY_COLOR_WITH_ALPHA)));
-
+    scanline::window(ctx, 1, 0x2f);
 }

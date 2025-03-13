@@ -3,6 +3,7 @@ use graph1::core::context::GraphContext;
 use graph1::draw::polygons::{PolygonProperties, StarProperties};
 use graph1::draw::tools::fill;
 use graph1::draw::{polygons, rectangle};
+use graph1::fx::scanline;
 use graph1::primitives::plane::RectArea;
 use graph1::primitives::Pixel;
 use graph1::utils::clear_screen;
@@ -157,4 +158,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     make_polygons(ctx, 0xff_ff_ff_ff, light_pink);
     make_stars(ctx, light_pink_3);
+    scanline::window(ctx, 1, 0x1f);
+
 }

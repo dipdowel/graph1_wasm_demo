@@ -2,6 +2,7 @@ use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
 use graph1::draw;
 use graph1::draw::rectangle;
+use graph1::fx::scanline;
 use graph1::primitives::plane::RectArea;
 use graph1::primitives::point::Point;
 use graph1::utils::color::desaturate::intensity::rgba_region_intensity;
@@ -270,4 +271,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx,
         &RectArea::new(3 * section_width, 0, section_width, ctx.win.h, None),
     );
+
+    scanline::window(ctx, 1, 48);
+
 }
