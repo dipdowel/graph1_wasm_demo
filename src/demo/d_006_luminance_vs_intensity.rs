@@ -272,6 +272,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         &RectArea::new(3 * section_width, 0, section_width, ctx.win.h, None),
     );
 
-    scanline::window(ctx, 1, 48);
+    scanline::window(ctx, 1, 24);
 
 }
