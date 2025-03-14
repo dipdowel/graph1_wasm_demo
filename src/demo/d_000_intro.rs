@@ -1,13 +1,15 @@
 use crate::demo::elements::cube::Cube;
 use crate::demo::user_data::DemoUserData;
-use crate::utils::console_log;
 use graph1::core::context::GraphContext;
 use graph1::fx::scanline;
+// use graph1::fx::noise::PerlinNoiseProps;
 use graph1::primitives::point::Point3D;
 use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
+use graph1::utils::color::math::{rgba_operation, ColorOperation};
 use graph1::utils::color::palettes::RetroNeon;
 use graph1::utils::math::oscillator;
+use graph1::utils::math::rng::lcg::LcgRng;
 
 const SPEED: Point3D<f64> = Point3D {
     x: 1.4,
@@ -25,6 +27,34 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     ctx.win.background_color = gradient::linear_step(color_start, color_end, 400, gradient_step);
 
     clear_screen(ctx);
+
+    if ctx.frame_count < 10 {}
+
+    // TODO: can we initialize the RNG only once and put it into heap?
+    let mut rng = LcgRng::new(ctx.frame_count as u64, None);
+
+
+    // TODO: consider turning this into a graph1 library function for simple noise? + the step parameter for skipping pixels
+    for i in (0..ctx.frame_buf.len()).step_by(4) {
+        ctx.frame_buf[i] = rgba_operation(
+            ctx.frame_buf[i],
+            rng.next_ranged_u32(255, 255 * 150),
+            ColorOperation::Add,
+            false,
+        );
+    }
+
+    // noise::perlin(&mut ctx.frame_buf, &ctx.win.dimensions_usize, &PerlinNoiseProps {
+    //     octaves: 5,
+    //     persistence: 13.78,
+    //     lacunarity: 2.5,
+    //     scale: 6.0,
+    //     seed_offset: 10.0,
+    //     offset: Point { x: 20.0, y:50.0},
+    //     tile_size: None,
+    //     seed: 225,
+    //
+    // });
 
     let cube_size = 60.0;
 
