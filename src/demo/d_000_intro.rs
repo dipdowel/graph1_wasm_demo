@@ -2,6 +2,7 @@ use crate::demo::elements::cube::Cube;
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
 use graph1::fx::scanline;
+use graph1::primitives::math::MinMax;
 // use graph1::fx::noise::PerlinNoiseProps;
 use graph1::primitives::point::Point3D;
 use graph1::utils::clear_screen;
@@ -28,17 +29,20 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     clear_screen(ctx);
 
-    if ctx.frame_count < 10 {}
+    // if ctx.frame_count < 10 {}
 
     // TODO: can we initialize the RNG only once and put it into heap?
     let mut rng = LcgRng::new(ctx.frame_count as u64, None);
+
+    let range:MinMax<u32> = MinMax::new(255, 255 * 150);
+    let random_colors = rng.get_vec_u32(ctx.frame_buf.len(), Some(&range));
 
 
     // TODO: consider turning this into a graph1 library function for simple noise? + the step parameter for skipping pixels
     for i in (0..ctx.frame_buf.len()).step_by(4) {
         ctx.frame_buf[i] = rgba_operation(
             ctx.frame_buf[i],
-            rng.next_ranged_u32(255, 255 * 150),
+            random_colors[i],
             ColorOperation::Add,
             false,
         );
