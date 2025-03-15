@@ -10,7 +10,8 @@ use graph1::utils::color::gradient;
 use graph1::utils::color::math::{rgba_operation, ColorOperation};
 use graph1::utils::color::palettes::RetroNeon;
 use graph1::utils::math::oscillator;
-use graph1::utils::math::rng::lcg::LcgRng;
+
+use graph1::utils::math::rng::XorShiftRng;
 
 const SPEED: Point3D<f64> = Point3D {
     x: 1.4,
@@ -29,14 +30,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     clear_screen(ctx);
 
-    // if ctx.frame_count < 10 {}
-
     // TODO: can we initialize the RNG only once and put it into heap?
-    let mut rng = LcgRng::new(ctx.frame_count as u64, None);
-
     let range:MinMax<u32> = MinMax::new(255, 255 * 150);
-    let random_colors = rng.get_vec_u32(ctx.frame_buf.len(), Some(&range));
-
+    let mut rng = XorShiftRng::new(ctx.frame_count as u32, ctx.frame_count as u64);
+    let random_colors = rng.get_vec_u32(ctx.frame_buf.len(), &range);
 
     // TODO: consider turning this into a graph1 library function for simple noise? + the step parameter for skipping pixels
     for i in (0..ctx.frame_buf.len()).step_by(4) {
