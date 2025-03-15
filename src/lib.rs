@@ -153,6 +153,19 @@ pub struct PixelStats {
 #[wasm_bindgen]
 /// Tell the app which frame to render
 pub fn update_frame(frame: usize) -> PixelStats {
+
+    // don't overflow the frame counter
+    if frame > usize::MAX - 1 {
+        return PixelStats {
+            average_red: 0,
+            average_green: 0,
+            average_blue: 0,
+            average_color: 0,
+            average_luminance: 0,
+            average_intensity: 0,
+        }
+    }
+
     unsafe {
         if let Some(mut ctx) = CONTEXT_CONTAINER.as_mut() {
             ctx.frame_count = frame;
