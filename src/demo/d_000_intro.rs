@@ -51,19 +51,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // TODO: can we initialize the RNG only once and put it into heap?
     let mut rng = GrayRng::new(ctx.frame_count as u32);
-    // let mut rng = ColorRng::new(500);
-    // let random_colors = rng.get_random_colors(
-    //     ctx.frame_buf.len(),
-    //     0x00_00_00_ff,
-    //     0xff_00_ff_ff,
-    //     Some(ctx.frame_count as u32),
-    // //     None,
-    // );
-
-
-
-    // let random_mono_colors = rng.get_random_monochromes(
-    let random_grays = rng.get_random_gray_fast(
+    let random_colors = rng.get_random_gray_fast(
 
         ctx.frame_buf.len()/4,
         0x00,
@@ -74,6 +62,22 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         None
     );
 
+    //
+    // let mut rng = ColorRng::new(500, 500);
+    // let random_colors = rng.get_random_colors_32(
+    //     ctx.frame_buf.len(),
+    //     0x00_00_00_ff,
+    //     0x33_88_33_ff,
+    //     Some(ctx.frame_count as u32),
+    //     // Some(ctx.frame_count as u64),
+    // //     None,
+    // );
+
+
+
+
+
+
     // console_log(&format!(">>> random_mono_colors len {}", random_mono_colors.len()));
     // console_log(&format!(">>> num pixels {}", ctx.win.get_num_pixels()));
 
@@ -83,7 +87,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         // ctx.frame_buf[i] = random_grays[i];
         ctx.frame_buf[i] = rgba_operation(
             ctx.frame_buf[i],
-            random_grays[i/4],
+            random_colors[i/4],
             ColorOperation::Add,
             false,
         );
