@@ -31,4 +31,3 @@
 ### WebAssembly / WASM
 Graph1 allows targeting [WebAssembly](https://webassembly.org/), that's how the animations on this website were made.<br />
 For WebAssembly-first development I could recommend [AssemblyScript](https://www.assemblyscript.org/), especially if you are a web developer.
-
