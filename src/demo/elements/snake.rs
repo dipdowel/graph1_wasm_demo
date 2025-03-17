@@ -97,10 +97,10 @@ impl Snake {
     pub fn move_forward(&mut self) {
 
 
-        // self.counter += 1;
-        // if self.counter % 7 != 0 {
-        //     return;
-        // }
+        self.counter += 1;
+        if self.counter >100 &&  self.counter < 1000 && self.counter % 100 == 0 {
+            self.grow();
+        }
 
 
         // Determine the current head position.
@@ -274,7 +274,7 @@ impl Snake {
         // Reinitialize steps_limit with a new random value.
         self.steps_limit = self.rng.get_u32(&MinMax {
             min: self.height_tiles / 4,
-            max: self.width_tiles / 3*2,
+            max: self.width_tiles / 7*4,
         });
     }
 
