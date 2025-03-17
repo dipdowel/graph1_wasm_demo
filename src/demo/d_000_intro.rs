@@ -55,7 +55,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
         ctx.frame_buf.len()/4,
         0x00,
-        0x33,
+        0x25,
         0xff,
         0xff,
         // Some(ctx.frame_count as u32),
