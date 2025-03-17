@@ -1,15 +1,69 @@
+use crate::demo::elements::snake::Snake;
 use crate::demo::user_data::DemoUserData;
-use graph1::core::context::GraphContext;
-use graph1::draw;
+use graph1::core::context::{GraphContext, WindowContext};
 use graph1::fx::scanline;
-use graph1::primitives::plane::RectArea;
-use graph1::primitives::point::Point;
-use graph1::text::font::Spacing;
-use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
-use graph1::text::printer;
-use graph1::text::printer::Align;
-use graph1::utils::clear_screen;
-use graph1::utils::color::palettes::RetroNeon;
+use graph1::utils::color::gradient;
+use graph1::utils::color::math::{rgba_operation, ColorOperation};
+use graph1::utils::color::palettes::{AutumnHarvest, DesertDusk, OceanBreeze, RetroNeon, SunsetGlow, VintagePastel};
+use graph1::utils::math::oscillator;
+use graph1::utils::math::rng::gray::GrayRng;
+
+const WIN_WIDTH: u32 = 480;
+const WIN_HEIGHT: u32 = 240;
+
+const WIDTH_TILES: u32 = 24;
+const HEIGHT_TILES: u32 = 12;
+
+// const WIDTH_TILES: u32 = 12;
+// const HEIGHT_TILES: u32 = 6;
+// const WIDTH_TILES: u32 = 24;
+// const HEIGHT_TILES: u32 = 12;
+
+
+
+pub fn get_snake() -> Snake {
+
+
+    let win_context = WindowContext::new(
+        WIN_WIDTH,
+        WIN_HEIGHT,
+
+
+
+        // Some(OceanBreeze::LIGHT_SAND),
+
+
+
+        // Some(DesertDusk::CLAY_BROWN),
+        // Some(DesertDusk::FADED_PEACH),
+
+        // Some(AutumnHarvest::BURNT_SIENNA),
+        Some(AutumnHarvest::RUST_RED),
+        Some(AutumnHarvest::MUSTARD_YELLOW),
+
+        // Some(AutumnHarvest::MUSTARD_YELLOW),
+
+
+        // Some(DesertDusk::RUSTY_ORANGE),
+        // Some(DesertDusk::GOLDEN_SAND),
+
+        // Some(DesertDusk::SANDSTONE),
+
+
+        // Some(0xff_ff_ff_ff),
+    );
+
+
+    Snake::new(
+        win_context,
+        WIDTH_TILES / 2,
+        HEIGHT_TILES / 4,
+        1+ HEIGHT_TILES / 5*4,
+        WIDTH_TILES,
+        HEIGHT_TILES,
+        321,
+    )
+}
 
 /// Render a frame with two rectangles on the screen.
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
@@ -18,53 +72,57 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if ctx.frame_count == 0 {
         ctx.win.background_color = RetroNeon::CYBER_BLUE;
         ctx.win.foreground_color = RetroNeon::LASER_LIME;
-        ctx.user_data.basic_concepts_pt1.text_font = Some(instantiate_embedded_font(
-            EmbeddedFonts::CCRedAlertInet,
-            2,
-            Some(Spacing {
-                kerning_px: 2,
-                leading_px: 3,
-            }),
-            None,
-        ));
     }
 
-    clear_screen(ctx);
 
-    let width = ctx.win.w - 40;
 
-    // Draw rectangle #1
-    // x = 20, y = 20, width = 440, height = 20, default window foreground color
-    draw::rectangle::filled(ctx, &RectArea::new(20, 20, width, 20, None));
 
-    // Draw rectangle #2
-    // x = 20, y = 200, width = 440, height = 20, vibrant cyan color
-    draw::rectangle::filled(
-        ctx,
-        &RectArea::new(20, ctx.win.h - 40, width, 20, Some(RetroNeon::VIBRANT_CYAN)),
+        // clear_screen(ctx);
+
+    // let lower_bound = oscillator::sine(ctx.frame_count, 0.01, 1, 5) as usize;
+    // let upper_bound = oscillator::sine(ctx.frame_count, 0.0021, 1, 20) as usize;
+    // let div = oscillator::sine(ctx.frame_count, 0.005, lower_bound, upper_bound) as usize;
+    let div = oscillator::sine(ctx.frame_count, 0.0008, 1, 9) as usize;
+
+    if ctx.frame_count % div == 0 {
+        ctx.user_data.snake.move_forward();
+    }
+
+        let snake_buffer = ctx.user_data.snake.get_frame_buffer();
+        // for i in (0..ctx.frame_buf.len()).step_by(4) {
+        for i in 0..ctx.frame_buf.len() {
+            ctx.frame_buf[i] = snake_buffer[i];
+        }
+
+
+
+
+    // TODO: can we initialize the RNG only once and put it into heap?
+    let mut rng = GrayRng::new(ctx.frame_count as u32);
+    let random_colors = rng.get_random_gray_fast(
+
+        // ctx.frame_buf.len()/4,
+        ctx.frame_buf.len(),
+        0x00,
+        0x52,
+        0xff,
+        0xff,
+        // Some(ctx.frame_count as u32),
+        None
     );
 
-    // Resources to print the text
-    let text_color_prop = ctx.user_data.basic_concepts_pt1.text_color_props.clone();
-    let text_font = ctx.user_data.basic_concepts_pt1.text_font.clone().unwrap();
+    // TODO: consider turning this into a graph1 library function for simple noise? + the step parameter for skipping pixels
+        let step = 9;
+    for i in (0..ctx.frame_buf.len()).step_by(step) {
+        // ctx.frame_buf[i] = random_grays[i];
+        ctx.frame_buf[i] = rgba_operation(
+            ctx.frame_buf[i],
+            random_colors[i/step],
+            ColorOperation::Subtract,
+            false,
+        );
+    }
 
-    // Print the text
-    printer::print_line(
-        ctx,
-        &Point { x: 40, y: 110 },
-        &text_font,
-        &text_color_prop,
-        &"> Welcome to Basic Concepts pt. 2",
-    );
+        scanline::window(ctx, 1, 0x45);
 
-    // Blinking cursor
-    let color: u32 = if (ctx.frame_count / 40) % 2 == 0 {
-        ctx.win.background_color
-    } else {
-        ctx.win.foreground_color
-    };
-    draw::rectangle::filled(ctx, &RectArea::new(400, 104, 12, 28, Some(color)));
-
-    // apply the scanline effect
-    scanline::window(ctx, 1, 0x25);
 }

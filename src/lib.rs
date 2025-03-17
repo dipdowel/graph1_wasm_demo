@@ -38,6 +38,7 @@ pub mod demo {
 
     pub mod elements {
         pub mod cube;
+        pub mod snake;
     }
     //     /// A minimal example of displaying and animating a square on the screen
     //     pub mod bouncy;
