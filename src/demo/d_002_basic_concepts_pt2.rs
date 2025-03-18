@@ -2,6 +2,7 @@ use crate::demo::elements::snake::Snake;
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::{GraphContext, WindowContext};
 use graph1::fx::scanline;
+use graph1::primitives::point::Point;
 use graph1::utils::color::math::{rgba_operation, ColorOperation};
 use graph1::utils::color::palettes::{AutumnHarvest, RetroNeon};
 use graph1::utils::math::oscillator;
@@ -23,11 +24,25 @@ pub fn get_snake() -> Snake {
     Snake::new(
         win_context,
         WIDTH_TILES / 2,
-        HEIGHT_TILES / 4,
-        1 + HEIGHT_TILES / 5 * 4,
+        HEIGHT_TILES / 4, 3,
         WIDTH_TILES,
         HEIGHT_TILES,
-        321,
+        // 416,
+        1025,
+        vec![
+            Point::new(7, 7),
+            Point::new(5, 5),
+            Point::new(23, 11),
+            Point::new(22, 5),
+            Point::new(0, 11),
+            Point::new(3, 2),
+            Point::new(4, 5),
+            Point::new(8, 3),
+            Point::new(5, 10),
+            Point::new(12, 6),
+            Point::new(17, 9),
+            Point::new(14, 3),
+        ],
     )
 }
 

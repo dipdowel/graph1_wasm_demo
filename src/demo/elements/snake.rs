@@ -1,11 +1,11 @@
-use crate::demo::user_data::DemoUserData;
 use graph1::core::context::{GraphContext, WindowContext};
 use graph1::draw;
 use graph1::primitives::math::MinMax;
 use graph1::primitives::plane::RectArea;
-use graph1::utils::clear_screen;
+use graph1::primitives::point::Point;
 use graph1::utils::color::gradient;
-use graph1::utils::color::palettes::RetroNeon;
+use graph1::utils::color::math::{rgba_operation, ColorOperation};
+use graph1::utils::color::palettes::{SunsetGlow, TropicalParadise};
 use graph1::utils::math::rng::XorShiftRng;
 
 /// Represents the four possible movement directions.
@@ -15,6 +15,16 @@ enum Direction {
     Down,
     Left,
     Right,
+}
+
+/// Draws a tile at the given position with the specified color.
+fn draw_tile(ctx: &mut GraphContext, tile_x: u32, tile_y: u32, color: u32, width_tiles: u32) {
+    let container_side = ctx.win.w / width_tiles;
+    let tile_side = container_side - 2;
+    let x = 1 + tile_x * container_side;
+    let y = 1 + tile_y * container_side;
+    let rect = RectArea::square(x, y, tile_side, Some(color));
+    draw::rectangle::filled(ctx, &rect);
 }
 
 /// Structure representing the snake.
@@ -30,6 +40,7 @@ pub struct Snake {
     steps_limit: u32,                 // Number of steps to keep moving in the same direction
     tile_container_bg_color: u32,
     counter: u32,
+    apples: Vec<Point>,
 }
 
 impl Snake {
@@ -42,6 +53,7 @@ impl Snake {
         width_tiles: u32,
         height_tiles: u32,
         seed: u32,
+        apples: Vec<Point>,
     ) -> Self {
         let mut body = Vec::new();
         // Initially, the snake occupies consecutive tiles vertically.
@@ -65,13 +77,21 @@ impl Snake {
 
         for tile_y in 0..height_tiles {
             for tile_x in 0..width_tiles {
-                let container_side = ctx.win.w / width_tiles;
-                let tile_side = container_side - 2;
-                let x = 1 + tile_x * container_side;
-                let y = 1 + tile_y * container_side;
-                let rect = RectArea::square(x, y, tile_side, Some(ctx.win.background_color));
-                draw::rectangle::filled(&mut ctx, &rect);
+                let color = ctx.win.background_color;
+                draw_tile(&mut ctx, tile_x, tile_y, color, width_tiles);
             }
+        }
+
+        let apple_color = rgba_operation(
+            ctx.win.background_color,
+            0x33_44_22_ff,
+            ColorOperation::Subtract,
+            false,
+        );
+
+        for apple in apples.iter() {
+            draw_tile(&mut ctx, apple.x, apple.y, apple_color, width_tiles);
+            // draw_tile(&mut ctx, apple.x, apple.y, TropicalParadise::COCONUT_WHITE, width_tiles);
         }
 
         Self {
@@ -85,7 +105,8 @@ impl Snake {
             ctx,
             steps_limit: 4, // starting steps limit
             tile_container_bg_color,
-            counter:0
+            counter: 0,
+            apples,
         }
     }
 
@@ -95,14 +116,6 @@ impl Snake {
 
     /// Moves the snake one tile forward, updating the display.
     pub fn move_forward(&mut self) {
-
-
-        self.counter += 1;
-        if self.counter >100 &&  self.counter < 1000 && self.counter % 100 == 0 {
-            self.grow();
-        }
-
-
         // Determine the current head position.
         let head = *self.body.last().unwrap();
         // Compute the next tile based on the current direction.
@@ -193,6 +206,17 @@ impl Snake {
         }
         self.body.push(new_head);
         self.set_tile(new_head.0, new_head.1);
+
+        let potential_apple = Point {
+            x: new_head.0,
+            y: new_head.1,
+        };
+
+        if self.apples.contains(&potential_apple) {
+            self.grow();
+            self.apples.retain(|&x| x != potential_apple);
+        }
+
         // Decrement steps_limit for continuing in the same direction.
         self.steps_limit = self.steps_limit.saturating_sub(1);
     }
@@ -274,7 +298,7 @@ impl Snake {
         // Reinitialize steps_limit with a new random value.
         self.steps_limit = self.rng.get_u32(&MinMax {
             min: self.height_tiles / 4,
-            max: self.width_tiles / 7*4,
+            max: self.width_tiles / 7 * 4,
         });
     }
 
@@ -289,23 +313,15 @@ impl Snake {
         )
     }
 
-    /// Draws a tile at the given position with the specified color.
-    fn draw_tile(&mut self, tile_x: u32, tile_y: u32, color: u32) {
-        let container_side = self.ctx.win.w / self.width_tiles;
-        let tile_side = container_side - 2;
-        let x = 1 + tile_x * container_side;
-        let y = 1 + tile_y * container_side;
-        let rect = RectArea::square(x, y, tile_side, Some(color));
-        draw::rectangle::filled(&mut self.ctx, &rect);
-    }
-
     /// Resets the tile at the given position to the default color.
     fn reset_tile(&mut self, tile_x: u32, tile_y: u32) {
-        self.draw_tile(tile_x, tile_y, self.ctx.win.background_color);
+        let color = self.ctx.win.background_color;
+        draw_tile(&mut self.ctx, tile_x, tile_y, color, self.width_tiles);
     }
 
     /// Sets the tile at the given position to the snake color.
     fn set_tile(&mut self, tile_x: u32, tile_y: u32) {
-        self.draw_tile(tile_x, tile_y, self.ctx.win.foreground_color);
+        let color = self.ctx.win.foreground_color;
+        draw_tile(&mut self.ctx, tile_x, tile_y, color, self.width_tiles);
     }
 }
