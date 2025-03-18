@@ -51,7 +51,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // TODO: can we initialize the RNG only once and put it into heap?
     let mut rng = GrayRng::new(ctx.frame_count as u32);
-    let random_colors = rng.get_random_gray_fast(
+    let random_colors = rng.get_random_grays_32(
 
         ctx.frame_buf.len()/4,
         0x00,
@@ -88,7 +88,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.frame_buf[i] = rgba_operation(
             ctx.frame_buf[i],
             random_colors[i/4],
-            ColorOperation::Add,
+            &ColorOperation::Add,
             false,
         );
     }
