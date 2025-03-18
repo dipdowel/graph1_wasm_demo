@@ -1,25 +1,39 @@
 use crate::demo::elements::cube::Cube;
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
+use graph1::fx::noise::{WhiteNoise, WhiteNoiseProps};
 use graph1::fx::scanline;
-use graph1::primitives::math::MinMax;
-// use graph1::fx::noise::PerlinNoiseProps;
+
 use graph1::primitives::point::Point3D;
 use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
-use graph1::utils::color::math::{rgba_operation, ColorOperation};
+use graph1::utils::color::math::ColorOperation;
 use graph1::utils::color::palettes::RetroNeon;
 use graph1::utils::math::oscillator;
-use graph1::utils::math::rng::color::{ ColorRng};
-use graph1::utils::math::rng::gray::GrayRng;
-use graph1::utils::math::rng::XorShiftRng;
-use crate::utils::console_log;
 
 const SPEED: Point3D<f64> = Point3D {
     x: 1.4,
     y: -2.1,
     z: 1.7,
 };
+
+pub struct IntroUserData<'a> {
+    pub noise: WhiteNoise<'a>,
+}
+
+const NOISE_PROPS: WhiteNoiseProps = WhiteNoiseProps {
+    min_color: 0x00,
+    max_color: 0x25,
+    min_alpha: 0xff,
+    max_alpha: 0xff,
+    operation: Some(ColorOperation::Add),
+    step: Some(4),
+};
+
+pub fn get_user_data<'a>() -> IntroUserData<'a> {
+    let noise = WhiteNoise::new(123, &NOISE_PROPS);
+    IntroUserData { noise }
+}
 
 /// Render a frame with a clear screen.
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
@@ -32,78 +46,11 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     clear_screen(ctx);
 
-    /*
-        // TODO: can we initialize the RNG only once and put it into heap?
-        let range:MinMax<u32> = MinMax::new(255, 255 * 150);
-        let mut rng = XorShiftRng::new(ctx.frame_count as u32, ctx.frame_count as u64);
-        let random_colors = rng.get_vec_u32(ctx.frame_buf.len(), &range);
-
-        // TODO: consider turning this into a graph1 library function for simple noise? + the step parameter for skipping pixels
-        for i in (0..ctx.frame_buf.len()).step_by(4) {
-            ctx.frame_buf[i] = rgba_operation(
-                ctx.frame_buf[i],
-                random_colors[i],
-                ColorOperation::Add,
-                false,
-            );
-        }
-    */
-
-    // TODO: can we initialize the RNG only once and put it into heap?
-    let mut rng = GrayRng::new(ctx.frame_count as u32);
-    let random_colors = rng.get_random_grays_32(
-
-        ctx.frame_buf.len()/4,
-        0x00,
-        0x25,
-        0xff,
-        0xff,
-        // Some(ctx.frame_count as u32),
-        None
-    );
-
-    //
-    // let mut rng = ColorRng::new(500, 500);
-    // let random_colors = rng.get_random_colors_32(
-    //     ctx.frame_buf.len(),
-    //     0x00_00_00_ff,
-    //     0x33_88_33_ff,
-    //     Some(ctx.frame_count as u32),
-    //     // Some(ctx.frame_count as u64),
-    // //     None,
-    // );
-
-
-
-
-
-
-    // console_log(&format!(">>> random_mono_colors len {}", random_mono_colors.len()));
-    // console_log(&format!(">>> num pixels {}", ctx.win.get_num_pixels()));
-
-
-    // TODO: consider turning this into a graph1 library function for simple noise? + the step parameter for skipping pixels
-    for i in (0..ctx.frame_buf.len()).step_by(4) {
-        // ctx.frame_buf[i] = random_grays[i];
-        ctx.frame_buf[i] = rgba_operation(
-            ctx.frame_buf[i],
-            random_colors[i/4],
-            &ColorOperation::Add,
-            false,
-        );
-    }
-
-    // noise::perlin(&mut ctx.frame_buf, &ctx.win.dimensions_usize, &PerlinNoiseProps {
-    //     octaves: 5,
-    //     persistence: 13.78,
-    //     lacunarity: 2.5,
-    //     scale: 6.0,
-    //     seed_offset: 10.0,
-    //     offset: Point { x: 20.0, y:50.0},
-    //     tile_size: None,
-    //     seed: 225,
-    //
-    // });
+    // Add some noise to the background
+    ctx.user_data
+        .intro
+        .noise
+        .generate_32(&mut ctx.frame_buf, None, None);
 
     let cube_size = 60.0;
 
@@ -114,7 +61,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     };
 
     let speed_gain = oscillator::sine(ctx.frame_count, 0.01, -0.09, 0.09);
-    // console_log(&format!("frame:{} val:{}", ctx.frame_count, speed_gain));
 
     let speed_accelerated = Point3D {
         x: SPEED.x + speed_gain,
