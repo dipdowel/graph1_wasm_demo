@@ -54,7 +54,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             ctx.frame_buf[i] = rgba_operation(
                 ctx.frame_buf[i],
                 0x20_20_20_ff,
-                &ColorOperation::Subtract,
+                ColorOperation::Subtract,
                 false,
             );
         } else {
