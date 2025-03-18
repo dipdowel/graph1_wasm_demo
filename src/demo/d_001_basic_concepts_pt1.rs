@@ -7,10 +7,8 @@ use graph1::primitives::point::Point;
 use graph1::text::font::Spacing;
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
 use graph1::text::printer;
-use graph1::text::printer::Align;
 use graph1::utils::clear_screen;
 use graph1::utils::color::palettes::RetroNeon;
-
 
 
 /// Render a frame with a clear screen.
@@ -54,5 +52,5 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     draw::rectangle::filled(ctx, &RectArea::new(400, 104, 12, 28, Some(color)));
 
     // apply the scanline effect
-    scanline::window(ctx, 1, 0x25);
+    scanline::window(ctx, 1, 0x3a);
 }
