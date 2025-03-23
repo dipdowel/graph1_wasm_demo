@@ -10,7 +10,6 @@ use graph1::text::printer;
 use graph1::utils::clear_screen;
 use graph1::utils::color::palettes::RetroNeon;
 
-
 /// Render a frame with a clear screen.
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if ctx.frame_count == 0 {
@@ -50,6 +49,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.win.foreground_color
     };
     draw::rectangle::filled(ctx, &RectArea::new(400, 104, 12, 28, Some(color)));
+
 
     // apply the scanline effect
     scanline::window(ctx, 1, 0x3a);

@@ -13,7 +13,7 @@ pub struct AlphaUserData {
     pub dx: i32,
     pub dy: i32,
 }
-pub const ALPHA_USER_DATA:AlphaUserData = AlphaUserData {
+pub const ALPHA_USER_DATA: AlphaUserData = AlphaUserData {
     x: 10,
     y: 10,
     dx: 1,
@@ -76,7 +76,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.user_data.alpha.dy = 1;
     }
 
-
     // Read the animation values from the context
     let AlphaUserData {
         mut x,
@@ -115,6 +114,11 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let side = SQUARE_SIDE_PX as u32;
 
     // Finally, render Alpha Bouncy on the window surface
-    rectangle::filled(ctx, &RectArea::square(x, y, side, Some(BOUNCY_COLOR_WITH_ALPHA)));
+    rectangle::filled(
+        ctx,
+        &RectArea::square(x, y, side, Some(BOUNCY_COLOR_WITH_ALPHA)),
+    );
+
+
     scanline::window(ctx, 1, 0x2f);
 }
