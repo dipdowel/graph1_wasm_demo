@@ -5,6 +5,7 @@ use graph1::core::context::GraphContext;
 use graph1::fx::glitch::HorizontalGlitchProps;
 use graph1::fx::noise::{WhiteNoise, WhiteNoiseProps};
 use graph1::fx::{glitch, scanline};
+use graph1::hash_random_u32;
 use graph1::primitives::point::Point3D;
 use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
@@ -13,6 +14,7 @@ use graph1::utils::color::palettes::RetroNeon;
 use graph1::utils::math::constants::golden_ratio::GOLDEN_RATIO_U32;
 use graph1::utils::math::constants::mersenne::MERSENNE_LIKE_PRIME_32;
 use graph1::utils::math::oscillator;
+use crate::utils::console_log;
 
 const SPEED: Point3D<f64> = Point3D {
     x: 1.4,
@@ -110,10 +112,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     if is_glitching {
 
-        // TODO: replace with a macro from `graph1` once it's available
-        let random = ((ctx.frame_count as u64 * GOLDEN_RATIO_U32 as u64)
-            % MERSENNE_LIKE_PRIME_32 as u64) as u32;
 
+        let random = hash_random_u32!(ctx.frame_count);
+        
         if random % 9 == 0 {
             glitch::horizontal_glitch(
                 ctx,
