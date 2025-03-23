@@ -1,14 +1,17 @@
 use crate::demo::elements::cube::Cube;
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
-use graph1::fx::noise::{WhiteNoise, WhiteNoiseProps};
-use graph1::fx::scanline;
 
+use graph1::fx::glitch::HorizontalGlitchProps;
+use graph1::fx::noise::{WhiteNoise, WhiteNoiseProps};
+use graph1::fx::{glitch, scanline};
 use graph1::primitives::point::Point3D;
 use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
 use graph1::utils::color::math::ColorOperation;
 use graph1::utils::color::palettes::RetroNeon;
+use graph1::utils::math::constants::golden_ratio::GOLDEN_RATIO_U32;
+use graph1::utils::math::constants::mersenne::MERSENNE_LIKE_PRIME_32;
 use graph1::utils::math::oscillator;
 
 const SPEED: Point3D<f64> = Point3D {
@@ -101,6 +104,39 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         gradient::linear_step(ctx.win.background_color, RetroNeon::LASER_LIME, 255, 80),
     );
     cube.render(ctx, None);
+
+    let os: u32 = oscillator::sine(50+ctx.frame_count, 0.0005, 0, 200) as u32;
+    let is_glitching = os > 195 || os < 5 || (os > 90 && os < 95) || (os > 41 && os < 45);
+
+    if is_glitching {
+
+        // TODO: replace with a macro from `graph1` once it's available
+        let random = ((ctx.frame_count as u64 * GOLDEN_RATIO_U32 as u64)
+            % MERSENNE_LIKE_PRIME_32 as u64) as u32;
+
+        if random % 9 == 0 {
+            glitch::horizontal_glitch(
+                ctx,
+                &mut HorizontalGlitchProps {
+                    strength: 25,
+                    chance: 220,
+                    left_right_balance: 128,
+                },
+                None,
+            );
+        }
+        if random % 42 == 0 {
+            glitch::horizontal_glitch(
+                ctx,
+                &mut HorizontalGlitchProps {
+                    strength: ctx.win.w / 2,
+                    chance: 180,
+                    left_right_balance: 128,
+                },
+                None,
+            );
+        }
+    }
 
     scanline::window(ctx, 1, 48);
 }
