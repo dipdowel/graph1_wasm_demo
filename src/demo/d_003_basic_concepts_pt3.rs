@@ -1,7 +1,8 @@
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
 use graph1::draw;
-use graph1::fx::scanline;
+use graph1::fx::glitch::HorizontalGlitchProps;
+use graph1::fx::{glitch, scanline};
 use graph1::primitives::plane::RectArea;
 use graph1::primitives::point::Point;
 use graph1::text::font::Spacing;
@@ -10,6 +11,7 @@ use graph1::text::printer;
 use graph1::text::printer::Align;
 use graph1::utils::clear_screen;
 use graph1::utils::color::palettes::RetroNeon;
+use graph1::utils::math::oscillator;
 
 /// Render a frame with two rectangles on the screen.
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
@@ -41,7 +43,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // x = 20, y = 200, width = 440, height = 20, vibrant cyan color
     draw::rectangle::filled(
         ctx,
-        &RectArea::new(20, ctx.win.h - 40, width, 20, Some(RetroNeon::NEON_PINK)),
+        &RectArea::new(20, ctx.win.h - 40, width, 20, Some(RetroNeon::LASER_AQUA)),
     );
 
     // Resources to print the text
@@ -64,6 +66,31 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.win.foreground_color
     };
     draw::rectangle::filled(ctx, &RectArea::new(400, 104, 12, 28, Some(color)));
+
+    // The glitch engine ;P
+    if ctx.frame_count % 9 == 0 {
+        let chance = if ctx.frame_count % 7 == 0 {
+            oscillator::sine(ctx.frame_count, 0.01, 15, 100) as u8
+        } else {
+            oscillator::sine(ctx.frame_count, 0.001, 15, 50) as u8
+        };
+
+        let strength = if ctx.frame_count % 3 == 0 {
+            oscillator::sine(ctx.frame_count, 0.01, 15, 100) as u32
+        } else {
+            oscillator::sine(ctx.frame_count, 0.001, 15, 200) as u32
+        };
+
+        glitch::horizontal_glitch(
+            ctx,
+            &mut HorizontalGlitchProps {
+                strength,
+                chance,
+                left_right_balance: 128,
+            },
+            None,
+        );
+    }
 
     // apply the scanline effect
     scanline::window(ctx, 1, 0x25);
