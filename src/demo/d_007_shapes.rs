@@ -1,7 +1,13 @@
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
 use graph1::draw;
+use graph1::fx::scanline::window;
+use graph1::primitives::Pixel;
+use graph1::primitives::plane::RectArea;
 use graph1::primitives::point::Point;
+use graph1::utils::clear_screen;
+use graph1::utils::color::palettes::RetroNeon;
+use graph1::utils::math::oscillator;
 
 //---------------------------------------------------------------------
 // Configure the user data
@@ -18,22 +24,31 @@ use graph1::primitives::point::Point;
  
 /// Illustrates how color Intensity and color Luminance are different
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-    let mut current_frame = ctx.frame_count as i32;
+
 
     // initialize the data maintained between frames
-    if current_frame == 0 {
-        ctx.user_data.ghosts.current_point.x = 26;
-        ctx.user_data.ghosts.current_point.y = 0;
-        ctx.user_data.ghosts.direction.x = 1;
-        ctx.user_data.ghosts.direction.y = 0;
-        return;
-    }
+    // if current_frame == 0 {
+    //     ctx.user_data.ghosts.current_point.x = 26;
+    //     ctx.user_data.ghosts.current_point.y = 0;
+    //     ctx.user_data.ghosts.direction.x = 1;
+    //     ctx.user_data.ghosts.direction.y = 0;
+    //     return;
+    // }
 
-    // Clear the screen
-    draw::tools::fill::buffer(&mut ctx.frame_buf, 0xff_00_ff_00, ctx.num_threads);
+    clear_screen(ctx);
 
-    // Change direction when the ghost approaches the edge of the screen
-    // if current_frame % (ctx.win.w_i32 - 106) == 0 {
-    //     ctx.user_data.ghosts.direction.x *= -1;
-    // } 
+    let c:(Pixel, Pixel, Pixel, Pixel) = (
+        ctx.win.quadrants.top_left.center().to_pixel(RetroNeon::CIRCUIT_GREEN),
+        ctx.win.quadrants.top_right.center().to_pixel(RetroNeon::ACID_GREEN),
+        ctx.win.quadrants.bottom_left.center().to_pixel(RetroNeon::LASER_LIME),
+        ctx.win.quadrants.bottom_right.center().to_pixel(RetroNeon::CYBER_YELLOW),
+    );
+
+    draw::circle2::filled(ctx, &c.3, oscillator::sine(ctx.frame_count + 0, 0.02, 4, 70) as u32, 0);
+    draw::circle2::filled(ctx, &c.1, oscillator::sine(ctx.frame_count + 35, 0.02, 4, 70)  as u32, 0);
+    draw::circle2::filled(ctx, &c.2, oscillator::sine(ctx.frame_count  + 70, 0.02, 4, 70) as u32, 0);
+    draw::circle2::filled(ctx, &c.0, oscillator::sine(ctx.frame_count + 105, 0.02, 4, 70) as u32, 0);
+
+
+
 }
