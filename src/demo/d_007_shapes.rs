@@ -1,6 +1,8 @@
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
 use graph1::draw;
+use graph1::fx::{glitch, scanline};
+use graph1::fx::glitch::HorizontalGlitchProps;
 use graph1::fx::scanline::window;
 use graph1::primitives::Pixel;
 use graph1::primitives::plane::RectArea;
@@ -44,11 +46,23 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.win.quadrants.bottom_right.center().to_pixel(RetroNeon::CYBER_YELLOW),
     );
 
-    draw::circle2::filled(ctx, &c.3, oscillator::sine(ctx.frame_count + 0, 0.02, 4, 70) as u32, 0);
-    draw::circle2::filled(ctx, &c.1, oscillator::sine(ctx.frame_count + 35, 0.02, 4, 70)  as u32, 0);
-    draw::circle2::filled(ctx, &c.2, oscillator::sine(ctx.frame_count  + 70, 0.02, 4, 70) as u32, 0);
-    draw::circle2::filled(ctx, &c.0, oscillator::sine(ctx.frame_count + 105, 0.02, 4, 70) as u32, 0);
+    let max_radius = ctx.win.quadrants.bottom_left.width()/4;
+
+    draw::circle::filled(ctx, &c.3, oscillator::sine(ctx.frame_count + 0, 0.02, 4, max_radius) as u32, 0);
+    draw::circle::filled(ctx, &c.1, oscillator::sine(ctx.frame_count + 35, 0.02, 4, max_radius)  as u32, 0);
+    draw::circle::filled(ctx, &c.2, oscillator::sine(ctx.frame_count  + 70, 0.02, 4, max_radius) as u32, 0);
+    draw::circle::filled(ctx, &c.0, oscillator::sine(ctx.frame_count + 105, 0.02, 4, max_radius) as u32, 0);
 
 
+
+    // glitch::horizontal_glitch(
+    //     ctx,
+    //     &mut HorizontalGlitchProps {
+    //         strength: 30,
+    //         chance: 10,
+    //         left_right_balance: 128,
+    //     },
+    //     None,
+    // );
 
 }
