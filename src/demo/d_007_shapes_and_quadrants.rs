@@ -93,11 +93,11 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     );
 
 
-    draw::rectangle::filled(ctx, &RectArea {
-        top_left: ctx.win.quadrants.top_left.right() ,
-        dimensions: Dimensions2d::new(100, 100),
-        color: Some(RetroNeon::GLITCH_RED),
-    });
+    // draw::rectangle::filled(ctx, &RectArea {
+    //     top_left: ctx.win.quadrants.top_left.right() ,
+    //     dimensions: Dimensions2d::new(100, 100),
+    //     color: Some(RetroNeon::GLITCH_RED),
+    // });
         
         
 
