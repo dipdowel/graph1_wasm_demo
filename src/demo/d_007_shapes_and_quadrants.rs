@@ -64,7 +64,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     let mut i: usize =
         oscillator::sine(ctx.frame_count, 0.000055 * max_radius as f64, 0, 7) as usize;
-    i = i.min(i - 4);
+    i = i.min(0);
 
     let color: (u32, u32, u32, u32) = (
         gradient::linear_step(bg, fg[i], max_radius as usize, r.0 as usize),
