@@ -1,7 +1,7 @@
 use crate::demo::elements::cube::Cube;
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
-
+use graph1::core::misc::line_clipping_style::LineClippingStyle;
 use graph1::fx::glitch::HorizontalGlitchProps;
 use graph1::fx::noise::{WhiteNoise, WhiteNoiseProps};
 use graph1::fx::{glitch, scanline};
@@ -43,6 +43,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let color_end = gradient::linear_step(RetroNeon::CYBER_BLUE, 0x0a0a0aff, 255, 40);
 
     let gradient_step = oscillator::sine(ctx.frame_count, 0.0008, 4, 198) as usize;
+
+    ctx.line_clipping = LineClippingStyle::ElasticSlide;
 
     ctx.win.background_color = gradient::linear_step(color_start, color_end, 400, gradient_step);
 
@@ -104,12 +106,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     );
     cube.render(ctx, None);
 
-    let os: u32 = oscillator::sine(50+ctx.frame_count, 0.0005, 0, 200) as u32;
+    let os: u32 = oscillator::sine(50 + ctx.frame_count, 0.0005, 0, 200) as u32;
     let is_glitching = os > 195 || os < 5 || (os > 90 && os < 95) || (os > 41 && os < 45);
 
     if is_glitching {
-
-
         let random = hash_random_u32!(ctx.frame_count);
 
         if random % 9 == 0 {
