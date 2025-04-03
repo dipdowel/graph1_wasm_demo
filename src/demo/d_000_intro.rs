@@ -1,3 +1,4 @@
+use graph1::core::context::alpha::AlphaMethod;
 use crate::demo::elements::cube::Cube;
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
@@ -45,8 +46,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let gradient_step = oscillator::sine(ctx.frame_count, 0.0008, 4, 198) as usize;
 
     ctx.line_clipping = LineClippingStyle::ElasticSlide;
-
     ctx.win.background_color = gradient::linear_step(color_start, color_end, 400, gradient_step);
+    ctx.alpha.enabled = false;
 
     clear_screen(ctx);
 
@@ -95,6 +96,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         center,
         cube_size,
         gradient::linear_step(ctx.win.background_color, RetroNeon::LASER_LIME, 255, 120),
+        // 0xcc_ff_00_33
     );
     cube.render(ctx, None);
 
@@ -103,6 +105,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         center,
         cube_size * 1.045,
         gradient::linear_step(ctx.win.background_color, RetroNeon::LASER_LIME, 255, 80),
+        // 0xcc_ff_00_22
     );
     cube.render(ctx, None);
 
