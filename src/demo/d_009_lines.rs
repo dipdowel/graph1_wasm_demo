@@ -67,7 +67,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         Point::new(x + s_len * sx + dx * sx, y + s_len * sy + dy * sy)
     }
 
-    let lw = oscillator::sine(ctx.frame_count, 0.002, 1, 9) as usize;
+    let lw = oscillator::sine(ctx.frame_count, 0.0028, 1, 9) as usize;
     let line_width = lw;
 
     // starting coordinates

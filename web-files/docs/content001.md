@@ -50,4 +50,4 @@ println!("Width as i32{}", win_ctx.w_i32); // 320
 println!("Window dimensions as `Dimensions2d`{:?}", win_ctx.dimensions);
 // Dimensions2d { w: 320, h: 240 }
 ```
-Graph1 is relatively low-level, so it's expected that you know what you're doing and that you won't overwrite, say, `win_ctx.w_i32` with a value that's not a valid window width, e.g. `-640`. Introducing getters could make it safer, but it would also slow things down if window properties are accessed in a tight loop `(TODO: this statement needs to be benchmarked! Check the #[inline] directive)`.
+Graph1 is relatively low-level, so it's expected that you know what you're doing and that you won't overwrite, say, `win_ctx.w_i32` with a value that's not a valid window width, e.g. `-640`. Introducing getters could make it safer, but it would also make us type those `()` each time.

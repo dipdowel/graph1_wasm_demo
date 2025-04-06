@@ -283,11 +283,24 @@
                 inset 0 0 20px ${glowColor}`;
         }
 
+
+        // Throttle the framerate (just in case, if someone has a too good of a computer
+        let lastTimestamp = 0;
+        let maxFPS = 120;
+        let period = 1000 / maxFPS; // ms for each frame
+
+
         /**
          * Main rendering function, updates the canvas content, applies glow effect, and increments frame count.
          */
-        function render() {
+        function render(timestamp) {
+          requestAnimationFrame(render);
           if (isPaused) return;
+
+          // skip if period ms hasn't passed since last frame
+          if (timestamp - lastTimestamp < period) return;
+
+          lastTimestamp = timestamp;
 
           const pixel_stats = update_frame(frame_count);
 
@@ -302,7 +315,7 @@
           applyGlowEffect(pixel_stats);
 
           frame_count++;
-          requestAnimationFrame(render);
+
         }
 
         renderFunction = render;
