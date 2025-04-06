@@ -62,7 +62,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         line::between_two_points(ctx, &p0, &p1, Some(ctx.win.foreground_color));
     }
 
-
     #[inline(always)]
     fn p(x: i32, y: i32, s_len: i32, dx: i32, dy: i32, sx: i32, sy: i32) -> Point<i32> {
         Point::new(x + s_len * sx + dx * sx, y + s_len * sy + dy * sy)
@@ -70,7 +69,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     let lw = oscillator::sine(ctx.frame_count, 0.002, 1, 9) as usize;
     let line_width = lw;
-
 
     // starting coordinates
     let x = 20;
@@ -91,42 +89,37 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     sx = 0;
     sy = 0;
-    ctx.line.anti_aliasing.enabled = false;
-    ctx.line.rasterization = RasterizationMethod::Int;
+    ctx.line.set_int_no_aa(None);
     draw(ctx, p(x, y, s_len, dx, dy, sx, sy), s_len);
 
     sx = 1;
     sy = 0;
-    ctx.line.rasterization = RasterizationMethod::Float;
+    ctx.line.set_float_no_aa(None);
     draw(ctx, p(x, y, s_len, dx, dy, sx, sy), s_len);
 
     sx = 2;
     sy = 0;
-    ctx.line.width_int += 1;
-    ctx.line.anti_aliasing.enabled = true;
-    ctx.line.anti_aliasing.method = AntiAliasingMethod::Int;
-    ctx.line.rasterization = RasterizationMethod::Int;
+    ctx.line.set_int_aa_int(Some(ctx.line.width_int + 1));
     draw(ctx, p(x, y, s_len, dx, dy, sx, sy), s_len);
     ctx.line.width_int -= 1;
 
     sx = 3;
     sy = 0;
-    ctx.line.rasterization = RasterizationMethod::Float;
+    ctx.line.set_float_aa_int(None);
+
     draw(ctx, p(x, y, s_len, dx, dy, sx, sy), s_len);
 
     // Start of the bottom raw of sample line groups. there are 2 groups of lines in the row
 
     sx = 1;
     sy = 1;
-    ctx.line.anti_aliasing.enabled = true;
-    ctx.line.anti_aliasing.method = AntiAliasingMethod::Float;
-    ctx.line.rasterization = RasterizationMethod::Int;
+    ctx.line.set_int_aa_float(None);
     draw(ctx, p(x, y, s_len, dx, dy, sx, sy), s_len);
 
     sx = 2;
     sy = 1;
-    ctx.line.width_float += 1.0;
-    ctx.line.rasterization = RasterizationMethod::Float;
+    ctx.line
+        .set_float_aa_float(Some(ctx.line.width_float + 1.0));
     draw(ctx, p(x, y, s_len, dx, dy, sx, sy), s_len);
     ctx.line.width_float -= 1.0;
 
@@ -157,5 +150,4 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     printer::print_line(ctx, &Point { x: 446, y: 202 }, &font2, &props, &lw_str);
 
     scanline::window(ctx, 1, 48);
-
 }
