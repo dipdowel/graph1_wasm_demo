@@ -3,7 +3,7 @@ mod utils;
 
 use crate::demo::user_data::DemoUserData;
 
-use crate::demo::{d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_004_bouncy, d_005_alpha, d_006_luminance_vs_intensity, test_card, d_003_basic_concepts_pt3, d_007_shapes_and_quadrants, d_008_polygons};
+use crate::demo::{d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_004_bouncy, d_005_alpha, d_006_luminance_vs_intensity, test_card, d_003_basic_concepts_pt3, d_007_shapes_and_quadrants, d_008_polygons, d_009_lines};
 use crate::utils::console_log;
 use graph1::core::context::{GraphContext, WindowContext};
 use graph1::utils::color;
@@ -30,6 +30,9 @@ pub mod demo {
     
     pub mod d_007_shapes_and_quadrants;
     pub mod d_008_polygons;
+
+    pub mod d_009_lines;
+
 
     pub mod test_card;
 
@@ -116,7 +119,7 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
             );
 
             // Create a context with the basic configuration
-            let ctx: GraphContext<DemoUserData> = GraphContext::new(win_ctx, true, true, None, 1);
+            let ctx: GraphContext<DemoUserData> = GraphContext::new(win_ctx, true, true, None, 1, None);
 
             // Place the context into the global container
             // so that it persists between frames
@@ -181,7 +184,8 @@ pub fn update_frame(frame: usize) -> PixelStats {
                 6 => d_006_luminance_vs_intensity::render_frame(&mut ctx),
                 7 => d_007_shapes_and_quadrants::render_frame(&mut ctx),
                 8 => d_008_polygons::render_frame(&mut ctx),
-                
+                9 => d_009_lines::render_frame(&mut ctx),
+
                 // 5 => circles::render_frame(&mut ctx),
                 _ => test_card::render_frame(&mut ctx),
             }

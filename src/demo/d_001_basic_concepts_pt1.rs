@@ -16,7 +16,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.win.background_color = RetroNeon::CYBER_BLUE;
         ctx.win.foreground_color = RetroNeon::LASER_LIME;
 
-        ctx.user_data.basic_concepts_pt1.text_font = Some(instantiate_embedded_font(
+        ctx.user_data.basic_concepts_pt1.text_font = Some( instantiate_embedded_font(
             EmbeddedFonts::CCRedAlertInet,
             2,
             Some(Spacing {

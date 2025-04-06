@@ -128,7 +128,10 @@ impl Cube {
             let p0 = Point::new(v0.x.round() as i32, v0.y.round() as i32);
             let p1 = Point::new(v1.x.round() as i32, v1.y.round() as i32);
 
+
+
             line::between_two_points(ctx, &p0, &p1, Some(self.color));
+
         }
     }
 }

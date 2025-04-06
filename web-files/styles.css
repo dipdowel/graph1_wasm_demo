@@ -155,6 +155,10 @@ pre {
 
 canvas {
     image-rendering: high-quality;
+    /*image-rendering: crisp-edges;*/
+    /*image-rendering: pixelated;*/
+    /*image-rendering: smooth;*/
+    /*image-rendering: optimizeQuality;*/
     border: 1px solid #333333;
     border-radius: 6px;
     background-color: #0f0f1f;
@@ -321,8 +325,6 @@ table caption {
 
 /* TODO: Consider moving to a dedicated file ? */
 @media (max-width: 768px) {
-
-
 
     canvas {
         width: 100vw; /* Scales canvas width relative to viewport */

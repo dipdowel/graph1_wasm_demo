@@ -1,7 +1,7 @@
 use graph1::core::context::alpha::AlphaMethod;
 use crate::demo::elements::cube::Cube;
 use crate::demo::user_data::DemoUserData;
-use graph1::core::context::GraphContext;
+use graph1::core::context::{AntiAliasingMethod, GraphContext, RasterizationMethod};
 use graph1::core::misc::line_clipping_style::LineClippingStyle;
 use graph1::fx::glitch::HorizontalGlitchProps;
 use graph1::fx::noise::{WhiteNoise, WhiteNoiseProps};
@@ -45,7 +45,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     let gradient_step = oscillator::sine(ctx.frame_count, 0.0008, 4, 198) as usize;
 
-    ctx.line_clipping = LineClippingStyle::ElasticSlide;
+    ctx.line.clipping = LineClippingStyle::ElasticSlide;
     ctx.win.background_color = gradient::linear_step(color_start, color_end, 400, gradient_step);
     ctx.alpha.enabled = false;
 
@@ -74,6 +74,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     };
 
     // console_log(&format!("{:?}", speed_accelerated));
+    //
+
+
+
 
     let mut cube_inner = Cube::new(
         speed_accelerated,
@@ -91,6 +95,13 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         }),
     );
 
+
+    // ctx.line.stroke_width_int = 4;
+    // ctx.line.stroke_width_float = 4.0;
+    // ctx.line.rasterization = RasterizationMethod::Float;
+    // ctx.line.anti_aliasing.method = AntiAliasingMethod::Float;
+    // ctx.line.anti_aliasing.enabled = true;
+
     let mut cube = Cube::new(
         SPEED,
         center,
@@ -103,7 +114,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let mut cube = Cube::new(
         SPEED,
         center,
-        cube_size * 1.045,
+        cube_size * 1.095,
         gradient::linear_step(ctx.win.background_color, RetroNeon::LASER_LIME, 255, 80),
         // 0xcc_ff_00_22
     );
@@ -139,5 +150,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         }
     }
 
+
+
     scanline::window(ctx, 1, 48);
+
+
 }
