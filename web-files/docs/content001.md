@@ -5,6 +5,7 @@ Struct `GraphContext` is the heart of Graph1. It provides access to all the core
 - `AlphaContext` — properties for alpha blending 
 - `BezierContext` — properties for Bézier curves
 - `WindowContext` — all the window-related properties 
+- `LineContext` — settings for drawing lines 
 
 
 Let's skip the `BezierContext` and `AlphaContext` for now as they are not essential for the basic setup.

@@ -1,8 +1,7 @@
-use graph1::core::context::alpha::AlphaMethod;
 use crate::demo::elements::cube::Cube;
 use crate::demo::user_data::DemoUserData;
-use graph1::core::context::{AntiAliasingMethod, GraphContext, RasterizationMethod};
-use graph1::core::misc::line_clipping_style::LineClippingStyle;
+use graph1::core::context::GraphContext;
+use graph1::core::context_utils::line_clipping_style::LineClippingStyle;
 use graph1::fx::glitch::HorizontalGlitchProps;
 use graph1::fx::noise::{WhiteNoise, WhiteNoiseProps};
 use graph1::fx::{glitch, scanline};
@@ -46,6 +45,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let gradient_step = oscillator::sine(ctx.frame_count, 0.0008, 4, 198) as usize;
 
     ctx.line.clipping = LineClippingStyle::ElasticSlide;
+
     ctx.win.background_color = gradient::linear_step(color_start, color_end, 400, gradient_step);
     ctx.alpha.enabled = false;
 
@@ -76,9 +76,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // console_log(&format!("{:?}", speed_accelerated));
     //
 
-
-
-
     let mut cube_inner = Cube::new(
         speed_accelerated,
         center,
@@ -86,6 +83,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         RetroNeon::LASER_LIME,
     );
 
+    let min_w = 1.1;
+    let max_w = 3.0;
+    let inner_cube_width = oscillator::sine(ctx.frame_count, 0.0008, min_w, max_w) as f32;
+    ctx.line.set_float_no_aa(Some(inner_cube_width ));
     cube_inner.render(
         ctx,
         Some(&Point3D {
@@ -94,7 +95,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             z: speed_gain * -50.0,
         }),
     );
-
+    // ctx.line.set_float_no_aa(Some(max_w- inner_cube_width));
+    ctx.line.set_int_no_aa(Some(1));
 
     // ctx.line.stroke_width_int = 4;
     // ctx.line.stroke_width_float = 4.0;
@@ -150,9 +152,5 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         }
     }
 
-
-
     scanline::window(ctx, 1, 48);
-
-
 }
