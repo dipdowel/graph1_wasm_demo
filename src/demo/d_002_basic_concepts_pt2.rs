@@ -5,13 +5,26 @@ use graph1::fx::scanline;
 use graph1::primitives::point::Point;
 use graph1::utils::color::math::{rgba_operation, ColorOperation};
 use graph1::utils::color::palettes::{AutumnHarvest, RetroNeon};
-use graph1::utils::math::oscillator;
 
 const WIN_WIDTH: u32 = 480;
 const WIN_HEIGHT: u32 = 240;
 
 const WIDTH_TILES: u32 = 24; // | 12 | 24 | 48
 const HEIGHT_TILES: u32 = 12; // | 6 | 12 | 24
+
+fn get_speed_divider(speed_points: u32) -> usize {
+    if speed_points > 60 {
+        2
+    } else if speed_points > 50 {
+        3
+    } else if speed_points > 40 {
+        4
+    } else if speed_points > 20 {
+        5
+    } else {
+        6
+    }
+}
 
 pub fn get_snake() -> Snake {
     let win_context = WindowContext::new(
@@ -24,17 +37,33 @@ pub fn get_snake() -> Snake {
     Snake::new(
         win_context,
         WIDTH_TILES / 2,
-        HEIGHT_TILES / 4, 3,
+        HEIGHT_TILES / 4,
+        3,
         WIDTH_TILES,
         HEIGHT_TILES,
-        // 416,
         1025,
         vec![
+
+            Point::new(23, 11),
+            Point::new(9, 6),
+            Point::new(12, 6),
+            Point::new(17, 9),
+            Point::new(1, 11),
+            Point::new(3, 2),
+            Point::new(14, 3),
             Point::new(7, 7),
-            Point::new(5, 5),
+            Point::new(5, 10),
+            Point::new(4, 5),
+            Point::new(8, 3),
+            Point::new(11, 8),
+            Point::new(13, 4),
+
+            /*
+            Point::new(7, 7),
+            Point::new(9, 6),
             Point::new(23, 11),
             Point::new(22, 5),
-            Point::new(0, 11),
+            Point::new(1, 11),
             Point::new(3, 2),
             Point::new(4, 5),
             Point::new(8, 3),
@@ -42,6 +71,8 @@ pub fn get_snake() -> Snake {
             Point::new(12, 6),
             Point::new(17, 9),
             Point::new(14, 3),
+
+             */
         ],
     )
 }
@@ -53,13 +84,16 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if ctx.frame_count == 0 {
         ctx.win.background_color = RetroNeon::CYBER_BLUE;
         ctx.win.foreground_color = RetroNeon::LASER_LIME;
-        
+
         // reset the snake, helps the `restart` button work correctly
         ctx.user_data.snake = get_snake();
     }
 
+    let speed_points = ctx.user_data.snake.speed_points;
+
     // Divider for defining the snake speed
-    let div = oscillator::sine(ctx.frame_count, 0.0008, 2, 6) as usize;
+    // (depends on speed points that the snake got after eating an apple)
+    let div = get_speed_divider(speed_points);
 
     if ctx.frame_count % div == 0 {
         ctx.user_data.snake.move_forward();
@@ -80,34 +114,5 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         }
     }
 
-    /*
-        let mut noise:WhiteNoise = WhiteNoise::new(ctx.frame_count as u32, &WhiteNoiseProps {
-            min_color: 0x5f,
-            max_color: 0x5f,
-            min_alpha: 0xff,
-            max_alpha: 0xff,
-            operation: Some(ColorOperation::Subtract),
-            step: Some(9),
-        });
-        noise.generate_32(&mut ctx.frame_buf, None, None);
-    */
-
     scanline::window(ctx, 1, 0x36);
 }
-
-// // TODO: can we initialize the RNG only once and put it into heap?
-// let mut rng = GrayRng::new(ctx.frame_count as u32);
-// let random_colors = rng.get_random_grays_32(ctx.frame_buf.len(), 0x00, 0x52, 0xff, 0xff, None);
-//
-//
-// let step = 9;
-// for i in (0..ctx.frame_buf.len()).step_by(step) {
-//     // ctx.frame_buf[i] = random_grays[i];
-//     ctx.frame_buf[i] = rgba_operation(
-//         ctx.frame_buf[i],
-//         random_colors[i / step],
-//
-//         &ColorOperation::Subtract,
-//         false,
-//     );
-// }

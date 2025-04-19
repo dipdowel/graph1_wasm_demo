@@ -5,7 +5,6 @@ use graph1::primitives::plane::RectArea;
 use graph1::primitives::point::Point;
 use graph1::utils::color::gradient;
 use graph1::utils::color::math::{rgba_operation, ColorOperation};
-use graph1::utils::color::palettes::{SunsetGlow, TropicalParadise};
 use graph1::utils::math::rng::XorShiftRng;
 
 /// Represents the four possible movement directions.
@@ -27,6 +26,8 @@ fn draw_tile(ctx: &mut GraphContext, tile_x: u32, tile_y: u32, color: u32, width
     draw::rectangle::filled(ctx, &rect);
 }
 
+const APPLE_SPEED_BOOST: u32 = 64;
+
 /// Structure representing the snake.
 pub struct Snake {
     body: Vec<(u32, u32)>, // Stores (x, y) coordinates of the snake body (tail is at index 0, head is at last)
@@ -41,6 +42,7 @@ pub struct Snake {
     tile_container_bg_color: u32,
     counter: u32,
     apples: Vec<Point>,
+    pub speed_points: u32,
 }
 
 impl Snake {
@@ -107,6 +109,7 @@ impl Snake {
             tile_container_bg_color,
             counter: 0,
             apples,
+            speed_points: 0,
         }
     }
 
@@ -116,6 +119,11 @@ impl Snake {
 
     /// Moves the snake one tile forward, updating the display.
     pub fn move_forward(&mut self) {
+
+        if self.speed_points > 0 {
+            self.speed_points -= 1;
+        }
+
         // Determine the current head position.
         let head = *self.body.last().unwrap();
         // Compute the next tile based on the current direction.
@@ -213,7 +221,10 @@ impl Snake {
         };
 
         if self.apples.contains(&potential_apple) {
+
+            // console_log(&format!("{:?}",potential_apple));
             self.grow();
+            self.speed_points += APPLE_SPEED_BOOST;
             self.apples.retain(|&x| x != potential_apple);
         }
 
