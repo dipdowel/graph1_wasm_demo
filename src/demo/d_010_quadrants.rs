@@ -11,6 +11,7 @@ use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
 use graph1::utils::color::palettes::RetroNeon;
 use graph1::utils::math::geometry::region::Region;
+use graph1::utils::math::oscillator;
 
 fn get_main_gem_stone_points(ctx: &GraphContext<DemoUserData>) -> Vec<Point<u32>> {
     vec![
@@ -24,17 +25,19 @@ fn get_main_gem_stone_points(ctx: &GraphContext<DemoUserData>) -> Vec<Point<u32>
 
 /// Illustrate the use of polygons and stars
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
+    let frame_count = ctx.frame_count;
+
     // initial context setup
-    if ctx.frame_count == 0 {
+    if frame_count == 0 {
         ctx.win.background_color = RetroNeon::FUTURE_BRONZE;
         ctx.win.foreground_color = RetroNeon::LASER_LIME;
     }
 
     // Skip some frames to avoid vomit-inducing effect :]
-    if ctx.frame_count % 7 != 0 {
+    if frame_count % 7 != 0 {
         return;
     }
-    let local_count = ctx.frame_count % 480;
+    let local_count = frame_count % 480;
     if local_count > 128 {
         return;
     }
@@ -50,11 +53,11 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // Switching the colours a couple of times.
     ctx.win.background_color = RetroNeon::FUTURE_BRONZE;
     let mut stone = gem_stones::TOPAZ;
-    if ctx.frame_count > 2248 {
+    if frame_count > 2248 {
         ctx.win.background_color = RetroNeon::CYBER_BLUE;
         stone = gem_stones::SAPPHIRE;
     }
-    if ctx.frame_count > 2248 * 2 {
+    if frame_count > 2248 * 2 {
         ctx.win.background_color = RetroNeon::FUTURE_BRONZE;
         stone = gem_stones::TOPAZ;
     }
