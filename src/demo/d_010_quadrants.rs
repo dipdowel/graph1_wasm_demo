@@ -1,5 +1,5 @@
 use crate::demo::user_data::DemoUserData;
-use graph1::core::context::{GraphContext, Quadrants};
+use graph1::core::context::{GraphContext, Quadrants, RasterizationMethod};
 
 use crate::demo::common::gemstones;
 use graph1::draw::line;
@@ -39,6 +39,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if frame_count == 0 {
         ctx.win.background_color = UrbanConcrete::ASPHALT_GRAY;
         ctx.win.foreground_color = RetroNeon::LASER_LIME;
+        ctx.line.anti_aliasing.enabled = false;
+        ctx.line.width_int = 1;
+        ctx.line.width_float = 1.0;
+        ctx.line.rasterization = RasterizationMethod::Int;
     }
 
     clear_screen(ctx);
