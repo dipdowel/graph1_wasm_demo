@@ -3,7 +3,11 @@ mod utils;
 
 use crate::demo::user_data::DemoUserData;
 
-use crate::demo::{d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_004_bouncy, d_005_alpha, d_006_luminance_vs_intensity, test_card, d_003_basic_concepts_pt3, d_007_shapes_and_quadrants, d_008_polygons, d_009_lines, d_010_quadrants};
+use crate::demo::{
+    d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_003_basic_concepts_pt3,
+    d_004_bouncy, d_005_alpha, d_006_luminance_vs_intensity, d_007_shapes_and_quadrants,
+    d_008_polygons, d_009_lines, d_010_quadrants, test_card,
+};
 use crate::utils::console_log;
 use graph1::core::context::{GraphContext, WindowContext};
 use graph1::utils::color;
@@ -15,6 +19,7 @@ pub mod demo {
 
     pub mod common {
         pub mod basic_concepts;
+        pub mod gem_stones;
     }
     pub mod d_001_basic_concepts_pt1;
     pub mod d_002_basic_concepts_pt2;
@@ -22,18 +27,16 @@ pub mod demo {
     /// Bouncy demo. Helps to understand the basics of rendering and animation.
     pub mod d_004_bouncy;
 
-
     pub mod d_006_luminance_vs_intensity;
-    
+
     /// Alpha blending demo
     pub mod d_005_alpha;
-    
+
     pub mod d_007_shapes_and_quadrants;
     pub mod d_008_polygons;
 
     pub mod d_009_lines;
     pub mod d_010_quadrants;
-
 
     pub mod test_card;
 
@@ -120,7 +123,8 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
             );
 
             // Create a context with the basic configuration
-            let ctx: GraphContext<DemoUserData> = GraphContext::new(win_ctx, true, true, None, 1, None);
+            let ctx: GraphContext<DemoUserData> =
+                GraphContext::new(win_ctx, true, true, None, 1, None);
 
             // Place the context into the global container
             // so that it persists between frames
@@ -158,7 +162,6 @@ pub struct PixelStats {
 #[wasm_bindgen]
 /// Tell the app which frame to render
 pub fn update_frame(frame: usize) -> PixelStats {
-
     // don't overflow the frame counter
     if frame > usize::MAX - 1 {
         return PixelStats {
@@ -168,7 +171,7 @@ pub fn update_frame(frame: usize) -> PixelStats {
             average_color: 0,
             average_luminance: 0,
             average_intensity: 0,
-        }
+        };
     }
 
     unsafe {
