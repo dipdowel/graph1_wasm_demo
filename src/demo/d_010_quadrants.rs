@@ -70,17 +70,17 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     colors.rotate_right(local_count % 8);
 
 
-    // Draw the diamond
+    // Draw the gemstone
     for pair in gem_stone_points.windows(2) {
         line::between_two_points(ctx, &pair[0].convert(), &pair[1].convert(), color);
     }
 
-    // draw a vertical and a horizontal lines through the center of the 'diamond'
+    // draw a vertical and a horizontal lines through the center of the gemstone
     let win_region: Region<i32> = ctx.win.region.convert();
     line::between_two_points(ctx, &win_region.top(), &win_region.bottom(), color);
     line::between_two_points(ctx, &win_region.left(), &win_region.right(), color);
 
-    // Draw the diagonal lines through the center of the 'diamond'
+    // Draw the diagonal lines through the center of the gemstone
     let q: Quadrants<i32> = ctx.win.quadrants.convert();
     line::between_two_points(ctx, &q.top_left.center(), &q.bottom_right.center(), color);
     line::between_two_points(ctx, &q.top_right.center(), &q.bottom_left.center(), color);
@@ -131,7 +131,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         },
     ];
 
-    // Fill the gem stone with colors
+    // Fill the stone with colors
     for fill_pixel in fill_pixels {
         fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &fill_pixel);
     }
