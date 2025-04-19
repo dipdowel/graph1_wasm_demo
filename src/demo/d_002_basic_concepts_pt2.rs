@@ -53,6 +53,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if ctx.frame_count == 0 {
         ctx.win.background_color = RetroNeon::CYBER_BLUE;
         ctx.win.foreground_color = RetroNeon::LASER_LIME;
+        
+        // reset the snake, helps the `restart` button work correctly
+        ctx.user_data.snake = get_snake();
     }
 
     // Divider for defining the snake speed
