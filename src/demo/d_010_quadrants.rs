@@ -1,7 +1,7 @@
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::{GraphContext, Quadrants};
 
-use crate::demo::common::gem_stones;
+use crate::demo::common::gemstones;
 use graph1::draw::line;
 use graph1::draw::tools::fill;
 use graph1::fx::scanline;
@@ -9,9 +9,17 @@ use graph1::primitives::point::Point;
 use graph1::primitives::Pixel;
 use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
-use graph1::utils::color::palettes::RetroNeon;
+use graph1::utils::color::palettes::{RetroNeon, UrbanConcrete};
 use graph1::utils::math::geometry::region::Region;
-use graph1::utils::math::oscillator;
+static GEMSTONES: [(u32, u32); 7] = [
+    gemstones::EMERALD,
+    gemstones::SAPPHIRE,
+    gemstones::AMETHYST,
+    gemstones::GARNET,
+    gemstones::TOPAZ,
+    gemstones::MOONSTONE,
+    gemstones::AQUAMARINE,
+];
 
 fn get_main_gem_stone_points(ctx: &GraphContext<DemoUserData>) -> Vec<Point<u32>> {
     vec![
@@ -23,44 +31,25 @@ fn get_main_gem_stone_points(ctx: &GraphContext<DemoUserData>) -> Vec<Point<u32>
     ]
 }
 
-/// Illustrate the use of polygons and stars
+
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-    let frame_count = ctx.frame_count;
+    let frame_count = ctx.frame_count / 4;
 
     // initial context setup
     if frame_count == 0 {
-        ctx.win.background_color = RetroNeon::FUTURE_BRONZE;
+        ctx.win.background_color = UrbanConcrete::ASPHALT_GRAY;
         ctx.win.foreground_color = RetroNeon::LASER_LIME;
-    }
-
-    // Skip some frames to avoid vomit-inducing effect :]
-    if frame_count % 7 != 0 {
-        return;
-    }
-    let local_count = frame_count % 480;
-    if local_count > 128 {
-        return;
     }
 
     clear_screen(ctx);
 
-    // These points allow drawing a 'diamond'
+    // These points allow drawing a 'gemstone'
     // by connecting the top, right, bottom and left midpoints of each side of the window.
     let gem_stone_points: Vec<Point<u32>> = get_main_gem_stone_points(&ctx);
 
-    // let mut colors = gradient::linear(3856274175, 4143056639, 4);
-
-    // Switching the colours a couple of times.
-    ctx.win.background_color = RetroNeon::FUTURE_BRONZE;
-    let mut stone = gem_stones::TOPAZ;
-    if frame_count > 2248 {
-        ctx.win.background_color = RetroNeon::CYBER_BLUE;
-        stone = gem_stones::SAPPHIRE;
-    }
-    if frame_count > 2248 * 2 {
-        ctx.win.background_color = RetroNeon::FUTURE_BRONZE;
-        stone = gem_stones::TOPAZ;
-    }
+    let step = frame_count / 128;
+    let idx = step % GEMSTONES.len();
+    let stone = GEMSTONES[idx];
 
     // Make a cyclic color gradient
     let mut colors = gradient::linear(stone.0, stone.1, 5);
@@ -69,9 +58,12 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     colors_second_half.remove(0);
     colors_second_half.reverse();
     colors.append(&mut colors_second_half);
-    let color = Some(colors[5]);
-    colors.rotate_right(local_count % 8);
 
+    if frame_count % 64 > 31 && frame_count % 64 < 40 {
+        colors.rotate_left(frame_count % 8);
+    }
+
+    let color = Some(gradient::linear_step(stone.0, stone.1, 64, 28));
 
     // Draw the gemstone
     for pair in gem_stone_points.windows(2) {
@@ -88,47 +80,46 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     line::between_two_points(ctx, &q.top_left.center(), &q.bottom_right.center(), color);
     line::between_two_points(ctx, &q.top_right.center(), &q.bottom_left.center(), color);
 
-
     let center: Point<u32> = ctx.win.center;
 
     let fill_pixels = [
         Pixel {
             x: &center.x - 100,
-            y: &center.y - 2,
-            color: colors.pop().unwrap(),
-        },
-        Pixel {
-            x: &center.x - 2,
-            y: &center.y - 2,
-            color: colors.pop().unwrap(),
-        },
-        Pixel {
-            x: &center.x + 2,
-            y: &center.y - 2,
-            color: colors.pop().unwrap(),
-        },
-        Pixel {
-            x: &center.x + 100,
-            y: &center.y - 2,
-            color: colors.pop().unwrap(),
-        },
-        Pixel {
-            x: &center.x + 100,
-            y: &center.y + 2,
-            color: colors.pop().unwrap(),
-        },
-        Pixel {
-            x: &center.x + 2,
-            y: &center.y + 2,
-            color: colors.pop().unwrap(),
-        },
-        Pixel {
-            x: &center.x - 2,
             y: &center.y + 2,
             color: colors.pop().unwrap(),
         },
         Pixel {
             x: &center.x - 100,
+            y: &center.y - 2,
+            color: colors.pop().unwrap(),
+        },
+        Pixel {
+            x: &center.x - 2,
+            y: &center.y - 2,
+            color: colors.pop().unwrap(),
+        },
+        Pixel {
+            x: &center.x + 2,
+            y: &center.y - 2,
+            color: colors.pop().unwrap(),
+        },
+        Pixel {
+            x: &center.x + 100,
+            y: &center.y - 2,
+            color: colors.pop().unwrap(),
+        },
+        Pixel {
+            x: &center.x + 100,
+            y: &center.y + 2,
+            color: colors.pop().unwrap(),
+        },
+        Pixel {
+            x: &center.x + 2,
+            y: &center.y + 2,
+            color: colors.pop().unwrap(),
+        },
+        Pixel {
+            x: &center.x - 2,
             y: &center.y + 2,
             color: colors.pop().unwrap(),
         },
@@ -139,8 +130,5 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &fill_pixel);
     }
 
-
     scanline::window(ctx, 1, 58);
-
-
 }

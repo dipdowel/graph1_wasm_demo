@@ -19,7 +19,7 @@ pub mod demo {
 
     pub mod common {
         pub mod basic_concepts;
-        pub mod gem_stones;
+        pub mod gemstones;
     }
     pub mod d_001_basic_concepts_pt1;
     pub mod d_002_basic_concepts_pt2;
