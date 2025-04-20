@@ -1,16 +1,10 @@
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
-use graph1::core::default_colors::BACKGROUND;
 use graph1::draw;
-use graph1::fx::glitch::HorizontalGlitchProps;
-use graph1::fx::scanline::window;
-use graph1::fx::{glitch, scanline};
-use graph1::primitives::plane::{Dimensions2d, RectArea};
-use graph1::primitives::point::Point;
 use graph1::primitives::Pixel;
 use graph1::utils::clear_screen;
 use graph1::utils::color::palettes::RetroNeon;
-use graph1::utils::color::{gradient, invert};
+use graph1::utils::color::gradient;
 use graph1::utils::math::oscillator;
 
 //---------------------------------------------------------------------
