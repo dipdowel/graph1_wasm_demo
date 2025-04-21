@@ -1,6 +1,6 @@
-# Shapes & Quadrants
+# Circles
 
-Graph1 provides basic 2D shape drawing capabilities. In this demo, we focus on **circles** and **quadrants**.
+Graph1 provides basic 2D shape drawing capabilities. In this demo, we focus on **circles**.
 
 ---
 
@@ -24,28 +24,11 @@ let center = ctx.win.quadrants.bottom_right.center().to_pixel(color);
 draw::circle::filled(ctx, &center, r, 0);
 ```
 
-Graph1 also supports stylized circles by skipping every N-th line in the fill.
-The fourth parameter in `filled()` is `skip_every`, which controls this effect:
-- `0` and `1`: draw all lines (solid circle)
+Graph1 also supports stylizing circles by skipping every N-th line in the fill.
+The fourth parameter in `draw::circle::filled` is `skip_every`, which controls this effect. E.g.
+- `1`: draw all lines (solid circle)
 - `2`: draw every other line
-- Higher values produce sparser, stylized fills
-
----
-
-## 🧭 Quadrants
-
-Each `WindowContext` is divided into 4 logical regions:
-- `top_left`
-- `top_right`
-- `bottom_left`
-- `bottom_right`
-
-These are accessed via `ctx.win.quadrants`, and each quadrant has helpful methods:
-- `.center()` — center point of the quadrant
-- `.rect_area()` — the region as a `RectArea`
-- `.width()` / `.height()` — dimensions
-
-Quadrants make it easy to animate shapes separately in different parts of the window.
+- Higher values produce a sparser fill
 
 ---
 

@@ -2,6 +2,7 @@ use crate::demo::user_data::DemoUserData;
 use graph1::core::context::{GraphContext, Quadrants, RasterizationMethod};
 
 use crate::demo::common::gemstones;
+use crate::utils::console_log;
 use graph1::draw::line;
 use graph1::draw::tools::fill;
 use graph1::fx::scanline;
@@ -11,13 +12,14 @@ use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
 use graph1::utils::color::palettes::{RetroNeon, UrbanConcrete};
 use graph1::utils::math::geometry::region::Region;
-static GEMSTONES: [(u32, u32); 7] = [
+
+static GEMSTONES: [(u32, u32); 6] = [
     gemstones::EMERALD,
     gemstones::SAPPHIRE,
     gemstones::AMETHYST,
     gemstones::GARNET,
     gemstones::TOPAZ,
-    gemstones::MOONSTONE,
+
     gemstones::AQUAMARINE,
 ];
 
@@ -30,7 +32,6 @@ fn get_main_gem_stone_points(ctx: &GraphContext<DemoUserData>) -> Vec<Point<u32>
         ctx.win.region.top(),
     ]
 }
-
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let frame_count = ctx.frame_count / 4;
@@ -63,8 +64,12 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     colors_second_half.reverse();
     colors.append(&mut colors_second_half);
 
-    if frame_count % 64 > 31 && frame_count % 64 < 40 {
-        colors.rotate_left(frame_count % 8);
+    if frame_count % 64 > 12 && frame_count % 64 < 24 {
+        if frame_count % 128 < 24 {
+            colors.rotate_left(frame_count % 8);
+        } else {
+            colors.rotate_right(frame_count % 8);
+        }
     }
 
     let color = Some(gradient::linear_step(stone.0, stone.1, 64, 28));
