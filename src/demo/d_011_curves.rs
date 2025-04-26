@@ -1,40 +1,17 @@
-use crate::demo::common::gemstones;
 use crate::demo::user_data::DemoUserData;
-use crate::utils::console_log;
-use graph1::core::context::{GraphContext, Quadrants, RasterizationMethod};
+use graph1::core::context::GraphContext;
 use graph1::draw;
 
-use graph1::draw::tools::fill;
 use graph1::fx::scanline;
-use graph1::primitives::point::Point;
-use graph1::primitives::Pixel;
 use graph1::utils::clear_screen;
-use graph1::utils::color::gradient;
-use graph1::utils::color::palettes::{RetroNeon, UrbanConcrete};
-use graph1::utils::math::geometry::region::Region;
+use graph1::utils::color::palettes::RetroNeon;
 
-use graph1::draw::curve::bezier;
+use graph1::draw::curve::bezier_segment::BezierSegment;
 use graph1::draw::polygons::{polygon, star, PolygonProperties, StarProperties};
-use graph1::draw::tools::fill::flood;
+use graph1::draw::tools::fill;
+use graph1::primitives::Pixel;
+use graph1::utils::math::oscillator;
 
-static GEMSTONES: [(u32, u32); 6] = [
-    gemstones::EMERALD,
-    gemstones::SAPPHIRE,
-    gemstones::AMETHYST,
-    gemstones::GARNET,
-    gemstones::TOPAZ,
-    gemstones::AQUAMARINE,
-];
-
-fn get_main_gem_stone_points(ctx: &GraphContext<DemoUserData>) -> Vec<Point<u32>> {
-    vec![
-        ctx.win.region.top(),
-        ctx.win.region.right(),
-        ctx.win.region.bottom(),
-        ctx.win.region.left(),
-        ctx.win.region.top(),
-    ]
-}
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // // initial context setup
@@ -46,35 +23,26 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // SOME BASIC CRUDE OSCILLATION
-    let frequency_adjustment_factor = 9.0; // Frequency of the change
-    let sine_input = (ctx.frame_count as f32 / frequency_adjustment_factor).sin();
-    let normalized_value = (sine_input + 1.0) / 2.0; // Now between 0 and 1
-    let oscillator = (normalized_value * 33_f32) as usize;
-    let oscillator = if oscillator == 0 { 1 } else { oscillator };
+    // SOME OSCILLATION
+    // let frequency_divisor = oscillator::sine(ctx.frame_count, 0.0005, 10.0, 11.0) as f32;
+    let frequency_divisor = 9.0;
+    let oscillator = oscillator::sine_discrete(ctx.frame_count, frequency_divisor, 33, true);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     // Assumed available: `ctx`, `ctx_draft`, `oscillator`, `local_frame_count`,
     // `FINAL_GROUND_FIRST_FRAME`, `FLOWER_WIRE_FIRST_FRAME`, `BORDER_1`, `BORDER_3`, `GRADIENT_DOUBLE_LEN`, `res_delta`
 
-    let star_props_1 = StarProperties {
+    let star_props = StarProperties {
         center: ctx.win.center_pixel(true),
-        num_rays: 45,
-        inner_radius: 34 - oscillator as u32 + 90,
-        outer_radius: oscillator as u32 + 80,
-        rotation_angle: ctx.frame_count as f64 / 2.0,
+        num_rays: 24,
+        inner_radius: oscillator as u32 + 56,
+        outer_radius: 2 * oscillator as u32 + 10,
+        rotation_angle: -1.0 * (ctx.frame_count as f64 / 2.0),
         skip_rendering: true,
     };
 
-    let mut star_props_2 = star_props_1;
-    star_props_2.num_rays = 24;
-    star_props_2.inner_radius = oscillator as u32 + 56;
-    star_props_2.outer_radius = 2 * oscillator as u32 + 10;
-    star_props_2.rotation_angle *= -1.0;
-    star_props_2.center.color = 0x00000000;
-
-    let star_vertices = star(ctx, &star_props_1);
-    let star_vertices_2 = star(ctx, &star_props_2);
+    // let star_vertices = star(ctx, &star_props_1);
+    let star_vertices = star(ctx, &star_props);
 
     let polygon_props = PolygonProperties {
         radius: oscillator as u32 + 10,
@@ -85,44 +53,41 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         skip_rendering: false,
     };
 
-    let mut control_points: Vec<Point<i32>> = Vec::new();
-    let mut start_end_points: Vec<Point<u32>> = Vec::new();
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    let mut segments: Vec<BezierSegment<i32>> = Vec::new();
 
-    start_end_points.push(star_vertices[star_vertices.len() - 1].convert());
+    segments.push(BezierSegment::new(
+        star_vertices[star_vertices.len() - 1].convert(),
+        star_vertices[2].convert(),
+        star_vertices[0].convert(),
+        star_vertices[1].convert(),
+        RetroNeon::CYBER_YELLOW,
+    ));
 
-    for i in (0..star_vertices.len() - 1).step_by(3) {
-        control_points.push(star_vertices[i + 0]);
-        control_points.push(star_vertices[i + 1]);
-        start_end_points.push(star_vertices[i + 2].convert());
-    }
-
-    control_points.clear();
-    start_end_points.clear();
-
-    start_end_points.push(star_vertices_2[star_vertices_2.len() - 1].convert());
-
-    for i in (0..star_vertices_2.len() - 1).step_by(3) {
-        control_points.push(star_vertices_2[i + 0]);
-        control_points.push(star_vertices_2[i + 1]);
-        start_end_points.push(star_vertices_2[i + 2].convert());
+    for i in (3..star_vertices.len() - 1).step_by(3) {
+        segments.push(BezierSegment::new(
+            segments.last().unwrap().end,
+            star_vertices[i + 2].convert(),
+            star_vertices[i + 0].convert(),
+            star_vertices[i + 1].convert(),
+            RetroNeon::CYBER_YELLOW,
+        ));
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-    ctx.bezier.control_color = Some(RetroNeon::DEEP_INDIGO);
-    ctx.bezier.start_end_points_color = Some(RetroNeon::HOT_PINK);
+    ctx.bezier.control_color = Some(RetroNeon::CIRCUIT_GREEN);
+    // ctx.bezier.control_color = None;
+    ctx.bezier.start_end_points_color = Some(RetroNeon::STROBE_WHITE);
+    // ctx.bezier.start_end_points_color = None;
 
     ctx.bezier.render_controls = false;
-    ctx.bezier.render_levers = true;
+    ctx.bezier.render_levers = false;
 
-    draw::curve::bezier(
-        ctx,
-        &start_end_points,
-        &control_points,
-        &[RetroNeon::GLITCH_RED],
-        0.01,
-    );
+    draw::curve::bezier(ctx, &segments, 0.01);
 
+    // The filling of the polygon and the curved body
+    // Good stuff so, keep it
     let mut pix = Pixel::from(ctx.win.center.to_pixel(RetroNeon::CYBER_YELLOW));
     fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pix);
 
@@ -132,6 +97,31 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     pix.color = RetroNeon::VIBRANT_CYAN;
     fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pix);
+
+    ctx.win.foreground_color = RetroNeon::STROBE_WHITE;
+
+    /*
+        draw::curve::bezier(
+            ctx,
+            &[
+                ctx.win.region.top(),
+                ctx.win.region.right(),
+                ctx.win.region.bottom(),
+                ctx.win.region.left(),
+
+
+            ],
+            &[
+                ctx.win.region.top_left().convert(),
+                ctx.win.region.top_right().convert(),
+                ctx.win.region.bottom_left().convert(),
+                ctx.win.region.bottom_right().convert(),
+                ctx.win.region.top_left().convert(),
+            ],
+            &[RetroNeon::STROBE_WHITE],
+            0.01,
+        );
+    */
 
     scanline::window(ctx, 1, 80);
 }
