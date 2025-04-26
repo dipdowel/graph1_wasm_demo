@@ -23,31 +23,31 @@
     <script src="showdown.min.js"></script>
 
     <link href="wave.css" rel="stylesheet" />
+    <link href="mobile.css" rel="stylesheet" />
 <!--    <link href="light-theme.css" rel="stylesheet" />-->
 <!--    <link href="dark-theme.css" rel="stylesheet" />-->
+
+  <!-- Theme selector Button  -->
+    <link href="theme-selector/theme-selector-button.css" rel="stylesheet" />
+    <script defer src="theme-selector/theme-selector-button.js"></script>
 
   </head>
   <body>
     <canvas id="myCanvas"></canvas>
 
-    <div class="button-container">
-      <button id="restart">🔄 Restart</button>
+    <div class="button-container" >
+      <button id="restart" style="margin-left: 0px" >🔄 Restart</button>
+        <button id="theme-selector-button"><div class="eye-icon"></div></button>
       <button id="pause">⏸️ Pause</button>
+
     </div>
 
     <select id="demo_selector"></select>
     <div id="top-page-navigation"></div>
 <!--===[ THEME SELECTOR START ]===-->
-    <link href="theme-selector/theme-selector.css" rel="stylesheet" />
-    <div class="theme-selector">
-    <label for="theme-select">Choose a theme:</label>
-    <select id="theme-select">
-      <option value="wave">Wave</option>
-      <option value="dark">Dark</option>
-      <option value="light">Light</option>
-    </select>
-    <script src="theme-selector/theme-selector.js"></script>
-    </div>
+
+
+
     <!--===[ THEME SELECTOR END ]===-->
     <div id="content"></div>
 

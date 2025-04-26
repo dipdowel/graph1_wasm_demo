@@ -1,0 +1,28 @@
+.eye-icon {
+    width: 44px;
+    height: 44px;
+    background-color: #ffff00; /* Set the eye color here! */
+    -webkit-mask-image: url("eye.png");
+    mask-image: url("eye.png");
+    -webkit-mask-size: cover;
+    mask-size: cover;
+    content: "";
+}
+
+
+#theme-selector-button {
+    padding: 0;
+    border-radius: 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    min-width: 44px;
+    max-width: 58px;
+    margin: 0 10px;
+
+}
+@media (max-width: 768px) {
+    #theme-selector-button {
+        padding-top: 2px;
+    }
+}
