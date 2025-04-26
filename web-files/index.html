@@ -109,7 +109,11 @@
         { value: "999", label: "Test card" }
       ];
 
-      // Populate the <select /> element
+      const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+
+
+        // Populate the <select /> element
       demos.forEach(demo => {
         const option = document.createElement("option");
         option.value = demo.value;
@@ -132,8 +136,7 @@
           const prevDemo = demos[currentIndex - 1];
           const prevLink = document.createElement("a");
           prevLink.href = `/?demo=${prevDemo.value}`;
-          prevLink.textContent = `◄◄ ${prevDemo.label} - ${padNumber(prevDemo.value)}`;
-
+          prevLink.textContent = isMobile? `◄◄ prev ${padNumber(prevDemo.value)}`: `◄◄ ${prevDemo.label} - ${padNumber(prevDemo.value)}`;
           navContainerBottom.appendChild(prevLink);
         }
 
@@ -142,7 +145,8 @@
           const nextDemo = demos[currentIndex + 1];
           const nextLink = document.createElement("a");
           nextLink.href = `/?demo=${nextDemo.value}`;
-          nextLink.textContent = `${padNumber(nextDemo.value)} - ${nextDemo.label} ►►`;
+
+          nextLink.textContent = isMobile ? `${padNumber(nextDemo.value)} next ►►` : `${padNumber(nextDemo.value)} - ${nextDemo.label} ►►`;
 
           // Add a separator if there's also a previous link
           if (navContainerBottom.children.length > 0) {
