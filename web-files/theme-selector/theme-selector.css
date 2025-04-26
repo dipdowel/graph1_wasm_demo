@@ -1,0 +1,7 @@
+.theme-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    border: solid 1px orange;
+}

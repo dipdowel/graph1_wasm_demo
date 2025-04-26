@@ -1,0 +1,187 @@
+/* dark.css */
+/* Updated dark theme to reflect styles.css */
+
+/* General resets and box-sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #1a1a3a; /* Darker background */
+    color: #d4d4d4; /* Lighter text for contrast */
+    font-family: "Inconsolata", monospace, "Courier New", Courier;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.008; /* Keep subtle background */
+    z-index: -1;
+    /* You might want to adjust or remove the background-image for dark mode */
+}
+
+code {
+    color: #ffbf00; /* Consistent code color */
+}
+
+hr {
+    border: 1px solid #555; /* Darker border */
+    width: 100%;
+    margin: 20px 0;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-transform: uppercase;
+    font-family: "Orbitron", sans-serif, "Courier New", Courier;
+    /* Retain text-shadow, but adjust color for dark theme if needed */
+    text-shadow: 0 0 5px rgba(150, 150, 150, 0.5);
+    margin-top: 14px;
+    margin-bottom: 12px;
+}
+
+h1 {
+    color: #ff77ff;
+    text-shadow: 0 0 8px rgba(255, 119, 255, 0.7);
+}
+h2 {
+    color: #ffbf00;
+    text-shadow: 0 0 8px rgba(255, 191, 0, 0.7);
+    margin-top: 32px;
+}
+h3 {
+    color: #33ccff;
+    text-shadow: 0 0 8px rgba(51, 204, 255, 0.7);
+    margin-top: 32px;
+}
+h4 {
+    color: #a8ff60;
+    text-shadow: 0 0 8px rgba(168, 255, 96, 0.7);
+    margin-top: 28px;
+}
+h5 {
+    color: #ff6666;
+    text-shadow: 0 0 8px rgba(255, 102, 102, 0.7);
+}
+h6 {
+    color: #99ffcc;
+    text-shadow: 0 0 8px rgba(153, 255, 204, 0.7);
+}
+
+/* Content area */
+#content {
+    width: 100%;
+    max-width: 766px;
+    text-align: left;
+    padding: 20px;
+    background: rgba(30, 30, 30, 0.85); /* Darker content background */
+    border: 1px solid #555; /* Darker border */
+    border-radius: 8px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    box-shadow: 0 0 10px rgba(150, 150, 150, 0.3); /* Softer shadow */
+}
+
+#content img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Firefox scrollbar */
+@-moz-document url-prefix() {
+    #content {
+        scrollbar-width: thin;
+        scrollbar-color: #555 #252525; /* Darker scrollbar */
+    }
+}
+
+/* Button container */
+.button-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+button,
+select {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #555; /* Darker border */
+    background-color: #333; /* Darker button background */
+    color: #d4d4d4; /* Lighter text */
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 5px rgba(150, 150, 150, 0.5); /* Softer shadow */
+}
+
+button {
+    min-width: 175px;
+}
+
+button:hover,
+select:hover {
+    background-color: #444; /* Slightly lighter hover */
+    box-shadow: 0 0 10px rgba(150, 150, 150, 0.7); /* Stronger hover shadow */
+}
+
+pre {
+    border: solid 1px #333; /* Darker border */
+    border-radius: 5px;
+}
+
+/* Canvas */
+canvas {
+    image-rendering: high-quality;
+    border: 1px solid #444; /* Darker border */
+    border-radius: 6px;
+    background-color: #222; /* Darker canvas background */
+    box-shadow: 0 0 20px rgba(200, 200, 200, 0),
+    0 0 40px rgba(200, 200, 200, 0), inset 0 0 10px rgba(200, 200, 200, 0),
+    inset 0 0 20px rgba(200, 200, 200, 0);
+    margin-bottom: 20px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(40, 40, 40, 0.85); /* Darker track */
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(100, 100, 100, 0.2); /* Softer shadow */
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #555, #888); /* Darker thumb */
+    box-shadow: 0 0 5px rgba(150, 150, 150, 0.7),
+    0 0 5px rgba(150, 150, 150, 0.7);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #666, #999); /* Slightly lighter hover */
+    box-shadow: 0 0 5px rgba(150, 150, 150, 0.7),

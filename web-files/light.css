@@ -1,0 +1,62 @@
+/* light.css */
+/* Updated light theme to reflect styles.css */
+
+/* General resets and box-sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f0f0f0; /* Light background */
+    color: #333; /* Dark text */
+    font-family: "Inconsolata", monospace, "Courier New", Courier;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.008; /* Keep subtle background */
+    z-index: -1;
+    /* You might want to adjust or remove the background-image for light mode */
+}
+
+code {
+    color: #c79200; /* Darker code color */
+}
+
+hr {
+    border: 1px solid #ccc; /* Light border */
+    width: 100%;
+    margin: 20px 0;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-transform: uppercase;
+    font-family: "Orbitron", sans-serif, "Courier New", Courier;
+    /* Retain text-shadow, but adjust color for light theme if needed */
+    text-shadow: 0 0 5px rgba(50, 50, 50, 0.5);
+    margin-top: 14px;
+    margin-bottom: 12px;
+}
+
+h1 {
+    color:

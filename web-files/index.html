@@ -22,7 +22,7 @@
     <!-- Local Showdown library for Markdown to HTML conversion -->
     <script src="showdown.min.js"></script>
 
-    <link href="styles.css" rel="stylesheet" />
+    <link href="wave.css" rel="stylesheet" />
 <!--    <link href="light-theme.css" rel="stylesheet" />-->
 <!--    <link href="dark-theme.css" rel="stylesheet" />-->
 
@@ -37,6 +37,18 @@
 
     <select id="demo_selector"></select>
     <div id="top-page-navigation"></div>
+<!--===[ THEME SELECTOR START ]===-->
+    <link href="theme-selector/theme-selector.css" rel="stylesheet" />
+    <div class="theme-selector">
+    <label for="theme-select">Choose a theme:</label>
+    <select id="theme-select">
+      <option value="wave">Wave</option>
+      <option value="dark">Dark</option>
+      <option value="light">Light</option>
+    </select>
+    <script src="theme-selector/theme-selector.js"></script>
+    </div>
+    <!--===[ THEME SELECTOR END ]===-->
     <div id="content"></div>
 
     <script type="module">
