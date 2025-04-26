@@ -22,7 +22,7 @@
     min-width: 44px;
     max-width: 58px;
     margin: 0 10px;
-
+    border: 1px solid #1d5c52;
 }
 
 #open-theme-selector-button .eye-icon {
