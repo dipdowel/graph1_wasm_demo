@@ -60,3 +60,10 @@ const mobileStyleSheet = document.createElement('link');
 mobileStyleSheet.rel = 'stylesheet';
 mobileStyleSheet.href = 'mobile.css';
 document.head.appendChild(mobileStyleSheet);
+
+// Make sure the theme selector styles are loaded after the main styles in order to override some properties
+const themeSelectorStyleSheet = document.createElement('link');
+themeSelectorStyleSheet.rel = 'stylesheet';
+themeSelectorStyleSheet.href = 'theme-selector/theme-selector.css';
+document.head.appendChild(themeSelectorStyleSheet);
+
