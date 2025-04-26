@@ -31,6 +31,14 @@ closeSelectorButton.addEventListener('click', () => {
     themeOverlay.classList.toggle('active'); // Show/hide overlay
 });
 
+// Close the overlay on `Esc`
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' || event.keyCode === 27) { // 'Escape' key or keyCode 27
+        themeOverlay.classList.toggle('active'); // Show/hide overlay
+    }
+});
+
+
 themeRadios.forEach(radio => {
     radio.addEventListener('change', () => {
         setTheme(radio.value);
