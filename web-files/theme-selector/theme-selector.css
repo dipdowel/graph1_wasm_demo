@@ -38,11 +38,9 @@
 @media (max-width: 768px) {
     #open-theme-selector-button {
         padding-top: 2px;
+        width: 42px;
     }
 
-    #open-theme-selector-button {
-        width: 46px;
-    }
 
 }
 
@@ -146,6 +144,5 @@
 }
 
 #close-theme-selector-button {
-
     margin-top: 12px;
 }
