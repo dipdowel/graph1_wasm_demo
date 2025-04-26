@@ -135,6 +135,8 @@
 .theme-options-container  h2 {
     color: #ffbf00;
     text-shadow: 0 0 8px rgba(255, 191, 0, 0.7);
+    text-decoration: none;
+    text-underline: none;
     margin-top: 0;
     margin-bottom: 12px;
     font-family: "Orbitron", sans-serif, "Courier New", Courier;
