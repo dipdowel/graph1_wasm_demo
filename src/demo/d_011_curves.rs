@@ -10,6 +10,7 @@ use graph1::draw::curve::bezier_segment::BezierSegment;
 use graph1::draw::polygons::{polygon, star, PolygonProperties, StarProperties};
 use graph1::draw::tools::fill;
 use graph1::primitives::Pixel;
+use graph1::primitives::point::Point;
 use graph1::utils::math::oscillator;
 
 
@@ -123,5 +124,23 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         );
     */
 
+/*
+    draw::curve::bezier(ctx, &[BezierSegment{
+        start: Point::new(20.0,200.0),
+        end: Point::new(50.0,100.0),
+        start_control: Point::new(30.0,10.0),
+        end_control: Point::new(40.0,10.0),
+        color:0x0000ffff
+    },
+        BezierSegment{
+            start: Point::new(50.0,100.0),
+            end: Point::new(80.0,200.0),
+            start_control: Point::new(60.0,10.0),
+            end_control: Point::new(70.0,10.0),
+            color:0x0000ffff
+        }
+    
+    ], 0.0001);
+  */  
     scanline::window(ctx, 1, 80);
 }
