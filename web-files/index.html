@@ -22,21 +22,48 @@
     <!-- Local Showdown library for Markdown to HTML conversion -->
     <script src="showdown.min.js"></script>
 
-    <link href="styles.css" rel="stylesheet" />
-<!--    <link href="light-theme.css" rel="stylesheet" />-->
-<!--    <link href="dark-theme.css" rel="stylesheet" />-->
+    <link href="default.css" rel="stylesheet" />
+<!--    <link href="wave.css" rel="stylesheet" />-->
+<!--    <link href="mobile.css" rel="stylesheet" />-->
+
+  <!-- Theme selector  -->
+    <link href="theme-selector/theme-selector.css" rel="stylesheet" />
+    <script defer src="theme-selector/theme-selector.js"></script>
 
   </head>
   <body>
     <canvas id="myCanvas"></canvas>
 
-    <div class="button-container">
-      <button id="restart">🔄 Restart</button>
+    <div class="button-container" >
+      <button id="restart" style="margin-left: 0px" >🔄 Restart</button>
+        <button id="open-theme-selector-button"><div class="eye-icon"></div></button>
       <button id="pause">⏸️ Pause</button>
+
     </div>
 
     <select id="demo_selector"></select>
     <div id="top-page-navigation"></div>
+<!--===[ THEME SELECTOR START ]===-->
+
+    <div id="theme-overlay" class="theme-overlay">
+
+      <div class="theme-options-container">
+        <h2> My eyes... </h2>
+          <p>Select a color theme:</p>
+        <label class="theme-label">
+          <input type="radio" name="theme" value="wave"> CyberWave
+        </label>
+        <label class="theme-label">
+          <input type="radio" name="theme" value="dark"> Dark
+        </label>
+        <label class="theme-label">
+          <input type="radio" name="theme" value="light"> Light
+        </label>
+        <button id="close-theme-selector-button">Cancel</button>
+      </div>
+    </div>
+
+    <!--===[ THEME SELECTOR END ]===-->
     <div id="content"></div>
 
     <script type="module">
@@ -79,10 +106,15 @@
         { value: "8", label: "Polygons, stars, gradients" },
         { value: "9", label: "Lines" },
         { value: "10", label: "Quadrants" },
+        { value: "11", label: "Curves" },
         { value: "999", label: "Test card" }
       ];
 
-      // Populate the <select /> element
+      const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+
+
+        // Populate the <select /> element
       demos.forEach(demo => {
         const option = document.createElement("option");
         option.value = demo.value;
@@ -105,8 +137,7 @@
           const prevDemo = demos[currentIndex - 1];
           const prevLink = document.createElement("a");
           prevLink.href = `/?demo=${prevDemo.value}`;
-          prevLink.textContent = `◄◄ ${prevDemo.label} - ${padNumber(prevDemo.value)}`;
-
+          prevLink.textContent = isMobile? `◄◄ prev ${padNumber(prevDemo.value)}`: `◄◄ ${prevDemo.label} - ${padNumber(prevDemo.value)}`;
           navContainerBottom.appendChild(prevLink);
         }
 
@@ -115,7 +146,8 @@
           const nextDemo = demos[currentIndex + 1];
           const nextLink = document.createElement("a");
           nextLink.href = `/?demo=${nextDemo.value}`;
-          nextLink.textContent = `${padNumber(nextDemo.value)} - ${nextDemo.label} ►►`;
+
+          nextLink.textContent = isMobile ? `${padNumber(nextDemo.value)} next ►►` : `${padNumber(nextDemo.value)} - ${nextDemo.label} ►►`;
 
           // Add a separator if there's also a previous link
           if (navContainerBottom.children.length > 0) {
@@ -219,7 +251,7 @@
        */
       function togglePauseState() {
         isPaused = !isPaused;
-        pauseButton.innerText = isPaused ? "▶️ Resume" : "⏸️ Pause";
+        pauseButton.innerText = isPaused ? "▶️ Play" : "⏸️ Pause";
         if (!isPaused) {
           requestAnimationFrame(renderFunction);
         }

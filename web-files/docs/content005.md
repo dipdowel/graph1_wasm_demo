@@ -1,70 +1,99 @@
 # Colors
+
 ## RGBA model + Alpha Context<br />+ Color Adapters
 
-### RGBA
-Graph1 supports basic [alpha blending](https://en.wikipedia.org/wiki/Alpha_compositing), which is the process of combining a foreground and background colors based on the transparency ([alpha channel](https://en.wiktionary.org/wiki/alpha_channel)) of the foreground, creating a composite color. <br /><br />
+### 🎨 RGBA
 
-Graph1 internally uses the [RGBA color model](https://en.wikipedia.org/wiki/RGBA_color_model), where each color is composed of four channels: red, green, blue, and alpha.<br /> 
-Each channel is 8 bits in size (values: 0-255), making the complete color a 32-bit integer. In Graph1, the `u32` type is almost always used to represent colors. The alpha channel controls the transparency level, enabling blending and opacity effects. <br /><br />
+Graph1 supports basic [alpha blending](https://en.wikipedia.org/wiki/Alpha_compositing), which is the process of combining foreground and background colors based on the transparency ([alpha channel](https://en.wiktionary.org/wiki/alpha_channel)) of the foreground. The result is a composite color.
 
-### Alpha Context
-Let's now look at another subcontext called `AlphaContext`. It's a part of the `GraphContext` struct and is responsible for managing the alpha blending settings. It's probably the simplest subcontext in Graph1, as it only has two properties:
-- `enabled` — a boolean value that turns alpha blending on or off.
-- `method` — an enum that defines the blending method. 
+Graph1 uses the [RGBA color model](https://en.wikipedia.org/wiki/RGBA_color_model), where each color is a `u32` representing four 8-bit channels:
+- **R**ed
+- **G**reen
+- **B**lue
+- **A**lpha (opacity: 0 = fully transparent, 255 = fully opaque)
 
-If alpha is enabled (`AlphaContext::enabled == true`), any function in Graph1 that supports alpha blending will use the alpha channel of a foreground pixel to blend it with the background. If alpha is disabled, the alpha channel is simply ignored.<br /><br />  
+These are stored in-memory as `0xRRGGBBAA`. This layout makes it easy to do bit-shifting, blending, and cross-platform manipulation.
 
-#### Blend methods 
-As of 2024, Graph1 supports two blending methods:
-- `AlphaMethod::Int` — uses only integers for all the calculations.
-    - This method is somewhat faster, especially on systems where floating-point operations are expensive.
-    - May introduce minor inaccuracies due to the limited precision of integer division.
-    - Used by default. 
-- `AlphaMethod::Float` — Uses `f32` floating-point arithmetic for calculations.
-    - Provides higher precision and results in somewhat more accurate blending.
-    - May be slower on some systems.
-    - Use it if `AlphaMethod::Int` doesn't provide the desired results. 
+---
 
+### 🧪 Alpha Context
 
+`AlphaContext` is the part of `GraphContext` responsible for controlling alpha blending. It has two fields:
+- `enabled: bool` — toggle alpha blending on or off
+- `method: AlphaMethod` — choose how to compute the blend
 
- 
+If `enabled` is `false`, the alpha channel is ignored and colors simply overwrite.
+
+#### Blend Methods
+```rust
+#[derive(Debug, Clone, Copy)]
+enum AlphaMethod {
+    Int,   // default: faster, integer math
+    Float, // more accurate, uses floating-point arithmetic
+}
+```
+- **Int** — integer math, faster and usually good enough
+- **Float** — uses `f32` for better visual fidelity
+
+You can switch methods at runtime:
 ```rust
 use graph1::core::context::alpha::AlphaMethod;
-
-// Enable alpha blending
 ctx.alpha.enabled = true;
+ctx.alpha.method = AlphaMethod::Float;
+```
 
-// Set the blending method
-ctx.alpha.method = AlphaMethod::Int;
+#### Example
+```rust
+let color: u32 = 0xff_33_00_85; // semi-transparent orange
 
-// Take an RGB-color `0xff_33_00` and
-// set the alpha channel to `0x85` (133)
-let color:u32 = 0xff_33_00_85;
-
-// Draw a filled square at x=0, y=0, side length = 100 
-// using `color`, which makes it partially transparent
 draw::rectangle::filled(ctx, &RectArea::square(0, 0, 100, Some(color)));
 ```
 
+This will draw a 100x100 square with 133 alpha (out of 255), blending over the background.
 
-### Color adapters
-The rendering layer of your application may use a color model other than `RGBA`. For example, a rendering & window management library for native apps [minifb](https://github.com/emoon/minifb) uses `0RGBA`. Another example would be copying pixel data from WASM memory to an HTML Canvas in the browser. The `RGBA` bytes then often need to be re-arranged as `ABGR`. To simplify such conversions, Graph1 provides a set of color adapters in the `graph1::utils::color::adapters` module. <br /><br />
+---
 
+### 🔁 Color Adapters
+
+Sometimes the renderer you use expects a different byte layout. For example:
+- `minifb` wants `0RGB`
+- Browsers might prefer `ABGR`
+
+Graph1 includes a handful of utilities for converting RGBA to common formats in:
 ```rust
-use graph1::utils::color::adapters::rgba_to_abgr;
- 
-let buf_len = ctx.frame_buf.len();
-
-// Create a buffer for ABGR colors that will be read by the rendering layer
-let mut canvas_buf_abgr: Vec<u32> = vec![0x00; buf_len];
-
-// Convert the frame buffer from RGBA to ABGR 
-// and write the result to `canvas_buf_abgr`
-rgba_to_abgr(&mut canvas_buf_abgr, &ctx.frame_buf, true).unwrap();
+use graph1::utils::color::adapters::*;
 ```
 
-If there is no color adapter for your specific use case, you can easily implement one yourself by using the provided adapters as a reference. You can also contribute your adapter to [Graph1 on Github](https://github.com/dipdowel/graph1/) or request it as a feature in the [discussions](https://github.com/dipdowel/graph1/discussions) or [open an issue](https://github.com/dipdowel/graph1/issues).
+#### Convert a buffer from RGBA to ABGR
+```rust
+let mut dst_buf: Vec<u32> = vec![0; ctx.frame_buf.len()];
+rgba_to_abgr(&mut dst_buf, &ctx.frame_buf, true).unwrap();
+```
 
+#### Convert RGBA to 0RGB
+```rust
+use graph1::utils::color::adapters::rgba_to_0rgb;
+rgba_to_0rgb(&mut dst_buf, &ctx.frame_buf, 4, false);
+```
 
-- - - - 
-- [Code of this demo on Github](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_004_alpha.rs)
+#### Convert a single color
+```rust
+let abgr = rgba_color_to_abgr(0xff_00_88_cc);
+let _0rgb = rgba_color_to_0rgb(0xff_00_88_cc);
+```
+
+#### AdapterStatistics (optional)
+Most buffer converters can compute simple stats like:
+- average red/green/blue value
+- average composite color
+
+This is useful for diagnostics or previews. Just set `stats = true`.
+
+---
+
+📦 There are both safe and unsafe versions of each adapter, for cases where you need max speed and can guarantee buffer correctness. They follow the same function signature.<br /><br />
+🧠 Don’t see your format? You can easily create your own adapter — check the `adapters/` module source. Contributions are welcome!
+
+- - - -
+💻 [Code of this demo on GitHub](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_005_alpha.rs)
+

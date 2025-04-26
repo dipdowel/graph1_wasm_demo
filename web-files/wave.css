@@ -1,0 +1,336 @@
+/* Base styling for a retro-futuristic cyberpunk look */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #0f0f1f, #1a1a3a);
+    min-height: 100vh;
+    height: 100%;
+    font-family: "Inconsolata", monospace, "Courier New", Courier;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    /*letter-spacing: 1px;*/
+    color: #a8ff60;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+}
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-image: url("bg8.webp");
+    background-size: auto;
+    background-repeat: repeat;
+    background-blend-mode: difference;
+    opacity: 0.008; /* Make the bg barely visible */
+    z-index: -1; /* Places the background behind all other content */
+}
+
+code {
+    color: #ffbf00;
+}
+
+hr {
+    border: 1px solid #99ffcc;
+    width: 100%;
+    margin: 20px 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-shadow: 0 0 5px rgba(255, 191, 0, 0.5);
+    margin-top: 14px;
+    margin-bottom: 12px;
+    font-family: "Orbitron", sans-serif, "Courier New", Courier;
+}
+
+h1 {
+    text-transform: uppercase;
+    color: #ff77ff;
+    text-shadow: 0 0 8px rgba(255, 119, 255, 0.7);
+}
+h2 {
+    color: #ffbf00;
+    text-shadow: 0 0 8px rgba(255, 191, 0, 0.7);
+    margin-top: 32px;
+}
+h3 {
+    color: #33ccff;
+    text-shadow: 0 0 8px rgba(51, 204, 255, 0.7);
+    margin-top: 32px;
+}
+h4 {
+    color: #a8ff60;
+    text-shadow: 0 0 8px rgba(168, 255, 96, 0.7);
+    margin-top: 28px;
+}
+h5 {
+    color: #ff6666;
+    text-shadow: 0 0 8px rgba(255, 102, 102, 0.7);
+}
+h6 {
+    color: #99ffcc;
+    text-shadow: 0 0 8px rgba(153, 255, 204, 0.7);
+}
+
+#content {
+    width: 100%;
+    max-width: 766px;
+    text-align: left;
+    padding: 20px;
+    background: rgba(20, 20, 50, 0.85);
+    border: 1px solid #a8ff60;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    box-shadow: 0 0 10px rgba(168, 255, 96, 0.3);
+}
+
+#content img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@-moz-document url-prefix() {
+    /* Firefox-specific scrollbar styling */
+    #content {
+        /* Custom scrollbar styles for Firefox */
+        scrollbar-width: thin; /* Options: auto | thin | none */
+        scrollbar-color: #33ccff #1a1a3a; /* Thumb color and track color */
+    }
+    /* Any other Firefox-specific styles */
+    /*body { }*/
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+button,
+select {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #00ffcc;
+    background-color: #222244;
+    color: #a8ff60;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+}
+
+button {
+    min-width: 175px;
+}
+
+button:hover,
+select:hover {
+    background-color: #333366;
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
+}
+
+pre {
+    border: solid 1px #222244;
+    border-radius: 5px;
+}
+
+canvas {
+    image-rendering: high-quality;
+    /*image-rendering: crisp-edges;*/
+    /*image-rendering: pixelated;*/
+    /*image-rendering: smooth;*/
+    /*image-rendering: optimizeQuality;*/
+    border: 1px solid #333333;
+    border-radius: 6px;
+    background-color: #0f0f1f;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0),
+    0 0 40px rgba(255, 255, 255, 0), inset 0 0 10px rgba(255, 255, 255, 0),
+    inset 0 0 20px rgba(255, 255, 255, 0);
+    margin-bottom: 20px;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px; /* Vertical scrollbar width */
+    height: 8px; /* Horizontal scrollbar height */
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(25, 25, 50, 0.85);
+    border-radius: 5px;
+    box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #0077aa, #bb33bb);
+    box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
+    0 0 5px rgba(255, 119, 255, 0.7);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #11aaee, #ff77ff);
+    box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
+    0 0 5px rgba(255, 119, 255, 0.7);
+}
+
+/* Links */
+a {
+    color: #33ccff; /* Base neon color */
+    text-decoration: none;
+    font-weight: bold;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #ff77ff; /* Hover neon color */
+    text-shadow: 0 0 5px rgba(255, 119, 255, 0.6),
+    0 0 10px rgba(255, 119, 255, 0.4), 0 0 15px rgba(255, 119, 255, 0.3);
+}
+
+a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(90deg, #33ccff, #ff77ff);
+    box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
+    0 0 10px rgba(255, 119, 255, 0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: scaleX(0);
+    transform-origin: left;
+}
+
+a:hover::after {
+    opacity: 1;
+    transform: scaleX(1); /* Expands the underline */
+}
+
+/* LISTS! */
+ul {
+    padding-left: 10px; /* Adds internal spacing to align bullets/numbers */
+    margin-top: 10px;
+    margin-bottom: 12px;
+    color: #a8ff60; /* Neon green text color to match theme */
+    list-style-type: none; /* Removes default bullets and numbering */
+    list-style-position: inside;
+    line-height: 1.5;
+}
+ul li::before {
+    content: "✧"; /* My custom bullet character! */
+    color: #33ccff; /* Neon blue for bullets */
+    text-shadow: 0 0 5px rgba(51, 204, 255, 0.7);
+    margin-right: 8px; /* Add some space between bullet and text */
+}
+
+ol {
+    list-style-type: none; /* Removes default numbering */
+    padding-left: 20px; /* Adds space for custom numbers */
+    counter-reset: custom-counter; /* Resets the counter */
+}
+
+ol li {
+    counter-increment: custom-counter;
+    display: flex; /* Ensures the number and content are on the same line */
+    align-items: center; /* Vertically aligns number and content */
+}
+
+ol li::before {
+    content: counter(custom-counter) ". "; /* Custom number style */
+    color: #ffbf00;
+    text-shadow: 0 0 5px rgba(255, 191, 0, 0.7);
+    font-weight: bold;
+    margin-right: 8px; /* Adds spacing after the number */
+}
+
+/* Table styling for retro-futuristic cyberpunk theme */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(25, 25, 50, 0.95);
+    border: 1px solid #a8ff60;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(168, 255, 96, 0.3), 0 0 5px rgba(51, 204, 255, 0.3);
+    margin: 20px 0;
+}
+
+table th, table td {
+    padding: 12px;
+    text-align: left;
+    font-family: "Inconsolata", monospace;
+    color: #a8ff60;
+    border-bottom: 1px solid rgba(168, 255, 96, 0.2);
+}
+
+table th {
+    background: rgba(51, 204, 255, 0.15);
+    color: #33ccff;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px rgba(51, 204, 255, 0.7);
+}
+
+table td {
+    background: rgba(25, 25, 50, 0.85);
+}
+
+table tr:hover td {
+    background: rgba(51, 204, 255, 0.15);
+    color: #ffbf00;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+table caption {
+    font-size: 1.2rem;
+    color: #ff77ff;
+    text-shadow: 0 0 5px rgba(255, 119, 255, 0.5);
+    padding: 10px;
+    font-family: "Orbitron", sans-serif;
+    text-align: center;
+}
+
+#top-page-navigation {
+    margin-top: 20px;
+}
+
+#top-page-navigation, #bottom-page-navigation{
+    text-align: center;
+    /*border: solid 1px red;*/
+    min-width:  766px;
+    font-size: 1.0rem;
+}
+
+/********************************************************************************************************************/
+/*** Theme selector opening button colors for this theme  ***/
+#open-theme-selector-button {
+    border: 1px solid #1d5c52;
+}
+#open-theme-selector-button .eye-icon {
+    /*background-color: rgb(103, 103, 251);*/
+    background-color: rgba(255, 191, 0, 0.5);
+}
+#open-theme-selector-button .eye-icon:hover {
+    background-color: rgba(255, 255, 0, 1);
+}
