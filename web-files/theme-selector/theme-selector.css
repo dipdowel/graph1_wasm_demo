@@ -1,0 +1,119 @@
+.eye-icon {
+    width: 44px;
+    height: 44px;
+    -webkit-mask-image: url("eye.png");
+    mask-image: url("eye.png");
+    -webkit-mask-size: cover;
+    mask-size: cover;
+    content: "";
+}
+
+.eye-icon:hover {
+    /*background-color: #ffff00;*/
+    background-color: rgba(255, 255, 0, 1); /* Semi-transparent black */
+    transition: background-color 0.3s ease;
+}
+
+
+#open-theme-selector-button {
+    padding: 0;
+    border-radius: 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    min-width: 44px;
+    max-width: 58px;
+    margin: 0 10px;
+
+}
+
+#open-theme-selector-button .eye-icon {
+    background-color: rgba(255, 255, 0, 0.5); /* Semi-transparent black */
+}
+
+#open-theme-selector-button .eye-icon:hover {
+    /*background-color: #ffff00;*/
+    background-color: rgba(255, 255, 0, 1); /* Semi-transparent black */
+    transition: background-color 0.5s ease-in;
+}
+
+@media (max-width: 768px) {
+    #open-theme-selector-button {
+        padding-top: 2px;
+    }
+}
+
+
+/************************************************************************************************************************
+    * Theme Selector Overlay
+ ************************************************************************************************************************/
+
+
+
+
+
+
+.theme-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* High z-index to be on top */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.85); /* Semi-transparent black */
+    /*background: url("the-selector-man.png");*/
+    /*filter: alpha(opacity=50) ;*/
+    /*background-blend-mode: exclusion;*/
+    /*background-image:url("the-selector-man.png");*/
+}
+.theme-overlay::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    /*left: 0;*/
+    width: 100%;
+    height: 100%;
+    background:  url("the-selector-man.png") no-repeat center top;
+    /*background:  url("the-selector-man.png") ;*/
+
+    opacity: 0.25;
+    z-index: -1;
+}
+
+.theme-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.theme-options-container {
+    border: #00ffcc solid 1px;
+    position: fixed;
+    top: 166px;
+    background-color: #222244; /* Or any color you want for the options */
+
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    color: #a8ff60; /* Text color */
+}
+
+.theme-label {
+    display: block;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.theme-label input[type="radio"] {
+    margin-right: 8px;
+}
+
+#close-overlay-button {
+    margin-top: 10px;
+}

@@ -27,9 +27,9 @@
 <!--    <link href="light-theme.css" rel="stylesheet" />-->
 <!--    <link href="dark-theme.css" rel="stylesheet" />-->
 
-  <!-- Theme selector Button  -->
-    <link href="theme-selector/theme-selector-button.css" rel="stylesheet" />
-    <script defer src="theme-selector/theme-selector-button.js"></script>
+  <!-- Theme selector  -->
+    <link href="theme-selector/theme-selector.css" rel="stylesheet" />
+    <script defer src="theme-selector/theme-selector.js"></script>
 
   </head>
   <body>
@@ -37,7 +37,7 @@
 
     <div class="button-container" >
       <button id="restart" style="margin-left: 0px" >🔄 Restart</button>
-        <button id="theme-selector-button"><div class="eye-icon"></div></button>
+        <button id="open-theme-selector-button"><div class="eye-icon"></div></button>
       <button id="pause">⏸️ Pause</button>
 
     </div>
@@ -46,7 +46,22 @@
     <div id="top-page-navigation"></div>
 <!--===[ THEME SELECTOR START ]===-->
 
+    <div id="theme-overlay" class="theme-overlay">
 
+      <div class="theme-options-container">
+<!--        <h3>My eyes...</h3>-->
+        <label class="theme-label">
+          <input type="radio" name="theme" value="wave"> Wave
+        </label>
+        <label class="theme-label">
+          <input type="radio" name="theme" value="dark"> Dark
+        </label>
+        <label class="theme-label">
+          <input type="radio" name="theme" value="light"> Light
+        </label>
+        <button id="close-theme-selector-button">Cancel</button>
+      </div>
+    </div>
 
     <!--===[ THEME SELECTOR END ]===-->
     <div id="content"></div>
