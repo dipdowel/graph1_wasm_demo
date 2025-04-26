@@ -39,6 +39,11 @@
     #open-theme-selector-button {
         padding-top: 2px;
     }
+
+    #open-theme-selector-button {
+        width: 46px;
+    }
+
 }
 
 
@@ -82,6 +87,13 @@
     mask-size: 100% 100%;
     mask-repeat: no-repeat;
     z-index: -1;
+}
+
+@media (max-width: 768px) {
+    .theme-overlay::before {
+        background-size: auto;
+        background-position: top;
+    }
 }
 
 .theme-overlay.active {

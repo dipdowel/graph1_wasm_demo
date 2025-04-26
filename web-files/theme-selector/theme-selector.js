@@ -54,3 +54,9 @@ if (savedTheme) {
 } else {
     setTheme('wave'); // Default to 'wave'
 }
+
+// Make sure the mobile styles are loaded after the main styles in order to override some properties
+const mobileStyleSheet = document.createElement('link');
+mobileStyleSheet.rel = 'stylesheet';
+mobileStyleSheet.href = 'mobile.css';
+document.head.appendChild(mobileStyleSheet);

@@ -24,8 +24,6 @@
 
     <link href="wave.css" rel="stylesheet" />
     <link href="mobile.css" rel="stylesheet" />
-<!--    <link href="light-theme.css" rel="stylesheet" />-->
-<!--    <link href="dark-theme.css" rel="stylesheet" />-->
 
   <!-- Theme selector  -->
     <link href="theme-selector/theme-selector.css" rel="stylesheet" />
@@ -248,7 +246,7 @@
        */
       function togglePauseState() {
         isPaused = !isPaused;
-        pauseButton.innerText = isPaused ? "▶️ Resume" : "⏸️ Pause";
+        pauseButton.innerText = isPaused ? "▶️ Play" : "⏸️ Pause";
         if (!isPaused) {
           requestAnimationFrame(renderFunction);
         }
