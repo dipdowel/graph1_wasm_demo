@@ -1,7 +1,6 @@
-/* dark.css */
-/* Updated dark theme to reflect styles.css */
+/* dark.css - Based on wave.css, emulating GitHub Dark Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Example: Using Inter font */
 
-/* General resets and box-sizing */
 * {
     margin: 0;
     padding: 0;
@@ -9,17 +8,23 @@
 }
 
 body {
-    background: #1a1a3a; /* Darker background */
-    color: #d4d4d4; /* Lighter text for contrast */
-    font-family: "Inconsolata", monospace, "Courier New", Courier;
-    font-size: 1.1rem;
-    line-height: 1.2;
+    background-color: #0d1117; /* GitHub dark background */
+    min-height: 100vh;
+    height: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; /* System fonts */
+    font-size: 1rem; /* Adjusted font size */
+    line-height: 1.5;
+    color: #c9d1d9; /* GitHub dark text color */
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
     position: relative;
 }
+
+/*body::before { !* Removed the background image from wave.css *!*/
+/*    content: none;*/
+/*}*/
 
 body::before {
     content: "";
@@ -28,95 +33,80 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    opacity: 0.008; /* Keep subtle background */
-    z-index: -1;
-    /* You might want to adjust or remove the background-image for dark mode */
+
+    background-image: url("bg8.webp");
+    background-size: auto;
+    background-repeat: repeat;
+    background-blend-mode: difference;
+    opacity: 0.008; /* Make the bg barely visible */
+    z-index: -1; /* Places the background behind all other content */
 }
 
+
+
 code {
-    color: #ffbf00; /* Consistent code color */
+    color: #c9d1d9; /* Standard code color */
+    background-color: rgba(110,118,129,0.2); /* Subtle background for inline code */
+    padding: .2em .4em;
+    margin: 0;
+    font-size: 85%;
+    border-radius: 6px;
 }
 
 hr {
-    border: 1px solid #555; /* Darker border */
+    border: 0;
+    height: 1px;
+    background-color: #21262d; /* GitHub dark border color */
     width: 100%;
-    margin: 20px 0;
+    margin: 24px 0;
 }
 
-/* Headings */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    text-transform: uppercase;
-    font-family: "Orbitron", sans-serif, "Courier New", Courier;
-    /* Retain text-shadow, but adjust color for dark theme if needed */
-    text-shadow: 0 0 5px rgba(150, 150, 150, 0.5);
-    margin-top: 14px;
-    margin-bottom: 12px;
+h1, h2, h3, h4, h5, h6 {
+    color: #c9d1d9; /* Heading color */
+    text-shadow: none; /* Removed text shadow */
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600; /* Standard heading weight */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; /* System fonts */
 }
 
-h1 {
-    color: #ff77ff;
-    text-shadow: 0 0 8px rgba(255, 119, 255, 0.7);
-}
-h2 {
-    color: #ffbf00;
-    text-shadow: 0 0 8px rgba(255, 191, 0, 0.7);
-    margin-top: 32px;
-}
-h3 {
-    color: #33ccff;
-    text-shadow: 0 0 8px rgba(51, 204, 255, 0.7);
-    margin-top: 32px;
-}
-h4 {
-    color: #a8ff60;
-    text-shadow: 0 0 8px rgba(168, 255, 96, 0.7);
-    margin-top: 28px;
-}
-h5 {
-    color: #ff6666;
-    text-shadow: 0 0 8px rgba(255, 102, 102, 0.7);
-}
-h6 {
-    color: #99ffcc;
-    text-shadow: 0 0 8px rgba(153, 255, 204, 0.7);
-}
+h1 { font-size: 2em; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
+h3 { font-size: 1.25em; }
+h4 { font-size: 1em; }
+h5 { font-size: 0.875em; }
+h6 { font-size: 0.85em; color: #8b949e; } /* Lighter color for h6 */
 
-/* Content area */
 #content {
     width: 100%;
     max-width: 766px;
     text-align: left;
     padding: 20px;
-    background: rgba(30, 30, 30, 0.85); /* Darker content background */
-    border: 1px solid #555; /* Darker border */
-    border-radius: 8px;
+    background: #0d1117; /* Match body background */
+    border: 1px solid #30363d; /* GitHub dark border */
+    border-radius: 6px; /* Standard border radius */
     margin-bottom: 20px;
     margin-top: 20px;
-    box-shadow: 0 0 10px rgba(150, 150, 150, 0.3); /* Softer shadow */
+    box-shadow: none; /* Removed box shadow */
 }
 
 #content img {
     display: block;
     max-width: 100%;
     height: auto;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 16px auto; /* Adjusted margin */
+    background-color: #ffffff; /* Added white background for images for better visibility */
+    border-radius: 6px;
 }
 
-/* Firefox scrollbar */
+/* Firefox Scrollbar */
 @-moz-document url-prefix() {
     #content {
         scrollbar-width: thin;
-        scrollbar-color: #555 #252525; /* Darker scrollbar */
+        scrollbar-color: #58a6ff #0d1117; /* Blue thumb, dark track */
     }
 }
 
-/* Button container */
 .button-container {
     display: flex;
     gap: 10px;
@@ -125,63 +115,194 @@ h6 {
 
 button,
 select {
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 5px;
-    border: 1px solid #555; /* Darker border */
-    background-color: #333; /* Darker button background */
-    color: #d4d4d4; /* Lighter text */
+    padding: 8px 16px; /* Adjusted padding */
+    font-size: 0.95rem; /* Slightly smaller font size */
+    border-radius: 6px;
+    border: 1px solid rgba(191, 199, 207, 0.4); /* GitHub dark button border */
+    background-color: #21262d; /* GitHub dark button background */
+    color: #c9d1d9; /* GitHub dark button text */
     cursor: pointer;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 0 5px rgba(150, 150, 150, 0.5); /* Softer shadow */
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    box-shadow: none; /* Removed box shadow */
+    font-family: inherit; /* Use body font */
 }
 
 button {
-    min-width: 175px;
+    min-width: 120px; /* Adjusted min-width */
 }
 
 button:hover,
 select:hover {
-    background-color: #444; /* Slightly lighter hover */
-    box-shadow: 0 0 10px rgba(150, 150, 150, 0.7); /* Stronger hover shadow */
+    background-color: #30363d; /* Darker hover background */
+    border-color: #8b949e; /* Lighter border on hover */
 }
 
 pre {
-    border: solid 1px #333; /* Darker border */
-    border-radius: 5px;
-}
-
-/* Canvas */
-canvas {
-    image-rendering: high-quality;
-    border: 1px solid #444; /* Darker border */
+    border: 1px solid #30363d; /* GitHub dark border */
     border-radius: 6px;
-    background-color: #222; /* Darker canvas background */
-    box-shadow: 0 0 20px rgba(200, 200, 200, 0),
-    0 0 40px rgba(200, 200, 200, 0), inset 0 0 10px rgba(200, 200, 200, 0),
-    inset 0 0 20px rgba(200, 200, 200, 0);
-    margin-bottom: 20px;
+    background-color: #161b22; /* Slightly different background for code blocks */
+    padding: 16px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
 }
 
-/* Scrollbar */
+canvas {
+    border: 1px solid #30363d; /* GitHub dark border */
+    border-radius: 6px;
+    background-color: #010409; /* Very dark background for canvas */
+    box-shadow: none; /* Removed glow effect */
+    margin-bottom: 20px;
+    image-rendering: auto; /* Reset image rendering */
+}
+
+/* Webkit Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(40, 40, 40, 0.85); /* Darker track */
+    background: #0d1117; /* Dark track */
     border-radius: 5px;
-    box-shadow: inset 0 0 5px rgba(100, 100, 100, 0.2); /* Softer shadow */
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #555, #888); /* Darker thumb */
-    box-shadow: 0 0 5px rgba(150, 150, 150, 0.7),
-    0 0 5px rgba(150, 150, 150, 0.7);
+    background: #58a6ff; /* Blue thumb */
     border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #666, #999); /* Slightly lighter hover */
-    box-shadow: 0 0 5px rgba(150, 150, 150, 0.7),
+    background: #79c0ff; /* Lighter blue on hover */
+}
+
+/* Links */
+a {
+    color: #58a6ff; /* GitHub dark link color */
+    text-decoration: none;
+    font-weight: normal; /* Removed bold */
+    position: relative;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+a:hover {
+    color: #79c0ff; /* Lighter link color on hover */
+    text-decoration: underline;
+    text-shadow: none; /* Removed text shadow */
+}
+
+a::after { /* Removed underline effect */
+    content: none;
+}
+
+/* Lists */
+ul, ol {
+    padding-left: 2em; /* Standard indentation */
+    margin-top: 10px;
+    margin-bottom: 16px;
+    color: #c9d1d9;
+    list-style-position: outside; /* Standard list position */
+    line-height: 1.6;
+}
+
+ul {
+    list-style-type: disc; /* Standard disc bullets */
+}
+
+ul li::before { /* Removed custom bullet */
+    content: none;
+}
+
+ol {
+    list-style-type: decimal; /* Standard decimal numbering */
+}
+
+ol li { /* Reset list item display */
+    counter-increment: none;
+    display: list-item;
+    align-items: initial;
+}
+
+ol li::before { /* Removed custom numbering */
+    content: none;
+}
+
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse; /* Use collapse for standard table borders */
+    border-spacing: 0;
+    background: #0d1117; /* Match body background */
+    border: 1px solid #30363d; /* GitHub dark border */
+    border-radius: 0; /* No radius on table itself with collapse */
+    box-shadow: none;
+    margin: 20px 0;
+    display: block; /* For overflow scrolling */
+    overflow-x: auto; /* Allow horizontal scrolling */
+}
+
+table th, table td {
+    padding: 8px 12px; /* Standard padding */
+    text-align: left;
+    font-family: inherit; /* Use body font */
+    color: #c9d1d9;
+    border: 1px solid #30363d; /* Border for cells */
+    background: #161b22; /* Cell background */
+}
+
+table th {
+    background: #161b22; /* Header background */
+    color: #c9d1d9; /* Header text */
+    font-weight: 600;
+    text-transform: none; /* No text transform */
+    text-shadow: none;
+}
+
+table tr {
+    background-color: #0d1117; /* Row background */
+    border-top: 1px solid #21262d;
+}
+
+table tr:nth-child(2n) {
+    background-color: #161b22; /* Alternate row background */
+}
+
+
+table tr:hover td { /* Removed hover effect */
+    background: #161b22; /* Keep cell background */
+    color: #c9d1d9; /* Keep text color */
+}
+
+table caption {
+    font-size: 1em; /* Standard caption size */
+    color: #8b949e; /* Lighter caption color */
+    text-shadow: none;
+    padding: 10px 0; /* Padding above/below */
+    font-family: inherit;
+    text-align: left; /* Align caption left */
+    caption-side: bottom; /* Place caption below table */
+    margin-top: 8px;
+}
+
+
+#top-page-navigation, #bottom-page-navigation {
+    text-align: center;
+    min-width: 100%; /* Adjust for responsiveness */
+    max-width: 766px;
+    margin: 20px auto; /* Center navigation */
+    font-size: 0.9rem;
+}
+
+/********************************************************************************************************************/
+/*** Theme selector opening button colors for this theme  ***/
+#open-theme-selector-button {
+    border: 1px solid #707070;
+}
+#open-theme-selector-button .eye-icon {
+    background-color: rgb(101, 101, 101);
+}
+#open-theme-selector-button .eye-icon:hover {
+    background-color: rgb(127, 176, 255);
+}
+

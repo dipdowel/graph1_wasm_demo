@@ -6,19 +6,26 @@ const closeSelectorButton = document.getElementById("close-theme-selector-button
 const themeOverlay = document.getElementById('theme-overlay');
 const themeRadios = document.querySelectorAll('input[name="theme"]');
 
-const styleSheet = document.createElement('link');
-styleSheet.rel = 'stylesheet';
-document.head.appendChild(styleSheet);
+const mainCss = document.createElement('link');
+mainCss.rel = 'stylesheet';
+document.head.appendChild(mainCss);
+
+const prismCss = document.createElement('link');
+prismCss.rel = 'stylesheet';
+document.head.appendChild(prismCss);
 
 function setTheme(themeName) {
     if (themeName === 'wave') {
-        styleSheet.href = 'wave.css';
+        mainCss.href = 'wave.css';
+        prismCss.href = 'prism-tomorrow.css';
     } else if (themeName === 'dark') {
-        styleSheet.href = 'dark.css';
+        mainCss.href = 'dark.css';
+        prismCss.href = 'prism-tomorrow.dark.css';
     } else if (themeName === 'light') {
-        styleSheet.href = 'light.css';
+        mainCss.href = 'light.css';
+        prismCss.href = 'prism-tomorrow.light.css';
     } else {
-        styleSheet.href = 'wave.css'; // Default to 'wave'
+        mainCss.href = 'wave.css'; // Default to 'wave'
     }
     localStorage.setItem('theme', themeName);
 }

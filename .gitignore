@@ -23,6 +23,7 @@ Cargo.lock
 # Added by cargo
 
 /target
+/temp
 /.idea/.gitignore
 /.idea/graph1_wasm_demo.iml
 /.idea/misc.xml

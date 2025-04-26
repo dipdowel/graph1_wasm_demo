@@ -1,15 +1,14 @@
 .eye-icon {
     width: 44px;
     height: 44px;
-    -webkit-mask-image: url("eye.png");
-    mask-image: url("eye.png");
+    -webkit-mask-image: url("eye.svg");
+    mask-image: url("eye.svg");
     -webkit-mask-size: cover;
     mask-size: cover;
     content: "";
 }
 
 .eye-icon:hover {
-    background-color: rgba(255, 255, 0, 1);
     transition: background-color 0.3s ease;
 }
 
@@ -22,16 +21,16 @@
     min-width: 44px;
     max-width: 58px;
     margin: 0 10px;
-    border: 1px solid #1d5c52;
+    /*border: 1px solid #1d5c52;*/
 }
 
 #open-theme-selector-button .eye-icon {
-    background-color: rgba(255, 255, 0, 0.5);
+    /*background-color: rgba(255, 255, 0, 0.5);*/
 }
 
 #open-theme-selector-button .eye-icon:hover {
     /*background-color: #ffff00;*/
-    background-color: rgba(255, 255, 0, 1);
+    /*background-color: rgba(255, 255, 0, 1);*/
     transition: background-color 0.5s ease-in;
 }
 

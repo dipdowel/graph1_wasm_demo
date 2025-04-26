@@ -52,6 +52,7 @@ h3,
 h4,
 h5,
 h6 {
+    text-transform: uppercase;
     text-shadow: 0 0 5px rgba(255, 191, 0, 0.5);
     margin-top: 14px;
     margin-bottom: 12px;
@@ -59,7 +60,6 @@ h6 {
 }
 
 h1 {
-    text-transform: uppercase;
     color: #ff77ff;
     text-shadow: 0 0 8px rgba(255, 119, 255, 0.7);
 }
@@ -322,15 +322,61 @@ table caption {
     font-size: 1.0rem;
 }
 
-/********************************************************************************************************************/
-/*** Theme selector opening button colors for this theme  ***/
-#open-theme-selector-button {
-    border: 1px solid #1d5c52;
-}
-#open-theme-selector-button .eye-icon {
-    /*background-color: rgb(103, 103, 251);*/
-    background-color: rgba(255, 191, 0, 0.5);
-}
-#open-theme-selector-button .eye-icon:hover {
-    background-color: rgba(255, 255, 0, 1);
+
+/* TODO: Consider moving to a dedicated file ? */
+@media (max-width: 768px) {
+
+    canvas {
+        width: 100vw; /* Scales canvas width relative to viewport */
+        height: auto; /* Maintain aspect ratio */
+        max-width: 100%;
+        display: block;
+        margin: -20px 0 20px;
+        border-radius: 0;
+        border: none;
+    }
+
+    #top-page-navigation,
+    #bottom-page-navigation {
+        min-width: 100%;
+        font-size: 0.95rem;
+        padding: 0 10px;
+    }
+
+    .button-container {
+         align-items: stretch;
+        width: 100%;
+        gap: 12px;
+        /*padding: 0 10px;*/
+    }
+
+    button,
+    select {
+        width: 100%;
+        font-size: 1.1rem;
+        padding: 14px;
+        min-width: unset;
+    }
+
+    footer {
+        width: 100%;
+        text-align: center;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        padding: 20px 10px;
+        box-sizing: border-box;
+    }
+
+    footer hr {
+        margin: 16px 0;
+        width: 90%;
+    }
+
+    #content {
+        padding: 16px;
+        box-sizing: content-box;
+        border: 0;
+        background: none;
+        box-shadow: none;
+    }
 }
