@@ -86,7 +86,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // initialize the context
     if current_frame == 0 {
+        // // initial context setup
         ctx.win.background_color = SunsetGlow::GENTLE_INDIGO;
+        ctx.win.background_color = RetroNeon::CYBERPUNK_FUCHSIA;
+        ctx.line.set_int_no_aa(Some(1));
     }
 
     // Clear the screen
