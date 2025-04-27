@@ -1,48 +1,22 @@
-/* dark.css - Based on wave.css, emulating GitHub Dark Theme */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Example: Using Inter font */
-
-
+/* dark.css - GitHub Dark Theme Specific Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Specific font import */
 
 body {
-    background-color: #0d1117; /* GitHub dark background */
-    min-height: 100vh;
-    height: 100%;
+    background-color: #0d1117; /* Dark background */
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; /* System fonts */
-    font-size: 1rem; /* Adjusted font size */
+    font-size: 1rem;
     line-height: 1.5;
-    color: #c9d1d9; /* GitHub dark text color */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    position: relative;
+    color: #c9d1d9; /* Light text color */
 }
-
-/*body::before { !* Removed the background image from wave.css *!*/
-/*    content: none;*/
-/*}*/
 
 body::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    background-image: url("bg8.webp");
-    background-size: auto;
-    background-repeat: repeat;
-    background-blend-mode: difference;
-    opacity: 0.008; /* Make the bg barely visible */
-    z-index: -1; /* Places the background behind all other content */
+    background-blend-mode: difference; /* Specific blend mode */
+    opacity: 0.008; /* Specific opacity */
 }
 
-
-
 code {
-    color: #c9d1d9; /* Standard code color */
-    background-color: rgba(110,118,129,0.2); /* Subtle background for inline code */
+    color: #c9d1d9;
+    background-color: rgba(110,118,129,0.2); /* Subtle dark background */
     padding: .2em .4em;
     margin: 0;
     font-size: 85%;
@@ -52,18 +26,18 @@ code {
 hr {
     border: 0;
     height: 1px;
-    background-color: #21262d; /* GitHub dark border color */
+    background-color: #21262d; /* Dark border color */
     width: 100%;
     margin: 24px 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: #c9d1d9; /* Heading color */
-    text-shadow: none; /* Removed text shadow */
+    color: #c9d1d9;
+    text-shadow: none;
     margin-top: 24px;
     margin-bottom: 16px;
-    font-weight: 600; /* Standard heading weight */
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; /* System fonts */
+    font-weight: 600;
+    font-family: inherit; /* Use body font */
 }
 
 h1 { font-size: 2em; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
@@ -71,28 +45,18 @@ h2 { font-size: 1.5em; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
 h3 { font-size: 1.25em; }
 h4 { font-size: 1em; }
 h5 { font-size: 0.875em; }
-h6 { font-size: 0.85em; color: #8b949e; } /* Lighter color for h6 */
+h6 { font-size: 0.85em; color: #8b949e; } /* Muted color */
 
 #content {
-    width: 100%;
-    max-width: 766px;
-    text-align: left;
-    padding: 20px;
-    background: #0d1117; /* Match body background */
-    border: 1px solid #30363d; /* GitHub dark border */
-    border-radius: 6px; /* Standard border radius */
-    margin-bottom: 20px;
-    margin-top: 20px;
-    box-shadow: none; /* Removed box shadow */
+    background: #0d1117;
+    border: 1px solid #30363d; /* Dark border */
+    border-radius: 6px;
+    box-shadow: none;
 }
 
 #content img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 16px auto; /* Adjusted margin */
-    background-color: #ffffff; /* Added white background for images for better visibility */
-    border-radius: 6px;
+    margin: 16px auto;
+    background-color: #ffffff; /* White background for visibility */
 }
 
 /* Firefox Scrollbar */
@@ -103,40 +67,34 @@ h6 { font-size: 0.85em; color: #8b949e; } /* Lighter color for h6 */
     }
 }
 
-.button-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
 button,
 select {
-    padding: 8px 16px; /* Adjusted padding */
-    font-size: 0.95rem; /* Slightly smaller font size */
+    padding: 8px 16px;
+    font-size: 0.95rem;
     border-radius: 6px;
-    border: 1px solid rgba(191, 199, 207, 0.4); /* GitHub dark button border */
-    background-color: #21262d; /* GitHub dark button background */
-    color: #c9d1d9; /* GitHub dark button text */
+    border: 1px solid rgba(191, 199, 207, 0.4); /* Dark button border */
+    background-color: #21262d; /* Dark button background */
+    color: #c9d1d9;
     cursor: pointer;
     transition: background-color 0.2s ease, border-color 0.2s ease;
-    box-shadow: none; /* Removed box shadow */
-    font-family: inherit; /* Use body font */
+    box-shadow: none;
+    font-family: inherit;
 }
 
 button {
-    min-width: 120px; /* Adjusted min-width */
+    min-width: 120px;
 }
 
 button:hover,
 select:hover {
-    background-color: #30363d; /* Darker hover background */
-    border-color: #8b949e; /* Lighter border on hover */
+    background-color: #30363d;
+    border-color: #8b949e;
 }
 
 pre {
-    border: 1px solid #30363d; /* GitHub dark border */
+    border: 1px solid #30363d;
     border-radius: 6px;
-    background-color: #161b22; /* Slightly different background for code blocks */
+    background-color: #161b22; /* Dark code block background */
     padding: 16px;
     overflow: auto;
     font-size: 85%;
@@ -144,154 +102,121 @@ pre {
 }
 
 canvas {
-    border: 1px solid #30363d; /* GitHub dark border */
+    border: 1px solid #30363d;
     border-radius: 6px;
-    background-color: #010409; /* Very dark background for canvas */
-    box-shadow: none; /* Removed glow effect */
+    background-color: #010409; /* Very dark canvas background */
+    box-shadow: none;
     margin-bottom: 20px;
-    image-rendering: auto; /* Reset image rendering */
+    image-rendering: auto;
 }
 
-/* Webkit Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
+/* Webkit Scrollbar Colors */
 ::-webkit-scrollbar-track {
     background: #0d1117; /* Dark track */
-    border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: #58a6ff; /* Blue thumb */
-    border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #79c0ff; /* Lighter blue on hover */
+    background: #79c0ff;
 }
 
 /* Links */
 a {
-    color: #58a6ff; /* GitHub dark link color */
+    color: #58a6ff; /* Blue links */
     text-decoration: none;
-    font-weight: normal; /* Removed bold */
+    font-weight: normal;
     position: relative;
     transition: color 0.3s ease, text-decoration 0.3s ease;
 }
 
 a:hover {
-    color: #79c0ff; /* Lighter link color on hover */
+    color: #79c0ff;
     text-decoration: underline;
-    text-shadow: none; /* Removed text shadow */
+    text-shadow: none;
 }
 
-a::after { /* Removed underline effect */
-    content: none;
+a::after {
+    content: none; /* No underline effect */
 }
 
 /* Lists */
 ul, ol {
-    padding-left: 2em; /* Standard indentation */
+    padding-left: 2em;
     margin-top: 10px;
     margin-bottom: 16px;
     color: #c9d1d9;
-    list-style-position: outside; /* Standard list position */
+    list-style-position: outside;
     line-height: 1.6;
 }
 
-ul {
-    list-style-type: disc; /* Standard disc bullets */
-}
+ul { list-style-type: disc; }
+ul li::before { content: none; }
 
-ul li::before { /* Removed custom bullet */
-    content: none;
-}
-
-ol {
-    list-style-type: decimal; /* Standard decimal numbering */
-}
-
-ol li { /* Reset list item display */
-    counter-increment: none;
-    display: list-item;
-    align-items: initial;
-}
-
-ol li::before { /* Removed custom numbering */
-    content: none;
-}
+ol { list-style-type: decimal; }
+ol li { counter-increment: none; display: list-item; align-items: initial; }
+ol li::before { content: none; }
 
 
 /* Tables */
 table {
-    width: 100%;
-    border-collapse: collapse; /* Use collapse for standard table borders */
-    border-spacing: 0;
-    background: #0d1117; /* Match body background */
-    border: 1px solid #30363d; /* GitHub dark border */
-    border-radius: 0; /* No radius on table itself with collapse */
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 0; /* Collapse overrides radius here */
     box-shadow: none;
-    margin: 20px 0;
-    display: block; /* For overflow scrolling */
-    overflow-x: auto; /* Allow horizontal scrolling */
 }
 
 table th, table td {
-    padding: 8px 12px; /* Standard padding */
+    padding: 8px 12px;
     text-align: left;
-    font-family: inherit; /* Use body font */
+    font-family: inherit;
     color: #c9d1d9;
-    border: 1px solid #30363d; /* Border for cells */
+    border: 1px solid #30363d;
     background: #161b22; /* Cell background */
 }
 
 table th {
     background: #161b22; /* Header background */
-    color: #c9d1d9; /* Header text */
+    color: #c9d1d9;
     font-weight: 600;
-    text-transform: none; /* No text transform */
+    text-transform: none;
     text-shadow: none;
 }
 
 table tr {
-    background-color: #0d1117; /* Row background */
+    background-color: #0d1117;
     border-top: 1px solid #21262d;
 }
 
 table tr:nth-child(2n) {
-    background-color: #161b22; /* Alternate row background */
+    background-color: #161b22; /* Alternate row */
 }
 
-
-table tr:hover td { /* Removed hover effect */
-    background: #161b22; /* Keep cell background */
-    color: #c9d1d9; /* Keep text color */
+table tr:hover td {
+    background: #161b22; /* No hover effect */
+    color: #c9d1d9;
 }
 
 table caption {
-    font-size: 1em; /* Standard caption size */
-    color: #8b949e; /* Lighter caption color */
+    font-size: 1em;
+    color: #8b949e;
     text-shadow: none;
-    padding: 10px 0; /* Padding above/below */
+    padding: 10px 0;
     font-family: inherit;
-    text-align: left; /* Align caption left */
-    caption-side: bottom; /* Place caption below table */
+    text-align: left;
+    caption-side: bottom;
     margin-top: 8px;
 }
 
 
 #top-page-navigation, #bottom-page-navigation {
-    text-align: center;
-    min-width: 100%; /* Adjust for responsiveness */
-    max-width: 766px;
-    margin: 20px auto; /* Center navigation */
+    min-width: 100%;
     font-size: 0.9rem;
 }
 
-/********************************************************************************************************************/
-/*** Theme selector opening button colors for this theme  ***/
+/* Theme selector button */
 #open-theme-selector-button {
     border: 1px solid #707070;
 }
@@ -301,4 +226,3 @@ table caption {
 #open-theme-selector-button .eye-icon:hover {
     background-color: rgb(127, 176, 255);
 }
-

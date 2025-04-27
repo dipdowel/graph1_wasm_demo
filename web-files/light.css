@@ -1,49 +1,26 @@
-/* light.css - Based on wave.css, emulating GitHub Light Theme */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Example: Using Inter font */
-
+/* light.css - GitHub Light Theme Specific Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Specific font import */
 
 body {
-    background-color: #ffffff; /* GitHub light background */
-    min-height: 100vh;
-    height: 100%;
+    background-color: #ffffff; /* Light background */
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; /* System fonts */
-    font-size: 1rem; /* Adjusted font size */
+    font-size: 1rem;
     line-height: 1.5;
-    color: #24292f; /* GitHub light text color */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    position: relative;
+    color: #24292f; /* Dark text color */
 }
-
-/*body::before { !* Removed the background image from wave.css *!*/
-/*    content: none;*/
-/*}*/
 
 body::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    background-image: url("bg8.webp");
-    background-size: auto;
-    background-repeat: repeat;
-    background-blend-mode: darken;
-    opacity: 0.072; /* Make the bg barely visible */
-    z-index: -1; /* Places the background behind all other content */
+    background-blend-mode: darken; /* Specific blend mode */
+    opacity: 0.072; /* Specific opacity */
 }
 
-#myCanvas{
+#myCanvas { /* Specific style for canvas in light theme */
     background: #0a0a1b;
 }
 
 code {
-    color: #24292f; /* Standard code color */
-    background-color: rgba(175,184,193,0.2); /* Subtle background for inline code */
+    color: #24292f;
+    background-color: rgba(175,184,193,0.2); /* Subtle light background */
     padding: .2em .4em;
     margin: 0;
     font-size: 85%;
@@ -53,18 +30,18 @@ code {
 hr {
     border: 0;
     height: 1px;
-    background-color: #d0d7de; /* GitHub light border color */
+    background-color: #d0d7de; /* Light border color */
     width: 100%;
     margin: 24px 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: #24292f; /* Heading color */
-    text-shadow: none; /* Removed text shadow */
+    color: #24292f;
+    text-shadow: none;
     margin-top: 24px;
     margin-bottom: 16px;
-    font-weight: 600; /* Standard heading weight */
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; /* System fonts */
+    font-weight: 600;
+    font-family: inherit; /* Use body font */
 }
 
 h1 { font-size: 2em; border-bottom: 1px solid #d8dee4; padding-bottom: .3em; }
@@ -72,28 +49,18 @@ h2 { font-size: 1.5em; border-bottom: 1px solid #d8dee4; padding-bottom: .3em; }
 h3 { font-size: 1.25em; }
 h4 { font-size: 1em; }
 h5 { font-size: 0.875em; }
-h6 { font-size: 0.85em; color: #57606a; } /* Darker muted color for h6 */
+h6 { font-size: 0.85em; color: #57606a; } /* Muted color */
 
 #content {
-    width: 100%;
-    max-width: 766px;
-    text-align: left;
-    padding: 20px;
-    background: #ffffff; /* Match body background */
-    border: 1px solid #d0d7de; /* GitHub light border */
-    border-radius: 6px; /* Standard border radius */
-    margin-bottom: 20px;
-    margin-top: 20px;
-    box-shadow: none; /* Removed box shadow */
+    background: #ffffff;
+    border: 1px solid #d0d7de; /* Light border */
+    border-radius: 6px;
+    box-shadow: none;
 }
 
 #content img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 16px auto; /* Adjusted margin */
-    background-color: #ffffff; /* Keep white background */
-    border-radius: 6px;
+    margin: 16px auto;
+    background-color: #ffffff; /* White background */
 }
 
 
@@ -105,40 +72,34 @@ h6 { font-size: 0.85em; color: #57606a; } /* Darker muted color for h6 */
     }
 }
 
-.button-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
 button,
 select {
-    padding: 8px 16px; /* Adjusted padding */
-    font-size: 0.95rem; /* Slightly smaller font size */
+    padding: 8px 16px;
+    font-size: 0.95rem;
     border-radius: 6px;
-    border: 1px solid rgba(36, 41, 47, 0.2); /* GitHub light button border */
-    background-color: #f6f8fa; /* GitHub light button background */
-    color: #24292f; /* GitHub light button text */
+    border: 1px solid rgba(36, 41, 47, 0.2); /* Light button border */
+    background-color: #f6f8fa; /* Light button background */
+    color: #24292f;
     cursor: pointer;
     transition: background-color 0.2s ease, border-color 0.2s ease;
-    box-shadow: 0 1px 0 rgba(36, 41, 47, 0.04); /* Subtle bottom shadow */
-    font-family: inherit; /* Use body font */
+    box-shadow: 0 1px 0 rgba(36, 41, 47, 0.04); /* Subtle shadow */
+    font-family: inherit;
 }
 
 button {
-    min-width: 120px; /* Adjusted min-width */
+    min-width: 120px;
 }
 
 button:hover,
 select:hover {
-    background-color: #e9eaec; /* Slightly darker hover background */
+    background-color: #e9eaec;
     border-color: rgba(36, 41, 47, 0.25);
 }
 
 pre {
-    border: 1px solid #d0d7de; /* GitHub light border */
+    border: 1px solid #d0d7de;
     border-radius: 6px;
-    background-color: #f6f8fa; /* Light background for code blocks */
+    background-color: #f6f8fa; /* Light code block background */
     padding: 16px;
     overflow: auto;
     font-size: 85%;
@@ -146,153 +107,120 @@ pre {
 }
 
 canvas {
-    border: 1px solid #d0d7de; /* GitHub light border */
+    border: 1px solid #d0d7de;
     border-radius: 6px;
-    background-color: #f6f8fa; /* Light background for canvas */
-    box-shadow: none; /* Removed glow effect */
+    background-color: #f6f8fa; /* Light canvas background */
+    box-shadow: none;
     margin-bottom: 20px;
-    image-rendering: auto; /* Reset image rendering */
+    image-rendering: auto;
 }
 
-/* Webkit Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
+/* Webkit Scrollbar Colors */
 ::-webkit-scrollbar-track {
     background: #f6f8fa; /* Light track */
-    border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: #959da5; /* Gray thumb */
-    border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #6e7781; /* Darker gray on hover */
+    background: #6e7781;
 }
 
 /* Links */
 a {
-    color: #0969da; /* GitHub light link color */
+    color: #0969da; /* Blue links */
     text-decoration: none;
-    font-weight: normal; /* Removed bold */
+    font-weight: normal;
     position: relative;
     transition: color 0.3s ease, text-decoration 0.3s ease;
 }
 
 a:hover {
-    color: #0a60c2; /* Slightly darker link color on hover */
+    color: #0a60c2;
     text-decoration: underline;
-    text-shadow: none; /* Removed text shadow */
+    text-shadow: none;
 }
 
-a::after { /* Removed underline effect */
-    content: none;
+a::after {
+    content: none; /* No underline effect */
 }
-
 
 /* Lists */
 ul, ol {
-    padding-left: 2em; /* Standard indentation */
+    padding-left: 2em;
     margin-top: 10px;
     margin-bottom: 16px;
     color: #24292f;
-    list-style-position: outside; /* Standard list position */
+    list-style-position: outside;
     line-height: 1.6;
 }
 
-ul {
-    list-style-type: disc; /* Standard disc bullets */
-}
+ul { list-style-type: disc; }
+ul li::before { content: none; }
 
-ul li::before { /* Removed custom bullet */
-    content: none;
-}
-
-ol {
-    list-style-type: decimal; /* Standard decimal numbering */
-}
-
-ol li { /* Reset list item display */
-    counter-increment: none;
-    display: list-item;
-    align-items: initial;
-}
-
-ol li::before { /* Removed custom numbering */
-    content: none;
-}
+ol { list-style-type: decimal; }
+ol li { counter-increment: none; display: list-item; align-items: initial; }
+ol li::before { content: none; }
 
 
 /* Tables */
 table {
-    width: 100%;
-    border-collapse: collapse; /* Use collapse for standard table borders */
-    border-spacing: 0;
-    background: #ffffff; /* Match body background */
-    border: 1px solid #d0d7de; /* GitHub light border */
-    border-radius: 0; /* No radius on table itself with collapse */
+    background: #ffffff;
+    border: 1px solid #d0d7de;
+    border-radius: 0; /* Collapse overrides radius here */
     box-shadow: none;
-    margin: 20px 0;
-    display: block; /* For overflow scrolling */
-    overflow-x: auto; /* Allow horizontal scrolling */
 }
 
 table th, table td {
-    padding: 8px 12px; /* Standard padding */
+    padding: 8px 12px;
     text-align: left;
-    font-family: inherit; /* Use body font */
+    font-family: inherit;
     color: #24292f;
-    border: 1px solid #d0d7de; /* Border for cells */
+    border: 1px solid #d0d7de;
     background: #ffffff; /* Cell background */
 }
 
 table th {
     background: #f6f8fa; /* Header background */
-    color: #24292f; /* Header text */
+    color: #24292f;
     font-weight: 600;
-    text-transform: none; /* No text transform */
+    text-transform: none;
     text-shadow: none;
 }
 
 table tr {
-    background-color: #ffffff; /* Row background */
+    background-color: #ffffff;
     border-top: 1px solid #d8dee4;
 }
 
 table tr:nth-child(2n) {
-    background-color: #f6f8fa; /* Alternate row background */
+    background-color: #f6f8fa; /* Alternate row */
 }
 
-table tr:hover td { /* Removed hover effect */
-    background: #ffffff; /* Keep cell background */
-    color: #24292f; /* Keep text color */
+table tr:hover td {
+    background: #ffffff; /* No hover effect */
+    color: #24292f;
 }
-
 
 table caption {
-    font-size: 1em; /* Standard caption size */
-    color: #57606a; /* Muted caption color */
+    font-size: 1em;
+    color: #57606a;
     text-shadow: none;
-    padding: 10px 0; /* Padding above/below */
+    padding: 10px 0;
     font-family: inherit;
-    text-align: left; /* Align caption left */
-    caption-side: bottom; /* Place caption below table */
+    text-align: left;
+    caption-side: bottom;
     margin-top: 8px;
 }
 
 #top-page-navigation, #bottom-page-navigation {
-    text-align: center;
-    min-width: 100%; /* Adjust for responsiveness */
-    max-width: 766px;
-    margin: 20px auto; /* Center navigation */
+    min-width: 100%;
     font-size: 0.9rem;
 }
 
-/*** Theme selector opening button colors for this theme  ***/
+/* Theme selector button */
 #open-theme-selector-button {
     border: 1px solid #bdbdbd;
 }
@@ -300,8 +228,5 @@ table caption {
     background-color: rgba(117, 117, 117, 0.5);
 }
 #open-theme-selector-button .eye-icon:hover {
-     background-color: rgb(0, 0, 0);
- }
-
-
-
+    background-color: rgb(0, 0, 0);
+}

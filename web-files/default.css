@@ -5,8 +5,84 @@
 }
 
 body {
-    background-color: #000000;
+    background: #000;
+    min-height: 100vh;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    position: relative;
 }
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("bg8.webp"); /* Shared background image */
+    background-size: auto;
+    background-repeat: repeat;
+    z-index: -1; /* Places the background behind all other content */
+}
+
+#content {
+    width: 100%;
+    max-width: 766px; /* Consistent max width */
+    text-align: left;
+    padding: 20px; /* Consistent padding */
+    margin-bottom: 20px; /* Consistent margin */
+    margin-top: 20px; /* Consistent margin */
+}
+
+#content img {
+    display: block; /* Ensure images are block elements */
+    max-width: 100%; /* Prevent images from overflowing */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 6px; /* Consistent border radius */
+}
+
+.button-container {
+    display: flex;
+    gap: 10px; /* Consistent gap between buttons */
+    margin-bottom: 20px; /* Consistent margin */
+}
+
+/* Basic Webkit Scrollbar Structure */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 5px; /* Consistent track radius */
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 5px; /* Consistent thumb radius */
+}
+
+/* Basic Table Structure */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 20px 0; /* Consistent margin */
+    display: block; /* Allows overflow scrolling */
+    overflow-x: auto; /* Allows horizontal scrolling */
+}
+
+/* Basic Page Navigation Structure */
+#top-page-navigation, #bottom-page-navigation {
+    text-align: center;
+    max-width: 766px; /* Consistent max width */
+    margin: 20px auto; /* Center navigation */
+}
+
+
+
 
 
 /* Style for the navigation containers */
@@ -17,7 +93,7 @@ body {
     width: 100%;
     max-width: 766px;
     padding: 5px 0;
-     margin: 0 auto; /* Center if max-width is set
+     margin: 0 auto;
 }
 
 /* Style for the previous link area */
@@ -47,3 +123,5 @@ body {
 .nav-prev a, .nav-next a {
     display: inline-block;
 }
+
+

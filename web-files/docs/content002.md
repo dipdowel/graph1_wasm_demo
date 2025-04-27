@@ -1,4 +1,4 @@
-# Basic Concepts, Pt. 2
+# Basic Concepts, Pt.&nbsp;2
 ## Primitives — the Building Blocks
 
 Before we dive into drawing, animation, and effects, let’s get familiar with the core types that make everything tick: **primitives**.

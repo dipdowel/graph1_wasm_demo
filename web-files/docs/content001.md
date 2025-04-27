@@ -1,4 +1,4 @@
-# Basic Concepts, Pt. 1
+# Basic Concepts, Pt.&nbsp;1
 ## The Contexts
 
 At the heart of Graph1 is the `GraphContext` — a struct that manages everything needed to draw on screen, animate, and apply effects.
