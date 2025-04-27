@@ -127,8 +127,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const currentDemo = parseInt(urlParams.get("demo") || "0", 10); // Default to 0 if no demo param
 
-        // Find the current demo index in the configuration array
         const currentIndex = demos.findIndex(demo => parseInt(demo.value) === currentDemo);
+        const currentDemoValue = demos[currentIndex].value; // Get current demo value
 
         // Function to handle link clicks
         const handleNavLinkClick = async (event, demoValue) => {
@@ -138,53 +138,63 @@
           demoSelector.value = demoValue; // Update the dropdown to match
         };
 
-        // --- Navigation for Bottom ---
+        // --- Function to build navigation content ---
+        // This avoids duplicating the logic for top and bottom navs
+        const buildNavContent = (container) => {
+          container.innerHTML = ""; // Clear previous content
+          container.classList.add('page-navigation-container'); // Add class for Flexbox styling
+
+          // Create elements for prev, separator, and next
+          const prevSpan = document.createElement("span");
+          prevSpan.classList.add('nav-prev');
+          const separatorSpan = document.createElement("span");
+          separatorSpan.classList.add('nav-separator');
+          const nextSpan = document.createElement("span");
+          nextSpan.classList.add('nav-next');
+
+          // --- Previous Link ---
+          if (currentIndex > 0) {
+            const prevDemo = demos[currentIndex - 1];
+            const prevLink = document.createElement("a");
+            prevLink.href = `/?demo=${prevDemo.value}`;
+            // Use non-breaking spaces (&nbsp;) around arrows for slight visual padding
+            prevLink.innerHTML = `◄◄&nbsp;${isMobile ? padNumber(prevDemo.value) : `${prevDemo.label} - ${padNumber(prevDemo.value)}`}`;
+            prevLink.addEventListener('click', (event) => handleNavLinkClick(event, prevDemo.value));
+            prevSpan.appendChild(prevLink);
+          } else {
+            prevSpan.innerHTML = "&nbsp;"; // Non-breaking space to maintain height/layout
+          }
+
+          // --- Separator (Current Demo Number) ---
+          separatorSpan.textContent = `| ${padNumber(currentDemoValue)} |`;
+
+          // --- Next Link ---
+          if (currentIndex < demos.length - 1) {
+            const nextDemo = demos[currentIndex + 1];
+            const nextLink = document.createElement("a");
+            nextLink.href = `/?demo=${nextDemo.value}`;
+            // Use non-breaking spaces (&nbsp;) around arrows
+            nextLink.innerHTML = `${isMobile ? padNumber(nextDemo.value) : `${padNumber(nextDemo.value)} - ${nextDemo.label}`}&nbsp;►►`;
+            nextLink.addEventListener('click', (event) => handleNavLinkClick(event, nextDemo.value));
+            nextSpan.appendChild(nextLink);
+          } else {
+            // Add placeholder content or leave empty
+            nextSpan.innerHTML = "&nbsp;";
+          }
+
+          // Append all parts to the container
+          container.appendChild(prevSpan);
+          container.appendChild(separatorSpan);
+          container.appendChild(nextSpan);
+        };
+
+
+        // --- Apply to Top and Bottom Containers ---
         const navContainerBottom = document.getElementById("bottom-page-navigation");
-        navContainerBottom.innerHTML = ""; // Clear previous links
-
-        if (currentIndex > 0) {
-          const prevDemo = demos[currentIndex - 1];
-          const prevLink = document.createElement("a");
-          prevLink.href = `/?demo=${prevDemo.value}`; // Keep href for context/SEO (?)
-          prevLink.textContent = isMobile? `◄◄ prev ${padNumber(prevDemo.value)}`: `◄◄ ${prevDemo.label} - ${padNumber(prevDemo.value)}`;
-          prevLink.addEventListener('click', (event) => handleNavLinkClick(event, prevDemo.value));
-          navContainerBottom.appendChild(prevLink);
-        }
-
-        if (currentIndex < demos.length - 1) {
-          const nextDemo = demos[currentIndex + 1];
-          const nextLink = document.createElement("a");
-          nextLink.href = `/?demo=${nextDemo.value}`; // Keep href for context/SEO (?)
-          nextLink.textContent = isMobile ? `${padNumber(nextDemo.value)} next ►►` : `${padNumber(nextDemo.value)} - ${nextDemo.label} ►►`;
-
-          // Add a separator if there's also a previous link
-          if (navContainerBottom.children.length > 0 && currentIndex > 0) {
-            const currentDemoValue = demos[currentIndex].value;
-            navContainerBottom.appendChild(document.createTextNode(` | ${padNumber(currentDemoValue)} | `));
-          } else if (navContainerBottom.children.length > 0) {
-            navContainerBottom.appendChild(document.createTextNode(` | ${padNumber(demos[currentIndex].value)} | `));
-          }
-
-
-          nextLink.addEventListener('click', (event) => handleNavLinkClick(event, nextDemo.value)); // Add event listener
-          navContainerBottom.appendChild(nextLink);
-        }
-
-        // --- Clone Navigation for Top ---
         const navContainerTop = document.getElementById("top-page-navigation");
-        navContainerTop.innerHTML = ""; // Clear previous links
-        // Clone nodes and re-attach listeners is safer than innerHTML for elements with listeners
-        Array.from(navContainerBottom.childNodes).forEach(node => {
-          const clonedNode = node.cloneNode(true);
-          if (clonedNode.tagName === 'A') {
-            // Find the corresponding demo value to re-attach the listener
-            const demoValue = new URL(clonedNode.href).searchParams.get('demo');
-            if (demoValue) {
-              clonedNode.addEventListener('click', (event) => handleNavLinkClick(event, demoValue));
-            }
-          }
-          navContainerTop.appendChild(clonedNode);
-        });
+
+        buildNavContent(navContainerBottom);
+        buildNavContent(navContainerTop); // Build content separately for top nav
       }
 
 

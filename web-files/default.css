@@ -5,5 +5,45 @@
 }
 
 body {
-    background-color: #000000; /* GitHub dark background */
+    background-color: #000000;
+}
+
+
+/* Style for the navigation containers */
+.page-navigation-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 766px;
+    padding: 5px 0;
+     margin: 0 auto; /* Center if max-width is set
+}
+
+/* Style for the previous link area */
+.nav-prev {
+    flex: 1;
+    text-align: right;
+    margin-right: 12px;
+}
+
+/* Style for the separator (current number) */
+.nav-separator {
+    flex: 0 1 auto;
+    white-space: nowrap;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Style for the next link area */
+.nav-next {
+    flex: 1;
+    text-align: left;
+    margin-left: 12px;
+}
+
+
+/* Ensure links behave well within flex items */
+.nav-prev a, .nav-next a {
+    display: inline-block;
 }

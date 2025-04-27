@@ -1,11 +1,7 @@
 /* dark.css - Based on wave.css, emulating GitHub Dark Theme */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Example: Using Inter font */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+
 
 body {
     background-color: #0d1117; /* GitHub dark background */

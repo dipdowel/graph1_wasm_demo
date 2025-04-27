@@ -1,11 +1,6 @@
 /* light.css - Based on wave.css, emulating GitHub Light Theme */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Example: Using Inter font */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
 body {
     background-color: #ffffff; /* GitHub light background */
