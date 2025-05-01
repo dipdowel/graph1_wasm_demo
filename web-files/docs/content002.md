@@ -1,9 +1,9 @@
-# Basic Concepts, Pt. 2
+# Basic Concepts, Pt.&nbsp;2
 ## Primitives — the Building Blocks
 
-Before we dive into drawing, animation, and effects, let’s get familiar with the core types that make everything tick: **primitives**.
+Before we dive into drawing, animation, and effects, let’s get familiar with the core types that make everything tick: **the primitives**.
 
-These are the foundational types in Graph1 used to describe positions, areas, rectangles, ratios, and more. They're lean, flexible, and (mostly) won't yell at you. You’ll find them all under the `graph1::primitives` module.
+Primitives are the building block structs in Graph1, they are used to describe positions, areas, rectangles, ratios, and similar. You’ll find them in the [graph1::primitives](https://github.com/dipdowel/graph1/tree/develop/src/primitives) module.
 
 ---
 

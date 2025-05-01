@@ -1,312 +1,176 @@
-/* light.css - Based on wave.css, emulating GitHub Light Theme */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Example: Using Inter font */
+ /* light.css - GitHub Light Theme Specific Styles */
+ @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Specific font import */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    background-color: #ffffff; /* GitHub light background */
-    min-height: 100vh;
-    height: 100%;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; /* System fonts */
-    font-size: 1rem; /* Adjusted font size */
-    line-height: 1.5;
-    color: #24292f; /* GitHub light text color */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    position: relative;
-}
-
-/*body::before { !* Removed the background image from wave.css *!*/
-/*    content: none;*/
-/*}*/
-
-body::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    background-image: url("bg8.webp");
-    background-size: auto;
-    background-repeat: repeat;
-    background-blend-mode: darken;
-    opacity: 0.072; /* Make the bg barely visible */
-    z-index: -1; /* Places the background behind all other content */
-}
-
-#myCanvas{
-    background: #0a0a1b;
-}
-
-code {
-    color: #24292f; /* Standard code color */
-    background-color: rgba(175,184,193,0.2); /* Subtle background for inline code */
-    padding: .2em .4em;
-    margin: 0;
-    font-size: 85%;
-    border-radius: 6px;
-}
-
-hr {
-    border: 0;
-    height: 1px;
-    background-color: #d0d7de; /* GitHub light border color */
-    width: 100%;
-    margin: 24px 0;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    color: #24292f; /* Heading color */
-    text-shadow: none; /* Removed text shadow */
-    margin-top: 24px;
-    margin-bottom: 16px;
-    font-weight: 600; /* Standard heading weight */
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; /* System fonts */
-}
-
-h1 { font-size: 2em; border-bottom: 1px solid #d8dee4; padding-bottom: .3em; }
-h2 { font-size: 1.5em; border-bottom: 1px solid #d8dee4; padding-bottom: .3em; }
-h3 { font-size: 1.25em; }
-h4 { font-size: 1em; }
-h5 { font-size: 0.875em; }
-h6 { font-size: 0.85em; color: #57606a; } /* Darker muted color for h6 */
-
-#content {
-    width: 100%;
-    max-width: 766px;
-    text-align: left;
-    padding: 20px;
-    background: #ffffff; /* Match body background */
-    border: 1px solid #d0d7de; /* GitHub light border */
-    border-radius: 6px; /* Standard border radius */
-    margin-bottom: 20px;
-    margin-top: 20px;
-    box-shadow: none; /* Removed box shadow */
-}
-
-#content img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 16px auto; /* Adjusted margin */
-    background-color: #ffffff; /* Keep white background */
-    border-radius: 6px;
-}
-
-
-/* Firefox Scrollbar */
-@-moz-document url-prefix() {
-    #content {
-        scrollbar-width: thin;
-        scrollbar-color: #6e7781 #f6f8fa; /* Gray thumb, light track */
-    }
-}
-
-.button-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-button,
-select {
-    padding: 8px 16px; /* Adjusted padding */
-    font-size: 0.95rem; /* Slightly smaller font size */
-    border-radius: 6px;
-    border: 1px solid rgba(36, 41, 47, 0.2); /* GitHub light button border */
-    background-color: #f6f8fa; /* GitHub light button background */
-    color: #24292f; /* GitHub light button text */
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-    box-shadow: 0 1px 0 rgba(36, 41, 47, 0.04); /* Subtle bottom shadow */
-    font-family: inherit; /* Use body font */
-}
-
-button {
-    min-width: 120px; /* Adjusted min-width */
-}
-
-button:hover,
-select:hover {
-    background-color: #e9eaec; /* Slightly darker hover background */
-    border-color: rgba(36, 41, 47, 0.25);
-}
-
-pre {
-    border: 1px solid #d0d7de; /* GitHub light border */
-    border-radius: 6px;
-    background-color: #f6f8fa; /* Light background for code blocks */
-    padding: 16px;
-    overflow: auto;
-    font-size: 85%;
-    line-height: 1.45;
-}
-
-canvas {
-    border: 1px solid #d0d7de; /* GitHub light border */
-    border-radius: 6px;
-    background-color: #f6f8fa; /* Light background for canvas */
-    box-shadow: none; /* Removed glow effect */
-    margin-bottom: 20px;
-    image-rendering: auto; /* Reset image rendering */
-}
-
-/* Webkit Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f6f8fa; /* Light track */
-    border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #959da5; /* Gray thumb */
-    border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #6e7781; /* Darker gray on hover */
-}
-
-/* Links */
-a {
-    color: #0969da; /* GitHub light link color */
-    text-decoration: none;
-    font-weight: normal; /* Removed bold */
-    position: relative;
-    transition: color 0.3s ease, text-decoration 0.3s ease;
-}
-
-a:hover {
-    color: #0a60c2; /* Slightly darker link color on hover */
-    text-decoration: underline;
-    text-shadow: none; /* Removed text shadow */
-}
-
-a::after { /* Removed underline effect */
-    content: none;
-}
-
-
-/* Lists */
-ul, ol {
-    padding-left: 2em; /* Standard indentation */
-    margin-top: 10px;
-    margin-bottom: 16px;
-    color: #24292f;
-    list-style-position: outside; /* Standard list position */
-    line-height: 1.6;
-}
-
-ul {
-    list-style-type: disc; /* Standard disc bullets */
-}
-
-ul li::before { /* Removed custom bullet */
-    content: none;
-}
-
-ol {
-    list-style-type: decimal; /* Standard decimal numbering */
-}
-
-ol li { /* Reset list item display */
-    counter-increment: none;
-    display: list-item;
-    align-items: initial;
-}
-
-ol li::before { /* Removed custom numbering */
-    content: none;
-}
-
-
-/* Tables */
-table {
-    width: 100%;
-    border-collapse: collapse; /* Use collapse for standard table borders */
-    border-spacing: 0;
-    background: #ffffff; /* Match body background */
-    border: 1px solid #d0d7de; /* GitHub light border */
-    border-radius: 0; /* No radius on table itself with collapse */
-    box-shadow: none;
-    margin: 20px 0;
-    display: block; /* For overflow scrolling */
-    overflow-x: auto; /* Allow horizontal scrolling */
-}
-
-table th, table td {
-    padding: 8px 12px; /* Standard padding */
-    text-align: left;
-    font-family: inherit; /* Use body font */
-    color: #24292f;
-    border: 1px solid #d0d7de; /* Border for cells */
-    background: #ffffff; /* Cell background */
-}
-
-table th {
-    background: #f6f8fa; /* Header background */
-    color: #24292f; /* Header text */
-    font-weight: 600;
-    text-transform: none; /* No text transform */
-    text-shadow: none;
-}
-
-table tr {
-    background-color: #ffffff; /* Row background */
-    border-top: 1px solid #d8dee4;
-}
-
-table tr:nth-child(2n) {
-    background-color: #f6f8fa; /* Alternate row background */
-}
-
-table tr:hover td { /* Removed hover effect */
-    background: #ffffff; /* Keep cell background */
-    color: #24292f; /* Keep text color */
-}
-
-
-table caption {
-    font-size: 1em; /* Standard caption size */
-    color: #57606a; /* Muted caption color */
-    text-shadow: none;
-    padding: 10px 0; /* Padding above/below */
-    font-family: inherit;
-    text-align: left; /* Align caption left */
-    caption-side: bottom; /* Place caption below table */
-    margin-top: 8px;
-}
-
-#top-page-navigation, #bottom-page-navigation {
-    text-align: center;
-    min-width: 100%; /* Adjust for responsiveness */
-    max-width: 766px;
-    margin: 20px auto; /* Center navigation */
-    font-size: 0.9rem;
-}
-
-/*** Theme selector opening button colors for this theme  ***/
-#open-theme-selector-button {
-    border: 1px solid #bdbdbd;
-}
-#open-theme-selector-button .eye-icon {
-    background-color: rgba(117, 117, 117, 0.5);
-}
-#open-theme-selector-button .eye-icon:hover {
-     background-color: rgb(0, 0, 0);
+ body {
+     background-color: #ffffff;
+     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+     font-size: 1rem;
+     line-height: 1.5;
+     color: #24292f;
  }
 
+ body::before {
+     background-blend-mode: darken;
+     opacity: 0.072;
+ }
 
+ #myCanvas {
+     background: #0a0a1b;
+ }
 
+ code {
+     background-color: rgba(175,184,193,0.2);
+     padding: .2em .4em;
+     border-radius: 6px;
+ }
+
+ hr {
+     background-color: #d0d7de;
+     margin: 24px 0;
+ }
+
+ h1, h2, h3, h4, h5, h6 {
+     margin-top: 24px;
+     margin-bottom: 16px;
+     font-weight: 600;
+ }
+
+ h1 { font-size: 2em; border-bottom: 1px solid #d8dee4; padding-bottom: .3em; }
+ h2 { font-size: 1.5em; border-bottom: 1px solid #d8dee4; padding-bottom: .3em; }
+ h3 { font-size: 1.25em; }
+ h4 { font-size: 1em; }
+ h5 { font-size: 0.875em; }
+ h6 { font-size: 0.85em; color: #57606a; }
+
+ #content {
+     background: #ffffff;
+     border: 1px solid #d0d7de;
+     border-radius: 6px;
+ }
+
+ #content img {
+     margin: 16px auto;
+     background-color: #ffffff;
+ }
+
+ @-moz-document url-prefix() {
+     #content {
+         scrollbar-width: thin;
+         scrollbar-color: #6e7781 #f6f8fa;
+     }
+ }
+
+ button,
+ select {
+     padding: 8px 16px;
+     font-size: 0.95rem;
+     border-radius: 6px;
+     border: 1px solid rgba(36, 41, 47, 0.2);
+     background-color: #f6f8fa;
+     color: #24292f;
+     cursor: pointer;
+     transition: background-color 0.2s ease, border-color 0.2s ease;
+     box-shadow: 0 1px 0 rgba(36, 41, 47, 0.04);
+ }
+
+ button {
+     min-width: 120px;
+ }
+
+ button:hover,
+ select:hover {
+     background-color: #e9eaec;
+     border-color: rgba(36, 41, 47, 0.25);
+ }
+
+ pre {
+     border: 1px solid #d0d7de;
+     border-radius: 6px;
+     background-color: #f6f8fa;
+     padding: 16px;
+     overflow: auto;
+     font-size: 85%;
+     line-height: 1.45;
+ }
+
+ canvas {
+     border: 1px solid #d0d7de;
+     border-radius: 6px;
+     background-color: #f6f8fa;
+     margin-bottom: 20px;
+ }
+
+ ::-webkit-scrollbar-track {
+     background: #f6f8fa;
+ }
+
+ ::-webkit-scrollbar-thumb {
+     background: #959da5;
+ }
+
+ ::-webkit-scrollbar-thumb:hover {
+     background: #6e7781;
+ }
+
+ a {
+     color: #0969da;
+     text-decoration: none;
+     position: relative;
+     transition: color 0.3s ease, text-decoration 0.3s ease;
+ }
+
+ a:hover {
+     color: #0a60c2;
+     text-decoration: underline;
+ }
+
+ ul, ol {
+     padding-left: 2em;
+     margin-top: 10px;
+     margin-bottom: 16px;
+     line-height: 1.6;
+ }
+
+ ul { list-style-type: disc; }
+ ol { list-style-type: decimal; }
+
+ table {
+     background: #ffffff;
+     border: 1px solid #d0d7de;
+ }
+
+ table th, table td {
+     padding: 8px 12px;
+     text-align: left;
+     border: 1px solid #d0d7de;
+ }
+
+ table th {
+     background: #f6f8fa;
+     font-weight: 600;
+ }
+
+ table tr:nth-child(2n) {
+     background-color: #f6f8fa;
+ }
+
+ table caption {
+     font-size: 1em;
+     color: #57606a;
+     padding: 10px 0;
+ }
+
+ #top-page-navigation, #bottom-page-navigation {
+     min-width: 100%;
+     font-size: 0.9rem;
+ }
+
+ #open-theme-selector-button {
+     border: 1px solid #bdbdbd;
+ }
+ #open-theme-selector-button .eye-icon {
+     background-color: rgba(117, 117, 117, 0.5);
+ }
+ #open-theme-selector-button .eye-icon:hover {
+     background-color: rgb(0, 0, 0);
+ }

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rust + WebAssembly Demo</title>
+    <title>Graph1 Rust / WASM Demos</title>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
@@ -125,42 +125,76 @@
 
       function createNavigationLinks() {
         const urlParams = new URLSearchParams(window.location.search);
-        const currentDemo = parseInt(urlParams.get("demo"), 10);
+        const currentDemo = parseInt(urlParams.get("demo") || "0", 10); // Default to 0 if no demo param
 
-        // Find the current demo index in the configuration array
         const currentIndex = demos.findIndex(demo => parseInt(demo.value) === currentDemo);
-        const navContainerBottom = document.getElementById("bottom-page-navigation");
-        navContainerBottom.innerHTML = "";
+        const currentDemoValue = demos[currentIndex].value; // Get current demo value
 
-        if (currentIndex > 0) {
-          // Create previous link if it exists
-          const prevDemo = demos[currentIndex - 1];
-          const prevLink = document.createElement("a");
-          prevLink.href = `/?demo=${prevDemo.value}`;
-          prevLink.textContent = isMobile? `◄◄ prev ${padNumber(prevDemo.value)}`: `◄◄ ${prevDemo.label} - ${padNumber(prevDemo.value)}`;
-          navContainerBottom.appendChild(prevLink);
-        }
+        // Function to handle link clicks
+        const handleNavLinkClick = async (event, demoValue) => {
+          event.preventDefault(); // Prevent full page reload
+          const fileToLoad = getDocUrl(demoValue);
+          await loadMarkdownContent(fileToLoad, parseInt(demoValue));
+          demoSelector.value = demoValue; // Update the dropdown to match
+        };
 
-        if (currentIndex < demos.length - 1) {
-          // Create next link if it exists
-          const nextDemo = demos[currentIndex + 1];
-          const nextLink = document.createElement("a");
-          nextLink.href = `/?demo=${nextDemo.value}`;
+        // --- Function to build navigation content ---
+        // This avoids duplicating the logic for top and bottom navs
+        const buildNavContent = (container) => {
+          container.innerHTML = ""; // Clear previous content
+          container.classList.add('page-navigation-container'); // Add class for Flexbox styling
 
-          nextLink.textContent = isMobile ? `${padNumber(nextDemo.value)} next ►►` : `${padNumber(nextDemo.value)} - ${nextDemo.label} ►►`;
+          // Create elements for prev, separator, and next
+          const prevSpan = document.createElement("span");
+          prevSpan.classList.add('nav-prev');
+          const separatorSpan = document.createElement("span");
+          separatorSpan.classList.add('nav-separator');
+          const nextSpan = document.createElement("span");
+          nextSpan.classList.add('nav-next');
 
-          // Add a separator if there's also a previous link
-          if (navContainerBottom.children.length > 0) {
-            navContainerBottom.appendChild(document.createTextNode(` | ${padNumber(currentIndex)} | `));
+          // --- Previous Link ---
+          if (currentIndex > 0) {
+            const prevDemo = demos[currentIndex - 1];
+            const prevLink = document.createElement("a");
+            prevLink.href = `/?demo=${prevDemo.value}`;
+            // Use non-breaking spaces (&nbsp;) around arrows for slight visual padding
+            prevLink.innerHTML = `◄◄&nbsp;${isMobile ? padNumber(prevDemo.value) : `${prevDemo.label} - ${padNumber(prevDemo.value)}`}`;
+            prevLink.addEventListener('click', (event) => handleNavLinkClick(event, prevDemo.value));
+            prevSpan.appendChild(prevLink);
+          } else {
+            prevSpan.innerHTML = "&nbsp;"; // Non-breaking space to maintain height/layout
           }
 
-          navContainerBottom.appendChild(nextLink);
-        }
+          // --- Separator (Current Demo Number) ---
+          separatorSpan.textContent = `| ${padNumber(currentDemoValue)} |`;
 
+          // --- Next Link ---
+          if (currentIndex < demos.length - 1) {
+            const nextDemo = demos[currentIndex + 1];
+            const nextLink = document.createElement("a");
+            nextLink.href = `/?demo=${nextDemo.value}`;
+            // Use non-breaking spaces (&nbsp;) around arrows
+            nextLink.innerHTML = `${isMobile ? padNumber(nextDemo.value) : `${padNumber(nextDemo.value)} - ${nextDemo.label}`}&nbsp;►►`;
+            nextLink.addEventListener('click', (event) => handleNavLinkClick(event, nextDemo.value));
+            nextSpan.appendChild(nextLink);
+          } else {
+            // Add placeholder content or leave empty
+            nextSpan.innerHTML = "&nbsp;";
+          }
+
+          // Append all parts to the container
+          container.appendChild(prevSpan);
+          container.appendChild(separatorSpan);
+          container.appendChild(nextSpan);
+        };
+
+
+        // --- Apply to Top and Bottom Containers ---
+        const navContainerBottom = document.getElementById("bottom-page-navigation");
         const navContainerTop = document.getElementById("top-page-navigation");
 
-
-        navContainerTop.innerHTML = navContainerBottom.innerHTML;
+        buildNavContent(navContainerBottom);
+        buildNavContent(navContainerTop); // Build content separately for top nav
       }
 
 
@@ -187,7 +221,8 @@
 
             // Update the URL to reflect the current file, for bookmarking
             const newUrl = `${window.location.pathname}?demo=${demoIndex}`;
-            history.replaceState(null, "", newUrl);
+            // history.replaceState(null, "", newUrl);
+            history.pushState(null, "", newUrl);
 
             // Call WASM module to set active demo
             setActiveDemoFunction(demoIndex);
@@ -361,6 +396,17 @@
         await loadMarkdownContent(getDocUrl(initialDemo), initialDemo);
         render();
       }
+
+      window.addEventListener('popstate', function() {
+        const params = new URLSearchParams(window.location.search);
+        const demo = params.get('demo');
+
+        if (demo) {
+          demoSelector.value = demo;
+          demoSelector.dispatchEvent(new Event('change'));
+        }
+      });
+
 
       run();
     </script>

@@ -1,336 +1,262 @@
-/* Base styling for a retro-futuristic cyberpunk look */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+ /* wave.css - Retro Cyberpunk Theme Specific Styles */
 
-body {
-    background: linear-gradient(135deg, #0f0f1f, #1a1a3a);
-    min-height: 100vh;
-    height: 100%;
-    font-family: "Inconsolata", monospace, "Courier New", Courier;
-    font-size: 1.1rem;
-    line-height: 1.2;
-    /*letter-spacing: 1px;*/
-    color: #a8ff60;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    position: relative;
-}
-body::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+ body {
+     background: linear-gradient(135deg, #0f0f1f, #1a1a3a); /* Gradient background */
+     font-family: "Inconsolata", monospace, "Courier New", Courier; /* Monospace font */
+     font-size: 1.1rem;
+     line-height: 1.2;
+     color: #a8ff60; /* Neon green text */
+ }
 
-    background-image: url("bg8.webp");
-    background-size: auto;
-    background-repeat: repeat;
-    background-blend-mode: difference;
-    opacity: 0.008; /* Make the bg barely visible */
-    z-index: -1; /* Places the background behind all other content */
-}
+ body::before {
+     background-blend-mode: difference; /* Specific blend mode */
+     opacity: 0.008; /* Specific opacity */
+ }
 
-code {
-    color: #ffbf00;
-}
+ code {
+     color: #ffbf00; /* Amber code color */
+ }
 
-hr {
-    border: 1px solid #99ffcc;
-    width: 100%;
-    margin: 20px 0;
-}
+ hr {
+     border: 1px solid #99ffcc; /* Cyan border */
+     width: 100%;
+     margin: 20px 0;
+ }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    text-shadow: 0 0 5px rgba(255, 191, 0, 0.5);
-    margin-top: 14px;
-    margin-bottom: 12px;
-    font-family: "Orbitron", sans-serif, "Courier New", Courier;
-}
+ h1, h2, h3, h4, h5, h6 {
+     text-shadow: 0 0 5px rgba(255, 191, 0, 0.5); /* Default heading shadow */
+     margin-top: 14px;
+     margin-bottom: 12px;
+     font-family: "Orbitron", sans-serif, "Courier New", Courier; /* Sci-fi font */
+ }
 
-h1 {
-    text-transform: uppercase;
-    color: #ff77ff;
-    text-shadow: 0 0 8px rgba(255, 119, 255, 0.7);
-}
-h2 {
-    color: #ffbf00;
-    text-shadow: 0 0 8px rgba(255, 191, 0, 0.7);
-    margin-top: 32px;
-}
-h3 {
-    color: #33ccff;
-    text-shadow: 0 0 8px rgba(51, 204, 255, 0.7);
-    margin-top: 32px;
-}
-h4 {
-    color: #a8ff60;
-    text-shadow: 0 0 8px rgba(168, 255, 96, 0.7);
-    margin-top: 28px;
-}
-h5 {
-    color: #ff6666;
-    text-shadow: 0 0 8px rgba(255, 102, 102, 0.7);
-}
-h6 {
-    color: #99ffcc;
-    text-shadow: 0 0 8px rgba(153, 255, 204, 0.7);
-}
+ h1 { color: #ff77ff; text-transform: uppercase; text-shadow: 0 0 8px rgba(255, 119, 255, 0.7); }
+ h2 { color: #ffbf00; text-shadow: 0 0 8px rgba(255, 191, 0, 0.7); margin-top: 32px; }
+ h3 { color: #33ccff; text-shadow: 0 0 8px rgba(51, 204, 255, 0.7); margin-top: 32px; }
+ h4 { color: #a8ff60; text-shadow: 0 0 8px rgba(168, 255, 96, 0.7); margin-top: 28px; }
+ h5 { color: #ff6666; text-shadow: 0 0 8px rgba(255, 102, 102, 0.7); }
+ h6 { color: #99ffcc; text-shadow: 0 0 8px rgba(153, 255, 204, 0.7); }
 
-#content {
-    width: 100%;
-    max-width: 766px;
-    text-align: left;
-    padding: 20px;
-    background: rgba(20, 20, 50, 0.85);
-    border: 1px solid #a8ff60;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    margin-top: 20px;
-    box-shadow: 0 0 10px rgba(168, 255, 96, 0.3);
-}
+ #content {
+     background: rgba(20, 20, 50, 0.85); /* Dark transparent blue */
+     border: 1px solid #a8ff60; /* Neon green border */
+     border-radius: 8px;
+     box-shadow: 0 0 10px rgba(168, 255, 96, 0.3); /* Green glow */
+ }
 
-#content img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin-left: auto;
-    margin-right: auto;
-}
+ #content img {
+     margin-left: auto; /* Center images */
+     margin-right: auto;
+ }
 
-@-moz-document url-prefix() {
-    /* Firefox-specific scrollbar styling */
-    #content {
-        /* Custom scrollbar styles for Firefox */
-        scrollbar-width: thin; /* Options: auto | thin | none */
-        scrollbar-color: #33ccff #1a1a3a; /* Thumb color and track color */
-    }
-    /* Any other Firefox-specific styles */
-    /*body { }*/
-}
+ /* Firefox Scrollbar */
+ @-moz-document url-prefix() {
+     #content {
+         scrollbar-width: thin;
+         scrollbar-color: #33ccff #1a1a3a; /* Cyan thumb, dark blue track */
+     }
+ }
 
-.button-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
+ button,
+ select {
+     padding: 10px 20px;
+     font-size: 1rem;
+     border-radius: 5px;
+     border: 1px solid #00ffcc; /* Cyan border */
+     background-color: #222244; /* Dark blue background */
+     color: #a8ff60; /* Neon green text */
+     cursor: pointer;
+     transition: background-color 0.3s ease, box-shadow 0.3s ease;
+     box-shadow: 0 0 5px rgba(0, 255, 204, 0.5); /* Cyan glow */
+     font-family: inherit;
+ }
 
-button,
-select {
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 5px;
-    border: 1px solid #00ffcc;
-    background-color: #222244;
-    color: #a8ff60;
-    cursor: pointer;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
-}
+ button {
+     min-width: 175px;
+ }
 
-button {
-    min-width: 175px;
-}
+ button:hover,
+ select:hover {
+     background-color: #333366;
+     box-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
+ }
 
-button:hover,
-select:hover {
-    background-color: #333366;
-    box-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
-}
+ pre {
+     border: solid 1px #222244; /* Dark blue border */
+     border-radius: 5px;
+     background-color: rgba(25, 25, 50, 0.85); /* Match content slightly */
+     padding: 12px;
+     overflow: auto;
+     font-size: 1em;
+     line-height: 1.3;
+     color: #a8ff60;
+ }
 
-pre {
-    border: solid 1px #222244;
-    border-radius: 5px;
-}
+ canvas {
+     image-rendering: high-quality; /* Specific rendering */
+     border: 1px solid #333333; /* Gray border */
+     border-radius: 6px;
+     background-color: #0f0f1f; /* Dark background */
+     box-shadow: 0 0 20px rgba(255, 255, 255, 0),
+     0 0 40px rgba(255, 255, 255, 0), inset 0 0 10px rgba(255, 255, 255, 0),
+     inset 0 0 20px rgba(255, 255, 255, 0);
+     margin-bottom: 20px;
+ }
 
-canvas {
-    image-rendering: high-quality;
-    /*image-rendering: crisp-edges;*/
-    /*image-rendering: pixelated;*/
-    /*image-rendering: smooth;*/
-    /*image-rendering: optimizeQuality;*/
-    border: 1px solid #333333;
-    border-radius: 6px;
-    background-color: #0f0f1f;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0),
-    0 0 40px rgba(255, 255, 255, 0), inset 0 0 10px rgba(255, 255, 255, 0),
-    inset 0 0 20px rgba(255, 255, 255, 0);
-    margin-bottom: 20px;
-}
+ /* Webkit Scrollbar Colors */
+ ::-webkit-scrollbar-track {
+     background: rgba(25, 25, 50, 0.85); /* Dark transparent blue */
+     box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.2); /* Inner green glow */
+ }
 
-/* Custom scrollbar styling */
-::-webkit-scrollbar {
-    width: 8px; /* Vertical scrollbar width */
-    height: 8px; /* Horizontal scrollbar height */
-}
+ ::-webkit-scrollbar-thumb {
+     background: linear-gradient(135deg, #0077aa, #bb33bb); /* Gradient thumb */
+     box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
+     0 0 5px rgba(255, 119, 255, 0.7); /* Glow */
+ }
 
-::-webkit-scrollbar-track {
-    background: rgba(25, 25, 50, 0.85);
-    border-radius: 5px;
-    box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.2);
-}
+ ::-webkit-scrollbar-thumb:hover {
+     background: linear-gradient(135deg, #11aaee, #ff77ff);
+     box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
+     0 0 5px rgba(255, 119, 255, 0.7);
+ }
 
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #0077aa, #bb33bb);
-    box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
-    0 0 5px rgba(255, 119, 255, 0.7);
-    border-radius: 5px;
-}
+ /* Links */
+ a {
+     color: #33ccff; /* Cyan links */
+     text-decoration: none;
+     font-weight: bold;
+     position: relative;
+     transition: color 0.3s ease;
+ }
 
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #11aaee, #ff77ff);
-    box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
-    0 0 5px rgba(255, 119, 255, 0.7);
-}
+ a:hover {
+     color: #ff77ff; /* Pink hover */
+     text-shadow: 0 0 5px rgba(255, 119, 255, 0.6),
+     0 0 10px rgba(255, 119, 255, 0.4), 0 0 15px rgba(255, 119, 255, 0.3);
+ }
 
-/* Links */
-a {
-    color: #33ccff; /* Base neon color */
-    text-decoration: none;
-    font-weight: bold;
-    position: relative;
-    transition: color 0.3s ease;
-}
+ a::after { /* Animated underline */
+     content: "";
+     position: absolute;
+     left: 0;
+     bottom: -2px;
+     height: 2px;
+     width: 100%;
+     background: linear-gradient(90deg, #33ccff, #ff77ff);
+     box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
+     0 0 10px rgba(255, 119, 255, 0.6);
+     opacity: 0;
+     transition: opacity 0.3s ease, transform 0.3s ease;
+     transform: scaleX(0);
+     transform-origin: left;
+ }
 
-a:hover {
-    color: #ff77ff; /* Hover neon color */
-    text-shadow: 0 0 5px rgba(255, 119, 255, 0.6),
-    0 0 10px rgba(255, 119, 255, 0.4), 0 0 15px rgba(255, 119, 255, 0.3);
-}
+ a:hover::after {
+     opacity: 1;
+     transform: scaleX(1);
+ }
 
-a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    height: 2px;
-    width: 100%;
-    background: linear-gradient(90deg, #33ccff, #ff77ff);
-    box-shadow: 0 0 5px rgba(51, 204, 255, 0.7),
-    0 0 10px rgba(255, 119, 255, 0.6);
-    opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    transform: scaleX(0);
-    transform-origin: left;
-}
+ /* Lists */
+ ul {
+     padding-left: 10px;
+     margin-top: 10px;
+     margin-bottom: 12px;
+     color: #a8ff60;
+     list-style-type: none;
+     list-style-position: inside;
+     line-height: 1.5;
+ }
+ ul li::before { /* Custom bullet */
+     content: "✧";
+     color: #33ccff;
+     text-shadow: 0 0 5px rgba(51, 204, 255, 0.7);
+     margin-right: 8px;
+ }
 
-a:hover::after {
-    opacity: 1;
-    transform: scaleX(1); /* Expands the underline */
-}
+ ol {
+     list-style-type: none;
+     padding-left: 20px;
+     counter-reset: custom-counter;
+     margin-top: 10px;
+     margin-bottom: 12px;
+     color: #a8ff60;
+     line-height: 1.5;
+ }
+ ol li {
+     counter-increment: custom-counter;
+     display: flex;
+     align-items: center;
+ }
+ ol li::before { /* Custom numbering */
+     content: counter(custom-counter) ". ";
+     color: #ffbf00;
+     text-shadow: 0 0 5px rgba(255, 191, 0, 0.7);
+     font-weight: bold;
+     margin-right: 8px;
+ }
 
-/* LISTS! */
-ul {
-    padding-left: 10px; /* Adds internal spacing to align bullets/numbers */
-    margin-top: 10px;
-    margin-bottom: 12px;
-    color: #a8ff60; /* Neon green text color to match theme */
-    list-style-type: none; /* Removes default bullets and numbering */
-    list-style-position: inside;
-    line-height: 1.5;
-}
-ul li::before {
-    content: "✧"; /* My custom bullet character! */
-    color: #33ccff; /* Neon blue for bullets */
-    text-shadow: 0 0 5px rgba(51, 204, 255, 0.7);
-    margin-right: 8px; /* Add some space between bullet and text */
-}
+ /* Tables */
+ table {
+     background: rgba(25, 25, 50, 0.95);
+     border: 1px solid #a8ff60;
+     border-radius: 8px;
+     box-shadow: 0 0 10px rgba(168, 255, 96, 0.3), 0 0 5px rgba(51, 204, 255, 0.3);
+ }
 
-ol {
-    list-style-type: none; /* Removes default numbering */
-    padding-left: 20px; /* Adds space for custom numbers */
-    counter-reset: custom-counter; /* Resets the counter */
-}
+ table th, table td {
+     padding: 12px;
+     text-align: left;
+     font-family: "Inconsolata", monospace; /* Specific font */
+     color: #a8ff60;
+     border-bottom: 1px solid rgba(168, 255, 96, 0.2); /* Specific border */
+ }
 
-ol li {
-    counter-increment: custom-counter;
-    display: flex; /* Ensures the number and content are on the same line */
-    align-items: center; /* Vertically aligns number and content */
-}
+ table th {
+     background: rgba(51, 204, 255, 0.15); /* Header background */
+     color: #33ccff;
+     text-transform: uppercase;
+     text-shadow: 0 0 5px rgba(51, 204, 255, 0.7);
+     font-weight: normal;
+ }
 
-ol li::before {
-    content: counter(custom-counter) ". "; /* Custom number style */
-    color: #ffbf00;
-    text-shadow: 0 0 5px rgba(255, 191, 0, 0.7);
-    font-weight: bold;
-    margin-right: 8px; /* Adds spacing after the number */
-}
+ table td {
+     background: rgba(25, 25, 50, 0.85);
+ }
 
-/* Table styling for retro-futuristic cyberpunk theme */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: rgba(25, 25, 50, 0.95);
-    border: 1px solid #a8ff60;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(168, 255, 96, 0.3), 0 0 5px rgba(51, 204, 255, 0.3);
-    margin: 20px 0;
-}
+ table tr:hover td {
+     background: rgba(51, 204, 255, 0.15);
+     color: #ffbf00;
+     transition: background-color 0.3s ease, color 0.3s ease;
+ }
 
-table th, table td {
-    padding: 12px;
-    text-align: left;
-    font-family: "Inconsolata", monospace;
-    color: #a8ff60;
-    border-bottom: 1px solid rgba(168, 255, 96, 0.2);
-}
+ table caption {
+     font-size: 1.2rem;
+     color: #ff77ff;
+     text-shadow: 0 0 5px rgba(255, 119, 255, 0.5);
+     padding: 10px;
+     font-family: "Orbitron", sans-serif;
+     text-align: center;
+     caption-side: top;
+     margin-top: 0;
+ }
 
-table th {
-    background: rgba(51, 204, 255, 0.15);
-    color: #33ccff;
-    text-transform: uppercase;
-    text-shadow: 0 0 5px rgba(51, 204, 255, 0.7);
-}
+ #top-page-navigation {
+     margin-top: 20px;
+ }
 
-table td {
-    background: rgba(25, 25, 50, 0.85);
-}
+ #top-page-navigation, #bottom-page-navigation {
+     min-width:  766px;
+     font-size: 1.0rem;
+ }
 
-table tr:hover td {
-    background: rgba(51, 204, 255, 0.15);
-    color: #ffbf00;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-table caption {
-    font-size: 1.2rem;
-    color: #ff77ff;
-    text-shadow: 0 0 5px rgba(255, 119, 255, 0.5);
-    padding: 10px;
-    font-family: "Orbitron", sans-serif;
-    text-align: center;
-}
-
-#top-page-navigation {
-    margin-top: 20px;
-}
-
-#top-page-navigation, #bottom-page-navigation{
-    text-align: center;
-    /*border: solid 1px red;*/
-    min-width:  766px;
-    font-size: 1.0rem;
-}
-
-/********************************************************************************************************************/
-/*** Theme selector opening button colors for this theme  ***/
-#open-theme-selector-button {
-    border: 1px solid #1d5c52;
-}
-#open-theme-selector-button .eye-icon {
-    /*background-color: rgb(103, 103, 251);*/
-    background-color: rgba(255, 191, 0, 0.5);
-}
-#open-theme-selector-button .eye-icon:hover {
-    background-color: rgba(255, 255, 0, 1);
-}
+ /* Theme selector button */
+ #open-theme-selector-button {
+     border: 1px solid #1d5c52;
+ }
+ #open-theme-selector-button .eye-icon {
+     background-color: rgba(255, 191, 0, 0.5);
+ }
+ #open-theme-selector-button .eye-icon:hover {
+     background-color: rgba(255, 255, 0, 1);
+ }

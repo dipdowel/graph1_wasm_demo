@@ -30,9 +30,16 @@
     select {
         width: 100%;
         font-size: 1.1rem;
-        padding: 14px;
+        padding: 4px 8px;
         min-width: unset;
     }
+
+
+    select {
+        padding: 12px 8px;
+    }
+
+
 
     footer {
         width: 100%;
@@ -56,5 +63,16 @@
         box-shadow: none;
     }
 
+
+    #top-page-navigation {
+        margin-bottom: 0;
+    }
+
+    h1 {
+        margin-top: 0;
+    }
+    #content {
+        margin-top: 0;
+    }
 
 }

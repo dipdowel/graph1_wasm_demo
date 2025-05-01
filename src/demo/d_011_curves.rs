@@ -18,6 +18,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // // initial context setup
     if ctx.frame_count == 0 {
         ctx.win.background_color = RetroNeon::CYBERPUNK_FUCHSIA;
+        ctx.line.set_int_no_aa(Some(1));
     }
 
     clear_screen(ctx);

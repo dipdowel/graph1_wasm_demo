@@ -1,4 +1,4 @@
-# Basic Concepts, Pt. 3
+# Basic Concepts, Pt.&nbsp;3
 
 ## Drawing Rectangles, Blending, and Going Retro
 
