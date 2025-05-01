@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rust + WebAssembly Demo</title>
+    <title>Graph1 Rust / WASM Demos</title>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
@@ -221,7 +221,8 @@
 
             // Update the URL to reflect the current file, for bookmarking
             const newUrl = `${window.location.pathname}?demo=${demoIndex}`;
-            history.replaceState(null, "", newUrl);
+            // history.replaceState(null, "", newUrl);
+            history.pushState(null, "", newUrl);
 
             // Call WASM module to set active demo
             setActiveDemoFunction(demoIndex);
@@ -395,6 +396,17 @@
         await loadMarkdownContent(getDocUrl(initialDemo), initialDemo);
         render();
       }
+
+      window.addEventListener('popstate', function() {
+        const params = new URLSearchParams(window.location.search);
+        const demo = params.get('demo');
+
+        if (demo) {
+          demoSelector.value = demo;
+          demoSelector.dispatchEvent(new Event('change'));
+        }
+      });
+
 
       run();
     </script>
