@@ -112,6 +112,6 @@ If you got this far, it may be the time to grab [this whole project on GitHub](h
 
 ---
 
-💻 [Code of this demo on GitHub](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_003_bouncy.rs)<br />  
+💻 [Code of this demo on GitHub](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_004_bouncy.rs)<br />  
 🧩 [`GraphContext` configuration and the animation loop](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/lib.rs)
 
