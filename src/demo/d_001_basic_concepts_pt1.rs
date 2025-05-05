@@ -35,12 +35,14 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // Print the text
     printer::print_line(
         ctx,
-        &Point { x: 40, y: 110 },
+        &Point { x: 40, y: 111 },
         &text_font,
         &text_color_prop,
         &"> Welcome to Basic Concepts pt. 1",
 
     );
+
+
 
     // Blinking cursor
     let color: u32 = if (ctx.frame_count / 40) % 2 == 0 {
@@ -49,6 +51,20 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.win.foreground_color
     };
     draw::rectangle::filled(ctx, &RectArea::new(400, 104, 12, 28, Some(color)));
+
+
+    // // TODO: Either move to a fonts-dedicated demo or remove!
+    // // DEBUG OUTPUT OF THE FONT IMAGE
+    // let max_width = ctx.win.w.min(text_font.img_dimensions.w );
+    // for x in 0..max_width {
+    //     for y in 0..text_font.img_dimensions.h {
+    //         let pix_font_index = (y * text_font.img_dimensions.w + x) as usize;
+    //         let pix_frame_index = (y * ctx.win.w + x) as usize;
+    //         let pixel = text_font.font_image_buf[pix_font_index];
+    //         ctx.frame_buf[pix_frame_index] = pixel;
+    //
+    //     }
+    // }
 
 
     // apply the scanline effect
