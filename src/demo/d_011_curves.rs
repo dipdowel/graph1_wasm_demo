@@ -41,8 +41,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if ctx.frame_count == 0 {
         ctx.win.background_color = RetroNeon::CYBERPUNK_FUCHSIA;
         ctx.line.set_int_no_aa(Some(1));
-        
-        let text_color =    
+
+        let text_color =
             gradient::linear_step(RetroNeon::NEON_PINK, RetroNeon::DEEP_INDIGO, 32, 27);
 
         ctx.user_data.bezier_curves.text_color_props.color = Some(text_color);
@@ -59,13 +59,13 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     clear_screen(ctx);
 
-    
 
-    // SOME OSCILLATION    
+
+    // SOME OSCILLATION
     let frequency_divisor = 9.0;
     let oscillator = oscillator::sine_discrete(ctx.frame_count, frequency_divisor, 33, true);
 
-    
+
     let star_props = StarProperties {
         center: ctx.win.center_pixel(true),
         num_rays: 24,
@@ -125,9 +125,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // show_control_points = true;
     // show_controls_levers = true;
 
-    ctx.bezier.control_color = Some(RetroNeon::DEEP_INDIGO);
+
     ctx.bezier.render_controls = show_control_points;
     ctx.bezier.render_levers = show_controls_levers;
+    ctx.bezier.control_color = Some(RetroNeon::DEEP_INDIGO);
 
     draw::curve::bezier(ctx, &segments, 0.01);
 
