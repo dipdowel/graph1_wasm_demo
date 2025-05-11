@@ -9,31 +9,63 @@ use graph1::utils::color::palettes::RetroNeon;
 use graph1::draw::curve::bezier_segment::BezierSegment;
 use graph1::draw::polygons::{polygon, star, PolygonProperties, StarProperties};
 use graph1::draw::tools::fill;
-use graph1::primitives::Pixel;
 use graph1::primitives::point::Point;
+use graph1::primitives::Pixel;
+use graph1::text::font::{PixelFont, Spacing};
+use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
+use graph1::text::printer;
+use graph1::utils::color::gradient;
 use graph1::utils::math::oscillator;
 
+//---------------------------------------------------------------------
+// Configure the user data for typing text in Basic Concepts pt. 1
+pub struct BezierCurvesUserData {
+    pub text_color_props: printer::ColorProperties<'static>,
+    pub text_font: Option<PixelFont>,
+}
+
+pub const BEZIER_CURVES_USER_DATA: BezierCurvesUserData = BezierCurvesUserData {
+    text_color_props: printer::ColorProperties {
+        color: Some(RetroNeon::STROBE_WHITE),
+        color_transformer: None,
+        data: None,
+    },
+    // Let's put an instantiated font into the user data
+    // so that we don't have to instantiate it on every frame
+    text_font: None,
+};
+//---------------------------------------------------------------------
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-    // // initial context setup
+    // initial context setup
     if ctx.frame_count == 0 {
         ctx.win.background_color = RetroNeon::CYBERPUNK_FUCHSIA;
         ctx.line.set_int_no_aa(Some(1));
+        
+        let text_color =    
+            gradient::linear_step(RetroNeon::NEON_PINK, RetroNeon::DEEP_INDIGO, 32, 27);
+
+        ctx.user_data.bezier_curves.text_color_props.color = Some(text_color);
+        ctx.user_data.bezier_curves.text_font = Some(instantiate_embedded_font(
+            EmbeddedFonts::CCRedAlertInet,
+            2,
+            Some(Spacing {
+                kerning_px: 2,
+                leading_px: 2,
+            }),
+            None,
+        ));
     }
 
     clear_screen(ctx);
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    
 
-    // SOME OSCILLATION
-    // let frequency_divisor = oscillator::sine(ctx.frame_count, 0.0005, 10.0, 11.0) as f32;
+    // SOME OSCILLATION    
     let frequency_divisor = 9.0;
     let oscillator = oscillator::sine_discrete(ctx.frame_count, frequency_divisor, 33, true);
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    // Assumed available: `ctx`, `ctx_draft`, `oscillator`, `local_frame_count`,
-    // `FINAL_GROUND_FIRST_FRAME`, `FLOWER_WIRE_FIRST_FRAME`, `BORDER_1`, `BORDER_3`, `GRADIENT_DOUBLE_LEN`, `res_delta`
-
+    
     let star_props = StarProperties {
         center: ctx.win.center_pixel(true),
         num_rays: 24,
@@ -43,7 +75,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         skip_rendering: true,
     };
 
-    // let star_vertices = star(ctx, &star_props_1);
     let star_vertices = star(ctx, &star_props);
 
     let polygon_props = PolygonProperties {
@@ -76,72 +107,78 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ));
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    let mut show_control_points = false;
+    let mut show_controls_levers = false;
 
-    ctx.bezier.control_color = Some(RetroNeon::CIRCUIT_GREEN);
-    // ctx.bezier.control_color = None;
-    ctx.bezier.start_end_points_color = Some(RetroNeon::STROBE_WHITE);
-    // ctx.bezier.start_end_points_color = None;
+    let frame_phase = ctx.frame_count % 1200;
 
-    ctx.bezier.render_controls = false;
-    ctx.bezier.render_levers = false;
+    // decide when to show the control points and levers
+    if frame_phase > 600 {
+        show_control_points = true;
+
+        if frame_phase > 900 {
+            show_controls_levers = true;
+        }
+    }
+
+    // force control points and levers to be drawn always
+    // show_control_points = true;
+    // show_controls_levers = true;
+
+    ctx.bezier.control_color = Some(RetroNeon::DEEP_INDIGO);
+    ctx.bezier.render_controls = show_control_points;
+    ctx.bezier.render_levers = show_controls_levers;
 
     draw::curve::bezier(ctx, &segments, 0.01);
 
-    // The filling of the polygon and the curved body
-    // Good stuff so, keep it
-    let mut pix = Pixel::from(ctx.win.center.to_pixel(RetroNeon::CYBER_YELLOW));
-    fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pix);
 
-    ctx.line.width_int = 3;
-    polygon(ctx, &polygon_props);
-    ctx.line.width_int = 1;
-
-    pix.color = RetroNeon::VIBRANT_CYAN;
-    fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pix);
-
+    if !show_control_points {
+        // Color filling of the polygon and the curved body
+        let mut pix = Pixel::from(ctx.win.center.to_pixel(RetroNeon::CYBER_YELLOW));
+        fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pix);
+        ctx.line.width_int = 3;
+        polygon(ctx, &polygon_props);
+        ctx.line.width_int = 1;
+        pix.color = RetroNeon::VIBRANT_CYAN;
+        fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pix);
+    }
     ctx.win.foreground_color = RetroNeon::STROBE_WHITE;
 
-    /*
-        draw::curve::bezier(
-            ctx,
-            &[
-                ctx.win.region.top(),
-                ctx.win.region.right(),
-                ctx.win.region.bottom(),
-                ctx.win.region.left(),
-
-
-            ],
-            &[
-                ctx.win.region.top_left().convert(),
-                ctx.win.region.top_right().convert(),
-                ctx.win.region.bottom_left().convert(),
-                ctx.win.region.bottom_right().convert(),
-                ctx.win.region.top_left().convert(),
-            ],
-            &[RetroNeon::STROBE_WHITE],
-            0.01,
-        );
-    */
-
-/*
-    draw::curve::bezier(ctx, &[BezierSegment{
-        start: Point::new(20.0,200.0),
-        end: Point::new(50.0,100.0),
-        start_control: Point::new(30.0,10.0),
-        end_control: Point::new(40.0,10.0),
-        color:0x0000ffff
-    },
-        BezierSegment{
-            start: Point::new(50.0,100.0),
-            end: Point::new(80.0,200.0),
-            start_control: Point::new(60.0,10.0),
-            end_control: Point::new(70.0,10.0),
-            color:0x0000ffff
-        }
-    
-    ], 0.0001);
-  */  
     scanline::window(ctx, 1, 80);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // Print some info regarding the control points and levers
+    //
+    // Resources to print the text
+    let text_color_prop = ctx.user_data.bezier_curves.text_color_props.clone();
+    let text_font = ctx.user_data.bezier_curves.text_font.clone().unwrap();
+    let dst = ctx.win.quadrants.bottom_right.right();
+
+    let mut text: Vec<&str> = vec![];
+
+    if show_control_points {
+        text.push("Control points");
+        if show_controls_levers {
+            text.insert(0, "Levers and");
+        } else {
+            text.insert(0, " ");
+        }
+    }
+
+    if text.len() > 0 {
+        // Print the text
+        printer::print(
+            ctx,
+            &Point {
+                x: dst.x - 148,
+                y: dst.y + 16,
+            },
+            &text_font,
+            &text_color_prop,
+            &text,
+            printer::Align::Right,
+        );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
 }

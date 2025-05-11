@@ -4,6 +4,7 @@ use crate::demo::d_002_basic_concepts_pt2::get_snake;
 use crate::demo::d_004_bouncy::{BouncyUserData, BOUNCY_USER_DATA};
 use crate::demo::d_005_alpha::{AlphaUserData, ALPHA_USER_DATA};
 use crate::demo::d_006_luminance_vs_intensity::{GhostsUserData, GHOSTS_USER_DATA};
+use crate::demo::d_011_curves::{BezierCurvesUserData, BEZIER_CURVES_USER_DATA};
 use crate::demo::elements::snake::Snake;
 
 // Shape the user-defined data, accessible via `ctx.user_data`
@@ -16,7 +17,8 @@ pub struct DemoUserData<'a> {
     pub alpha: AlphaUserData,
     pub ghosts: GhostsUserData,
     pub basic_concepts_pt1: BasicConceptsUserData,
-    pub snake: Snake
+    pub snake: Snake,
+    pub bezier_curves: BezierCurvesUserData
 }
 
 // Populate the user data with values defined in the corresponding demo modules
@@ -29,6 +31,7 @@ impl<'a> Default for DemoUserData<'a> {
             basic_concepts_pt1: BASIC_CONCEPTS_USER_DATA,
             snake: get_snake(),
             intro: get_user_data::<'a>(),
+            bezier_curves: BEZIER_CURVES_USER_DATA,
         }
     }
 }
