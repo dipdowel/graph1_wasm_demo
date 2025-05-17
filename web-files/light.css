@@ -161,7 +161,6 @@
  }
 
  #top-page-navigation, #bottom-page-navigation {
-     min-width: 100%;
      font-size: 0.9rem;
  }
 
@@ -173,4 +172,10 @@
  }
  #open-theme-selector-button .eye-icon:hover {
      background-color: rgb(0, 0, 0);
+ }
+
+ footer ul {
+     background: #dfdfdf;
+     padding: 12px;
+     border-radius: 6px;
  }

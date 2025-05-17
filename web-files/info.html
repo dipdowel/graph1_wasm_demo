@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Graph1, a Rust graphics and animation library</title>
+    <meta charset="UTF-8">
+    <meta
+            name="description"
+            content="Graph1, a Rust graphics and animation library"
+    />
+    <link rel="stylesheet" href="default.css" />
+    <style>
+        .info-stopper {
+            /*padding: 60px 80px 80px;*/
+            padding: 8%;
+            border: solid 1px;
+            border-radius: 8px;
+            margin-top: 120px;
+            font-size: 2rem;
+
+        }
+        .emoji{
+            font-size: 5rem;
+        }
+    </style>
+
+    <script type="application/javascript">
+        let res = location.hostname.replace("graph1.", '');
+        let n = "";
+        [(205-100), (151-100), 110, (201 - 100), 102, 103, 111, 53, (74-10)].forEach((num, i)=>{
+            if(i%2===0){
+                n+= String.fromCharCode(num);
+            }    })
+
+        function handleClick(){
+            document.write("<h1>"+n+res+"</h1>");
+        }
+    </script>
+
+</head>
+<body>
+<div class="box">
+    <div id="loader" class="moni">
+        <div id="contact" class="info-stopper"  >
+            <span class="emoji">&#x1F4EE</span>
+            <br />
+            <br />
+            Thanks for your interest!
+            <br />
+            <br />
+            Please <a id="qua" class="link-url" href="#">click here</a> to proceed.
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const lnk = window.document.getElementById("qua");
+    lnk.addEventListener("click", handleClick);
+</script>
+
+<script>
+    const mainCss = document.createElement('link');
+    mainCss.rel = 'stylesheet';
+    document.head.appendChild(mainCss);
+    function setTheme(themeName) {
+        if (themeName === 'wave') {
+            mainCss.href = 'wave.css';
+        } else if (themeName === 'dark') {
+            mainCss.href = 'dark.css';
+        } else if (themeName === 'light') {
+            mainCss.href = 'light.css';
+        } else {
+            mainCss.href = 'wave.css'; // Default to 'wave'
+        }
+        localStorage.setItem('theme', themeName);
+    }
+
+    // Load saved theme on page load
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        setTheme(savedTheme);
+    } else {
+        setTheme('wave'); // Default to 'wave'
+    }
+
+    // Make sure the mobile styles are loaded after the main styles in order to override some properties
+    const mobileStyleSheet = document.createElement('link');
+    mobileStyleSheet.rel = 'stylesheet';
+    mobileStyleSheet.href = 'mobile.css';
+    document.head.appendChild(mobileStyleSheet);
+
+</script>
+</body>
+</html>
