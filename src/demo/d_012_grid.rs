@@ -50,8 +50,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let mut grid = UniformGrid::new(RectArea::new(
         0,
         0,
-        30,
-        16,
+        20,
+        20,
         Some(ctx.win.background_color),
     ),
         
@@ -61,23 +61,41 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
 
     let mut colors = gradient::linear(
-        ctx.win.background_color,
-        ctx.win.foreground_color,
-        grid.num_cells()+10, 
+        0x0000ffff,
+        0x00ffffff,
+        grid.num_cells(), 
     );
     
     grid.iter().for_each(|cell| {
-        // let color = colors.pop();
-        // ctx.win.foreground_color = color.unwrap();
+        let color = colors.pop();
+        ctx.win.foreground_color = color.unwrap();
         draw::rectangle::filled(
             ctx, 
             &RectArea{
                 top_left: Point::new(cell.center().x, cell.center().y),
-                dimensions: Dimensions2d::new(10,6),
+                // dimensions: Dimensions2d::new(10,10),
+                dimensions: Dimensions2d::new(cell.rect_area().dimensions.w,cell.rect_area().dimensions.h),
                 color: Some(ctx.win.foreground_color),
             }
         );
+    });
+
+
+    grid.iter().for_each(|cell| {
+
+        draw::rectangle::filled(
+            ctx,
+            &RectArea{
+                top_left: Point::new(cell.bottom_right().x, cell.bottom_right().y),
+                dimensions: Dimensions2d::new(8,8),
+                
+                color: Some(0x00bbeeff),
+            }
+        );
     })
+    
+    
+    
     
     // 
     // for i in 0..grid.num_cells() {
