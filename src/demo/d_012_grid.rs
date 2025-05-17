@@ -3,20 +3,23 @@ use graph1::core::context::GraphContext;
 use graph1::draw;
 
 use graph1::fx::scanline;
-use graph1::utils::clear_screen;
 use graph1::utils::color::palettes::RetroNeon;
+use graph1::utils::{clear_screen, grid};
 
 use graph1::draw::curve::bezier_segment::BezierSegment;
 use graph1::draw::polygons::{polygon, star, PolygonProperties, StarProperties};
 use graph1::draw::tools::fill;
+use graph1::primitives::numeric::Numeric;
+use graph1::primitives::plane::{Dimensions2d, RectArea};
 use graph1::primitives::point::Point;
 use graph1::primitives::Pixel;
-use graph1::primitives::plane::{Dimensions2d, RectArea};
 use graph1::text::font::{PixelFont, Spacing};
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
 use graph1::text::printer;
-use graph1::utils::color::gradient;
+use graph1::utils::color::{alpha, gradient};
+
 use graph1::utils::grid::uniform::UniformGrid;
+use graph1::utils::math::geometry::region::Region;
 use graph1::utils::math::oscillator;
 
 //---------------------------------------------------------------------
@@ -41,75 +44,60 @@ pub const BEZIER_CURVES_USER_DATA: BezierCurvesUserData = BezierCurvesUserData {
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // initial context setup
     if ctx.frame_count == 0 {
- 
+        ctx.win.foreground_color = RetroNeon::GLITCH_RED;
+        ctx.win.background_color = RetroNeon::PSYCHEDELIC_BLUE;
     }
 
     clear_screen(ctx);
 
+    let num_cols: u32 = 20;
+    let num_rows: u32 = 10;
+    let cell_width: u32 = ctx.win.w / num_cols;
+    let cell_height: u32 = ctx.win.h / num_rows;
 
-    let mut grid = UniformGrid::new(RectArea::new(
-        0,
-        0,
-        20,
-        20,
-        Some(ctx.win.background_color),
-    ),
-        
-        8,
-        8,
-     );
+    // let mut colors = gradient::linear(0x0000ffff, 0x00ffffff, grid.num_cells());
 
 
-    let mut colors = gradient::linear(
-        0x0000ffff,
-        0x00ffffff,
-        grid.num_cells(), 
+
+    let mut grid = UniformGrid::new(
+        RectArea::new(0, 0, cell_width, cell_height, Some(RetroNeon::LASER_AQUA)),
+        num_rows as usize,
+        num_cols as usize,
+        Some(vec![
+            RetroNeon::PSYCHEDELIC_BLUE,128,
+            RetroNeon::DEEP_SPACE_BLUE,
+            RetroNeon::ELECTRIC_BLUE,
+        ]),
     );
-    
+
+    grid::uniform::render(ctx, &grid, false);
+
     grid.iter().for_each(|cell| {
-        let color = colors.pop();
-        ctx.win.foreground_color = color.unwrap();
-        draw::rectangle::filled(
-            ctx, 
-            &RectArea{
-                top_left: Point::new(cell.center().x, cell.center().y),
-                // dimensions: Dimensions2d::new(10,10),
-                dimensions: Dimensions2d::new(cell.rect_area().dimensions.w,cell.rect_area().dimensions.h),
-                color: Some(ctx.win.foreground_color),
+
+        let p:Point;
+
+
+        match ctx.frame_count % 80 {
+            0..=10 => { p=cell.top(); },
+            11..=20 => { p=cell.top_right(); },
+            21..=30 => { p=cell.right(); },
+            31..=40 => { p=cell.bottom_right(); },
+            41..=50 => { p=cell.bottom(); },
+            51..=60 => { p=cell.bottom_left(); },
+            61..=70 => { p=cell.left(); },
+            71..=80 => { p=cell.top_left(); },
+            // 81..=90 => { p=cell.center(); },
+            _ =>   p=cell.center(), // defensive: % 8 guarantees 0–7
+        }
+
+
+        draw::rectangle::filled(ctx,
+            &RectArea {
+                top_left: Point::new(p.x , p.y ),
+                dimensions: Dimensions2d::square(ctx.win.h/20),
+                color: Some( alpha::set_alpha(RetroNeon::STROBE_WHITE, 190)),
             }
-        );
+        )
     });
 
-
-    grid.iter().for_each(|cell| {
-
-        draw::rectangle::filled(
-            ctx,
-            &RectArea{
-                top_left: Point::new(cell.bottom_right().x, cell.bottom_right().y),
-                dimensions: Dimensions2d::new(8,8),
-                
-                color: Some(0x00bbeeff),
-            }
-        );
-    })
-    
-    
-    
-    
-    // 
-    // for i in 0..grid.num_cells() {
-    //     let color = colors[i];
-    //     draw::rectangle::filled(
-    //         ctx, 
-    //         &RectArea::new(
-    //             grid.cell(i).x,
-    //             grid.cell(i).y,
-    //             grid.cell(i).w,
-    //             grid.cell(i).h,
-    //             Some(color),
-    //         ),
-    //  
-    // 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
 }
