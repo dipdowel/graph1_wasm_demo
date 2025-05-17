@@ -168,7 +168,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // initialize the data maintained between frames
     if current_frame == 0 {
-        ctx.user_data.ghosts.current_point.x = 26;
+        ctx.user_data.ghosts.current_point.x = -4;
         ctx.user_data.ghosts.current_point.y = 0;
         ctx.user_data.ghosts.direction.x = 1;
         ctx.user_data.ghosts.direction.y = 0;
@@ -179,7 +179,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     draw::tools::fill::buffer(&mut ctx.frame_buf, 0xff_00_ff_ff, ctx.num_threads);
 
     // Change direction when the ghost approaches the edge of the screen
-    if current_frame % (ctx.win.w_i32 - 106) == 0 {
+    if current_frame % (ctx.win.w_i32 - 58) == 0 {
         ctx.user_data.ghosts.direction.x *= -1;
     }
 
