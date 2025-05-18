@@ -9,6 +9,7 @@ use graph1::utils::{clear_screen, grid};
 use graph1::draw::curve::bezier_segment::BezierSegment;
 use graph1::draw::polygons::{polygon, star, PolygonProperties, StarProperties};
 use graph1::draw::tools::fill;
+use graph1::primitives::neighborhood::NeighborhoodType;
 use graph1::primitives::numeric::Numeric;
 use graph1::primitives::plane::{Dimensions2d, RectArea};
 use graph1::primitives::point::Point;
@@ -50,8 +51,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     clear_screen(ctx);
 
-    let num_cols: u32 = 20;
-    let num_rows: u32 = 10;
+    let num_cols: u32 = 80;
+    let num_rows: u32 = 40;
     let cell_width: u32 = ctx.win.w / num_cols;
     let cell_height: u32 = ctx.win.h / num_rows;
 
@@ -64,40 +65,65 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         num_rows as usize,
         num_cols as usize,
         Some(vec![
-            RetroNeon::PSYCHEDELIC_BLUE,128,
+            RetroNeon::PSYCHEDELIC_BLUE,
             RetroNeon::DEEP_SPACE_BLUE,
             RetroNeon::ELECTRIC_BLUE,
         ]),
     );
 
-    grid::uniform::render(ctx, &grid, false);
+    grid::uniform::render(ctx, &grid, true);
 
-    grid.iter().for_each(|cell| {
+    // let neighborhood = NeighborhoodType::CircularRadius {radius: 16};
+    // let neighborhood = NeighborhoodType::DiamondRadius {radius: 12};
+    // let neighborhood = NeighborhoodType::Diagonal;
+    // let neighborhood = NeighborhoodType::Immediate;
+    // let neighborhood = NeighborhoodType::Orthogonal;
+    let neighborhood = NeighborhoodType::SquareRadius {radius: 4};
+    
 
-        let p:Point;
+    let mut surrounding = grid.get_neighbors( 18,25, &neighborhood);
 
-
-        match ctx.frame_count % 80 {
-            0..=10 => { p=cell.top(); },
-            11..=20 => { p=cell.top_right(); },
-            21..=30 => { p=cell.right(); },
-            31..=40 => { p=cell.bottom_right(); },
-            41..=50 => { p=cell.bottom(); },
-            51..=60 => { p=cell.bottom_left(); },
-            61..=70 => { p=cell.left(); },
-            71..=80 => { p=cell.top_left(); },
-            // 81..=90 => { p=cell.center(); },
-            _ =>   p=cell.center(), // defensive: % 8 guarantees 0–7
-        }
-
-
-        draw::rectangle::filled(ctx,
-            &RectArea {
-                top_left: Point::new(p.x , p.y ),
-                dimensions: Dimensions2d::square(ctx.win.h/20),
-                color: Some( alpha::set_alpha(RetroNeon::STROBE_WHITE, 190)),
-            }
-        )
+    ctx.line.set_int_no_aa(Some(1));
+    ctx.win.foreground_color = RetroNeon::GLITCH_RED;
+    surrounding.cells.iter_mut().for_each(|cell| {
+    
+        // fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &cell.cell.center().to_pixel(RetroNeon::LASER_LIME));
+        let mut cell_area = cell.cell.rect_area();
+        cell_area.color = Some(RetroNeon::LASER_LIME);
+        draw::rectangle::filled(ctx, &cell_area);
     });
 
+    // println!("\n\nsurrounding: {:?}", surrounding);
+
+
+
+    // grid.iter().for_each(|cell| {
+    //
+    //     let p:Point;
+    //
+    //
+    //     match ctx.frame_count % 80 {
+    //         0..=10 => { p=cell.top(); },
+    //         11..=20 => { p=cell.top_right(); },
+    //         21..=30 => { p=cell.right(); },
+    //         31..=40 => { p=cell.bottom_right(); },
+    //         41..=50 => { p=cell.bottom(); },
+    //         51..=60 => { p=cell.bottom_left(); },
+    //         61..=70 => { p=cell.left(); },
+    //         71..=80 => { p=cell.top_left(); },
+    //         // 81..=90 => { p=cell.center(); },
+    //         _ =>   p=cell.center(), // defensive: % 8 guarantees 0–7
+    //     }
+    //
+    //
+    //     draw::rectangle::filled(ctx,
+    //         &RectArea {
+    //             top_left: Point::new(p.x , p.y ),
+    //             dimensions: Dimensions2d::square(ctx.win.h/20),
+    //             color: Some( alpha::set_alpha(RetroNeon::STROBE_WHITE, 190)),
+    //         }
+    //     )
+    // });
+    
+    // scanline::window(ctx, 1, 80);
 }
