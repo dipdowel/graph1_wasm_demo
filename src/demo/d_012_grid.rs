@@ -71,21 +71,21 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ]),
     );
 
+    
     grid::uniform::render(ctx, &grid, true);
 
-    // let neighborhood = NeighborhoodType::CircularRadius {radius: 16};
-    // let neighborhood = NeighborhoodType::DiamondRadius {radius: 12};
+    // let neighborhood = NeighborhoodType::Circle {radius: 16};
+    // let neighborhood = NeighborhoodType::Diamond {distance: 12};
     // let neighborhood = NeighborhoodType::Diagonal;
     // let neighborhood = NeighborhoodType::Immediate;
     // let neighborhood = NeighborhoodType::Orthogonal;
-    let neighborhood = NeighborhoodType::SquareRadius {radius: 4};
-    
+    let neighborhood = NeighborhoodType::Square {distance: 4};
 
-    let mut surrounding = grid.get_neighbors( 18,25, &neighborhood);
+    let neighbors = grid.get_neighbors( 18,25, &neighborhood);
 
     ctx.line.set_int_no_aa(Some(1));
-    ctx.win.foreground_color = RetroNeon::GLITCH_RED;
-    surrounding.cells.iter_mut().for_each(|cell| {
+
+    neighbors.iter().for_each(|cell| {
     
         // fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &cell.cell.center().to_pixel(RetroNeon::LASER_LIME));
         let mut cell_area = cell.cell.rect_area();
