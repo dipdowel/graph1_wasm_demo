@@ -3,11 +3,11 @@ use graph1::core::context::GraphContext;
 use graph1::draw;
 
 use graph1::fx::{glitch, scanline};
-use graph1::utils::color::palettes::{OceanBreeze, RetroNeon};
 use graph1::utils::clear_screen;
+use graph1::utils::color::palettes::{OceanBreeze, RetroNeon};
 
 use graph1::draw::polygons::closed_perimeter;
-use graph1::primitives::plane::RectArea;
+use graph1::primitives::plane::{Dimensions2d, RectArea};
 use graph1::primitives::point::Point;
 use graph1::text::font::PixelFont;
 use graph1::text::printer;
@@ -19,6 +19,7 @@ use graph1::utils::math::oscillator;
 use graph1::draw::rectangle::filled as draw_rect;
 use graph1::draw::tools::fill::flood;
 use graph1::fx::glitch::HorizontalGlitchProps;
+use graph1::primitives::numeric::Numeric;
 
 //---------------------------------------------------------------------
 // Configure the user data for typing text in Basic Concepts pt. 1
@@ -44,15 +45,15 @@ pub const BEZIER_CURVES_USER_DATA: BezierCurvesUserData = BezierCurvesUserData {
 #[derive(Debug, Clone, Copy)]
 pub struct Bar3DProps {
     /// X-coordinate of the bar base
-    pub x: u32,
+    pub x: i32,
     /// Y-coordinate of the bar base
-    pub y: u32,
+    pub y: i32,
     /// Width of the bar front face
-    pub width: u32,
+    pub width: i32,
     /// Height of the bar (on the screen)
-    pub height: u32,
+    pub height: i32,
     /// Depth of the 3D bar (isometric projection)
-    pub depth: u32,
+    pub depth: i32,
     /// Color of the front face
     pub color_front: u32,
     /// Color of the top face
@@ -96,19 +97,19 @@ pub fn bar_3d<UserData>(ctx: &mut GraphContext<UserData>, props: &Bar3DProps) {
 
     // TOP face (parallelogram) drawn using horizontal lines
     for i in 0..=depth {
-        let start = Point::new((x + i) as i32, (y - height - i) as i32);
-        draw::line::horizontal(ctx, &start, width, Some(color_top));
+        let start = Point::new(x + i, y - height - i);
+        draw::line::horizontal(ctx, &start, i32::to_u32(width), Some(color_top));
     }
 
     // RIGHT-SIDE face (slanted parallelogram)
     let side = vec![
-        Point::new((x + width) as i32, (y - height) as i32),
-        Point::new((x + depth + width) as i32, (y - height - depth) as i32),
-        Point::new((x + depth + width) as i32, (y - depth) as i32),
-        Point::new((x + width) as i32, y as i32),
-    ];    
+        Point::new(x + width, y - height),
+        Point::new(x + depth + width, y - height - depth),
+        Point::new(x + depth + width, y - depth),
+        Point::new(x + width, y),
+    ];
     closed_perimeter(ctx, &side, Some(color_side));
-    
+
     flood(
         &mut ctx.frame_buf,
         &ctx.win.dimensions,
@@ -134,8 +135,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // #############################################################################################
 
-    let mut num_cols: u32 = 8;
-    let mut num_rows: u32 = 2;
+    let mut num_cols: i32 = 8;
+    let mut num_rows: i32 = 2;
 
     if ctx.frame_count % 1800 > 600 {
         num_cols = 16; // good!
@@ -147,11 +148,11 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         num_rows = 3;
     }
 
-    let cell_width: u32 = ctx.win.w / num_cols;
-    let cell_height: u32 = ctx.win.h / num_rows;
+    let mut cell_width = ctx.win.w_i32 / num_cols;
+    let mut cell_height = ctx.win.h_i32 / num_rows;
     ctx.line.set_int_no_aa(Some(2));
 
-    let mut grid = UniformGrid::new(
+    let mut grid: UniformGrid<i32> = UniformGrid::new(
         RectArea::new(0, 0, cell_width, cell_height, Some(RetroNeon::LASER_AQUA)),
         num_rows as usize,
         num_cols as usize,
@@ -159,6 +160,36 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             RetroNeon::CYBER_YELLOW, // RetroNeon::PSYCHEDELIC_BLUE, RetroNeon::DEEP_SPACE_BLUE, RetroNeon::ELECTRIC_BLUE,
         ]),
     );
+
+    // if ctx.frame_count % 1800 > 600 {
+    if ctx.frame_count % 300 > 100 {
+        num_rows = 5;
+        num_cols = 16;
+        cell_width = ctx.win.w_i32 / num_cols;
+        cell_height = ctx.win.h_i32 / num_rows;
+        grid.resize(
+            Dimensions2d::new(cell_width, cell_height),
+            num_rows as usize,
+            num_cols as usize,
+            None,
+        );
+        // grid.resize_grid_auto(num_rows, num_cols, None)
+    }
+
+    // if ctx.frame_count % 1800 > 1200 {
+    if ctx.frame_count % 300 > 200 {
+        num_rows = 3;
+        num_cols = 24;
+        cell_width = ctx.win.w_i32 / num_cols;
+        cell_height = ctx.win.h_i32 / num_rows;
+        grid.resize(
+            Dimensions2d::new(cell_width, cell_height),
+            num_rows as usize,
+            num_cols as usize,
+            None,
+        );
+        // grid.resize_grid_auto(num_rows, num_cols, None)
+    }
 
     //----------------------------------------------------------------------------------------------
     // Let's use the bottom-left corner of the first cell as the starting point for the 3D bars
@@ -196,16 +227,17 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     //
     //----------------------------------------------------------------------------------------------
+    // let dbg_vect: Vec<&Region<i32>> = grid.iter().collect();
+
     // Iterate over the grid cells and draw a 3D bar per each cell
     grid.iter().enumerate().for_each(|(i, cell)| {
         // Let's use the bottom-left corner of each cell as the base point for the current 3D bar
-        let cell_point = cell.bottom_left();
+        let cell_point = (*cell).bottom_left();
         props.x = cell_point.x;
         props.y = cell_point.y;
         // Let's pick up the height from the oscillated values, using the index to rotate through them
-        props.height = osc[i % osc.len()];
+        props.height = osc[i % osc.len()] as i32;
         bar_3d(ctx, &props);
-
         // An extra offset to make each row look 1 step different from the previous one
         osc.rotate_left(1);
     });
@@ -217,7 +249,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         || (ctx.frame_count % 1800 > 1185 && ctx.frame_count % 1800 < 1215)
         || (ctx.frame_count % 1800 > 1785 || ctx.frame_count % 1800 < 15);
 
-    if is_transition {
+    if false && is_transition {
         glitch::horizontal_glitch(
             ctx,
             &mut HorizontalGlitchProps {
