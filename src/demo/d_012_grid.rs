@@ -161,34 +161,22 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ]),
     );
 
-    // if ctx.frame_count % 1800 > 600 {
-    if ctx.frame_count % 300 > 100 {
+    if ctx.frame_count % 1800 > 600 {
+//    if ctx.frame_count % 300 > 100 {
         num_rows = 5;
         num_cols = 16;
         cell_width = ctx.win.w_i32 / num_cols;
         cell_height = ctx.win.h_i32 / num_rows;
-        grid.resize(
-            Dimensions2d::new(cell_width, cell_height),
-            num_rows as usize,
-            num_cols as usize,
-            None,
-        );
-        // grid.resize_grid_auto(num_rows, num_cols, None)
+        grid.resize_grid_auto(num_rows as usize, num_cols as usize, None)
     }
 
-    // if ctx.frame_count % 1800 > 1200 {
-    if ctx.frame_count % 300 > 200 {
+    if ctx.frame_count % 1800 > 1200 {
+    // if ctx.frame_count % 300 > 200 {
         num_rows = 3;
         num_cols = 24;
         cell_width = ctx.win.w_i32 / num_cols;
         cell_height = ctx.win.h_i32 / num_rows;
-        grid.resize(
-            Dimensions2d::new(cell_width, cell_height),
-            num_rows as usize,
-            num_cols as usize,
-            None,
-        );
-        // grid.resize_grid_auto(num_rows, num_cols, None)
+        grid.resize_grid_auto(num_rows as usize, num_cols as usize, None)
     }
 
     //----------------------------------------------------------------------------------------------
@@ -249,7 +237,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         || (ctx.frame_count % 1800 > 1185 && ctx.frame_count % 1800 < 1215)
         || (ctx.frame_count % 1800 > 1785 || ctx.frame_count % 1800 < 15);
 
-    if false && is_transition {
+    if  is_transition {
         glitch::horizontal_glitch(
             ctx,
             &mut HorizontalGlitchProps {
