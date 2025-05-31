@@ -32,7 +32,7 @@ const NOISE_PROPS: WhiteNoiseProps = WhiteNoiseProps {
     step: Some(4),
 };
 
-pub fn get_user_data<'a>() -> IntroUserData<'a> {
+pub fn get_intro_user_data<'a>() -> IntroUserData<'a> {
     let noise = WhiteNoise::new(123, &NOISE_PROPS);
     IntroUserData { noise }
 }
