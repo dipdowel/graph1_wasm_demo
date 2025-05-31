@@ -70,6 +70,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         let mid_blue: u32 =
             gradient::linear_step(OceanBreeze::HARBOR_NAVY, OceanBreeze::LAGOON_BLUE, 40, 28);
         ctx.win.background_color = mid_blue;
+        ctx.alpha.enabled = true;
+        ctx.alpha.set_method_float();
+
     }
 
     clear_screen(ctx);
