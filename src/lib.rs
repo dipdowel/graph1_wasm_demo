@@ -3,7 +3,7 @@ mod utils;
 
 use crate::demo::user_data::DemoUserData;
 
-use crate::demo::{d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_003_basic_concepts_pt3, d_004_bouncy, d_005_alpha, d_006_luminance_vs_intensity, d_007_shapes_and_quadrants, d_008_polygons, d_009_lines, d_010_quadrants, d_011_curves, d_012_grid};
+use crate::demo::{d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_003_basic_concepts_pt3, d_004_bouncy, d_005_alpha, d_006_luminance_vs_intensity, d_007_shapes_and_quadrants, d_008_polygons, d_009_lines, d_010_quadrants, d_011_curves, d_012_grid, d_013_grid_neighbors};
 use crate::utils::console_log;
 use graph1::core::context::{GraphContext, WindowContext};
 use graph1::utils::color;
@@ -35,6 +35,7 @@ pub mod demo {
     pub mod d_010_quadrants;
     pub mod d_011_curves;
     pub mod d_012_grid;
+    pub mod d_013_grid_neighbors;
 
 
     /// User data, used to store arbitrary data that needs to be persisted between frames
@@ -189,6 +190,7 @@ pub fn update_frame(frame: usize) -> PixelStats {
                 10 => d_010_quadrants::render_frame(&mut ctx),
                 11 => d_011_curves::render_frame(&mut ctx),
                 12 => d_012_grid::render_frame(&mut ctx),
+                13 => d_013_grid_neighbors::render_frame(&mut ctx),
 
                 // 5 => circles::render_frame(&mut ctx),
                 _ => d_011_curves::render_frame(&mut ctx),

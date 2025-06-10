@@ -1,0 +1,239 @@
+use std::collections::HashMap;
+use crate::demo::user_data::DemoUserData;
+use graph1::core::context::GraphContext;
+
+use graph1::utils::color::palettes::{DesertDusk, ForestMist, OceanBreeze, RetroNeon};
+use graph1::utils::{clear_screen, grid};
+
+use graph1::primitives::{neighborhood, plane::RectArea, point::Point};
+use graph1::text::font::{PixelFont, Spacing};
+use graph1::text::printer;
+use graph1::utils::color::gradient;
+
+use graph1::utils::grid::uniform::{Neighbor, UniformGrid};
+use graph1::utils::math::oscillator;
+
+use graph1::core::context_utils::line_clipping_style::LineClippingStyle;
+use graph1::draw;
+use graph1::draw::tools::fill;
+use graph1::draw::{line, rectangle};
+use graph1::fx::glitch::HorizontalGlitchProps;
+use graph1::fx::{glitch, scanline};
+use graph1::sprites::axonometric;
+use graph1::sprites::axonometric::Bar3DProps;
+use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
+use graph1::utils::color::alpha::set_alpha;
+use graph1::utils::math::geometry::region::Region;
+use crate::utils::console_log;
+
+//---------------------------------------------------------------------
+// Configure the user data for typing text in Basic Concepts pt. 1
+pub struct GridUserData {
+    pub text_color_props: printer::ColorProperties<'static>,
+    pub text_font: Option<PixelFont>,
+    pub text: Vec<String>,
+    pub background_color: Option<u32>,
+}
+
+//---------------------------------------------------------------------
+//---------------------------------------------------------------------
+
+const TILE_COLORS: [u32; 4] = [
+    DesertDusk::GOLDEN_SAND,
+    DesertDusk::DESERT_ROSE,
+    DesertDusk::RUSTY_ORANGE,
+    DesertDusk::CLAY_BROWN,
+];
+
+fn render_cell(ctx: &mut GraphContext<DemoUserData>, cell: &Region<i32>, light: u8) {
+    /*
+        ctx: &mut GraphContext<UserData>,
+    start: &Point<i32>,
+    end: &Point<i32>,
+    color: Option<u32>,
+     */
+
+    // let mixer = DesertDusk::SHADOW_BROWN;
+    let mixer = ForestMist::DEEP_BARK;
+    let steps = 255;
+    let step = steps - light as usize;
+    let tile_colors = [
+        gradient::linear_step(TILE_COLORS[0], mixer, steps, step),
+        gradient::linear_step(TILE_COLORS[1], mixer, steps, step),
+        gradient::linear_step(TILE_COLORS[2], mixer, steps, step),
+        gradient::linear_step(TILE_COLORS[3], mixer, steps, step),
+    ];
+
+
+    ////////////////////////////////////////////
+    // Check if the cell already has the designated colors
+    // If it does, we don't need to re-render it on this step.
+
+    ////////////////////////////////////////////
+
+
+
+
+    let line_color = Some(gradient::linear_step(
+        DesertDusk::SANDSTONE,
+        mixer,
+        steps,
+        step,
+    ));
+
+    let mut rect_area = cell.rect_area();
+    rect_area.color = line_color;
+
+    line::between_two_points(
+        ctx,
+        &cell.top_left().convert(),
+        &cell.bottom_right().convert(),
+        line_color,
+    );
+
+    line::between_two_points(
+        ctx,
+        &cell.top_right().convert(),
+        &cell.bottom_left().convert(),
+        line_color,
+    );
+
+    rectangle::outline(ctx, &rect_area);
+
+    let mut pixel = (cell.top_left() + Point::new(4, 2)).to_pixel(tile_colors[0]);
+    fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
+
+    pixel = (cell.top_right() + Point::new(-2, 4)).to_pixel(tile_colors[1]);
+    fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
+
+    pixel = (cell.bottom_right() + Point::new(-4, -2)).to_pixel(tile_colors[2]);
+    fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
+
+    pixel = (cell.bottom_left() + Point::new(2, -4)).to_pixel(tile_colors[3]);
+    fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
+}
+
+pub fn get_grid_user_data() -> GridUserData {
+    GridUserData {
+        background_color: Some(set_alpha(OceanBreeze::AQUAMARINE, 80)),
+        text_color_props: printer::ColorProperties {
+            // color: Some(OceanBreeze::FOAM_WHITE),
+            color: Some(OceanBreeze::SEAFOAM),
+            color_transformer: None,
+            data: None,
+        },
+        // Let's put an instantiated font into the user data
+        // so that we don't have to instantiate it on every frame
+        text_font: Some(instantiate_embedded_font(
+            EmbeddedFonts::CCRedAlertInet,
+            2,
+            Some(Spacing {
+                kerning_px: 2,
+                leading_px: 2,
+            }),
+            None,
+        )),
+
+        text: vec![
+            "Grid:  8x2".to_string(),
+            "Grid: 16x5".to_string(),
+            "Grid: 24x3".to_string(),
+        ],
+    }
+}
+
+pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
+    // initial context setup
+    if ctx.frame_count == 0 {
+        ctx.win.foreground_color = RetroNeon::GLITCH_RED;
+
+        let mid_blue: u32 =
+            gradient::linear_step(OceanBreeze::HARBOR_NAVY, OceanBreeze::LAGOON_BLUE, 40, 28);
+        ctx.win.background_color = mid_blue;
+        ctx.alpha.enabled = true;
+        ctx.alpha.set_method_float();
+    }
+
+    clear_screen(ctx);
+    // #############################################################################################
+
+    let num_cols = 30;
+    let num_rows = 15;
+
+    let cell_width = ctx.win.w_i32 / num_cols;
+    let cell_height = ctx.win.h_i32 / num_rows;
+
+    ctx.line.set_int_no_aa(Some(1));
+     ctx.line.clipping = LineClippingStyle::CohenSutherland;
+
+    let grid: UniformGrid<i32> = UniformGrid::new(
+        RectArea::new(0, 0, cell_width, cell_height, Some(DesertDusk::SANDSTONE)),
+        num_rows as usize,
+        num_cols as usize,
+        Some(vec![
+            DesertDusk::SANDSTONE,
+        ]),
+    );
+
+
+
+
+    // let neighborhood_type = neighborhood::NeighborhoodType::Circle { radius: 8};
+    // let light_multiplier:u8 = 27;
+    // let neighborhood_type = neighborhood::NeighborhoodType::Diamond {distance:5};
+    // let light_multiplier:u8 = 42;
+    let neighborhood_type = neighborhood::NeighborhoodType::Square {distance:4};
+    let light_multiplier:u8 = 53;
+
+
+    // let booster = oscillator::sine(ctx.frame_count, 0.002, 0, 4);
+
+    let row = oscillator::sine(ctx.frame_count,  0.004946, 0, num_rows) as usize;
+    let col = oscillator::linear(ctx.frame_count,  0.06523, 0, num_cols) as usize;
+
+
+    // let row = oscillator::linear(ctx.frame_count,  0.2946, 0, num_rows) as usize;
+    // let col = oscillator::linear_fast(ctx.frame_count as isize,   0, num_cols as isize) as usize;
+    // let row = oscillator::linear_fast(ctx.frame_count as isize,   0, num_rows as isize) as usize;
+
+
+    // let row = grid.rows / 2;
+    // let col = grid.cols / 2;
+
+
+    let neighborhood: Vec<Neighbor<i32>> = grid.get_neighbors(row, col, &neighborhood_type, true);
+
+    // Make a map of neighbors with their cell indices
+    // This will allow us to quickly check if a cell is a neighbor
+    let neighbor_map: HashMap<usize, Neighbor<i32>> = neighborhood
+        .into_iter()
+        .map(|n| (n.cell_index, n))
+        .collect();
+
+
+    grid.iter().enumerate().for_each(|(i, cell)| {
+        if neighbor_map.contains_key(&i) {
+            // If the cell is a neighbor, render it with a different light
+            let n = neighbor_map.get(&i).unwrap();
+            let light = 255_u8.saturating_sub((n.distance_to_center as u8).saturating_mul(light_multiplier));
+            render_cell(ctx, cell, light);
+        } else {
+            // Otherwise, render it with a default color
+            render_cell(ctx, cell, 22);
+        }
+
+
+
+    });
+
+
+
+    //----------------------------------------------------------------------------------------------
+    // The usual scanline effect. Classic stuff! 😌
+    scanline::window(ctx, 1, 34);
+
+    //
+    //----------------------------------------------------------------------------------------------
+
+    //
+}
