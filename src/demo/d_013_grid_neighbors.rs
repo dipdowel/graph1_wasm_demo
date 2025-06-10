@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
+use std::collections::HashMap;
 
 use graph1::utils::color::palettes::{DesertDusk, ForestMist, OceanBreeze, RetroNeon};
 use graph1::utils::{clear_screen, grid};
@@ -13,6 +13,7 @@ use graph1::utils::color::gradient;
 use graph1::utils::grid::uniform::{Neighbor, UniformGrid};
 use graph1::utils::math::oscillator;
 
+use crate::utils::console_log;
 use graph1::core::context_utils::line_clipping_style::LineClippingStyle;
 use graph1::draw;
 use graph1::draw::tools::fill;
@@ -24,7 +25,6 @@ use graph1::sprites::axonometric::Bar3DProps;
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
 use graph1::utils::color::alpha::set_alpha;
 use graph1::utils::math::geometry::region::Region;
-use crate::utils::console_log;
 
 //---------------------------------------------------------------------
 // Configure the user data for typing text in Basic Concepts pt. 1
@@ -46,17 +46,14 @@ const TILE_COLORS: [u32; 4] = [
 ];
 
 fn render_cell(ctx: &mut GraphContext<DemoUserData>, cell: &Region<i32>, light: u8) {
-    /*
-        ctx: &mut GraphContext<UserData>,
-    start: &Point<i32>,
-    end: &Point<i32>,
-    color: Option<u32>,
-     */
 
     // let mixer = DesertDusk::SHADOW_BROWN;
     let mixer = ForestMist::DEEP_BARK;
-    let steps = 255;
-    let step = steps - light as usize;
+    let steps: usize = 255;
+
+    let step = steps.saturating_sub(light as usize);
+    // let step = steps.saturating_sub(light) as usize;
+
     let tile_colors = [
         gradient::linear_step(TILE_COLORS[0], mixer, steps, step),
         gradient::linear_step(TILE_COLORS[1], mixer, steps, step),
@@ -64,15 +61,25 @@ fn render_cell(ctx: &mut GraphContext<DemoUserData>, cell: &Region<i32>, light: 
         gradient::linear_step(TILE_COLORS[3], mixer, steps, step),
     ];
 
-
     ////////////////////////////////////////////
     // Check if the cell already has the designated colors
     // If it does, we don't need to re-render it on this step.
+    // let  sample_point:Point<u32> = cell.top_left().convert();
+    let sample_point: Point<u32> = (cell.top_left() + Point::new(4, 2)).convert();
+    let pixel_index = (sample_point.y * ctx.win.w + sample_point.x) as usize;
+    let sample_color = ctx.frame_buf[pixel_index];
+    if sample_color == tile_colors[0] {
+        return;
+    }
+    // FIXME: This optimisation is very important! It allows us to skip rendering
+    // FIXME: cells that are not changing on this frame.
+    // FIXME: But it does not allow us to use the scanline effect.
+    // FIXME: Let's make an extra context in the user data and use it for all the rendering logic
+    // FIXME: And then just copy its frame buffer to the main context's framebuffer,
+    // FIXME: right before applying the scanline and other effects (if any).
+
 
     ////////////////////////////////////////////
-
-
-
 
     let line_color = Some(gradient::linear_step(
         DesertDusk::SANDSTONE,
@@ -152,54 +159,51 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.win.background_color = mid_blue;
         ctx.alpha.enabled = true;
         ctx.alpha.set_method_float();
+        clear_screen(ctx);
     }
 
-    clear_screen(ctx);
+    // clear_screen(ctx);
     // #############################################################################################
 
-    let num_cols = 30;
-    let num_rows = 15;
+    // TODO: Implement cycling between different grid sizes!!!
+    let num_cols = 60;
+    let num_rows = 30;
+    // let num_cols = 30;
+    // let num_rows = 15;
 
     let cell_width = ctx.win.w_i32 / num_cols;
     let cell_height = ctx.win.h_i32 / num_rows;
 
     ctx.line.set_int_no_aa(Some(1));
-     ctx.line.clipping = LineClippingStyle::CohenSutherland;
+    ctx.line.clipping = LineClippingStyle::CohenSutherland;
 
     let grid: UniformGrid<i32> = UniformGrid::new(
         RectArea::new(0, 0, cell_width, cell_height, Some(DesertDusk::SANDSTONE)),
         num_rows as usize,
         num_cols as usize,
-        Some(vec![
-            DesertDusk::SANDSTONE,
-        ]),
+        Some(vec![DesertDusk::SANDSTONE]),
     );
 
-
-
-
-    // let neighborhood_type = neighborhood::NeighborhoodType::Circle { radius: 8};
+    // TODO: Implement cycling between different neighborhood types!!!
+    let neighborhood_type = neighborhood::NeighborhoodType::Circle { radius: 8};
+    let light_multiplier:u8 = 29;
+    // let neighborhood_type = neighborhood::NeighborhoodType::Diamond {distance:8};
     // let light_multiplier:u8 = 27;
-    // let neighborhood_type = neighborhood::NeighborhoodType::Diamond {distance:5};
-    // let light_multiplier:u8 = 42;
-    let neighborhood_type = neighborhood::NeighborhoodType::Square {distance:4};
-    let light_multiplier:u8 = 53;
+    // let neighborhood_type = neighborhood::NeighborhoodType::Square { distance: 5 };
+    // let light_multiplier: u8 = 43;
 
 
     // let booster = oscillator::sine(ctx.frame_count, 0.002, 0, 4);
 
-    let row = oscillator::sine(ctx.frame_count,  0.004946, 0, num_rows) as usize;
-    let col = oscillator::linear(ctx.frame_count,  0.06523, 0, num_cols) as usize;
-
+    let row = oscillator::sine(ctx.frame_count, 0.004946, 0, num_rows) as usize;
+    let col = oscillator::linear(ctx.frame_count, 0.1293, 0, num_cols) as usize;
 
     // let row = oscillator::linear(ctx.frame_count,  0.2946, 0, num_rows) as usize;
     // let col = oscillator::linear_fast(ctx.frame_count as isize,   0, num_cols as isize) as usize;
     // let row = oscillator::linear_fast(ctx.frame_count as isize,   0, num_rows as isize) as usize;
 
-
     // let row = grid.rows / 2;
     // let col = grid.cols / 2;
-
 
     let neighborhood: Vec<Neighbor<i32>> = grid.get_neighbors(row, col, &neighborhood_type, true);
 
@@ -210,27 +214,19 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         .map(|n| (n.cell_index, n))
         .collect();
 
-
     grid.iter().enumerate().for_each(|(i, cell)| {
-        if neighbor_map.contains_key(&i) {
-            // If the cell is a neighbor, render it with a different light
+        let light: u8 = if neighbor_map.contains_key(&i) {
             let n = neighbor_map.get(&i).unwrap();
-            let light = 255_u8.saturating_sub((n.distance_to_center as u8).saturating_mul(light_multiplier));
-            render_cell(ctx, cell, light);
+            255_u8.saturating_sub((n.distance_to_center as u8).saturating_mul(light_multiplier))
         } else {
-            // Otherwise, render it with a default color
-            render_cell(ctx, cell, 22);
-        }
-
-
-
+            22
+        };
+        render_cell(ctx, cell, light);
     });
-
-
 
     //----------------------------------------------------------------------------------------------
     // The usual scanline effect. Classic stuff! 😌
-    scanline::window(ctx, 1, 34);
+    // scanline::window(ctx, 1, 34);
 
     //
     //----------------------------------------------------------------------------------------------
