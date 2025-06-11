@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use graph1::utils::color::palettes::{DesertDusk, ForestMist, OceanBreeze, RetroNeon};
 use graph1::utils::{clear_screen, grid};
 
-use graph1::primitives::{neighborhood, plane::RectArea, point::Point};
+use graph1::primitives::{neighborhood, plane::RectArea, point::Point, Pixel};
 use graph1::text::font::{PixelFont, Spacing};
 use graph1::text::printer;
 use graph1::utils::color::gradient;
@@ -16,15 +16,18 @@ use graph1::utils::math::oscillator;
 use crate::utils::console_log;
 use graph1::core::context_utils::line_clipping_style::LineClippingStyle;
 use graph1::draw;
-use graph1::draw::tools::fill;
+use graph1::draw::tools::{fill, spray};
 use graph1::draw::{line, rectangle};
+use graph1::draw::tools::brush::Brush;
 use graph1::fx::glitch::HorizontalGlitchProps;
 use graph1::fx::{glitch, scanline};
+use graph1::primitives::math::MinMax;
 use graph1::sprites::axonometric;
 use graph1::sprites::axonometric::Bar3DProps;
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
 use graph1::utils::color::alpha::set_alpha;
 use graph1::utils::math::geometry::region::Region;
+use graph1::utils::math::rng::XorShiftRng;
 
 //---------------------------------------------------------------------
 // Configure the user data for typing text in Basic Concepts pt. 1
@@ -170,6 +173,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let num_rows = 30;
     // let num_cols = 30;
     // let num_rows = 15;
+    // let num_cols = 20;
+    // let num_rows = 10;
 
     let cell_width = ctx.win.w_i32 / num_cols;
     let cell_height = ctx.win.h_i32 / num_rows;
@@ -198,6 +203,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let row = oscillator::sine(ctx.frame_count, 0.004946, 0, num_rows) as usize;
     let col = oscillator::linear(ctx.frame_count, 0.1293, 0, num_cols) as usize;
 
+
+
     // let row = oscillator::linear(ctx.frame_count,  0.2946, 0, num_rows) as usize;
     // let col = oscillator::linear_fast(ctx.frame_count as isize,   0, num_cols as isize) as usize;
     // let row = oscillator::linear_fast(ctx.frame_count as isize,   0, num_rows as isize) as usize;
@@ -223,6 +230,39 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         };
         render_cell(ctx, cell, light);
     });
+    //
+    // let glow_center:Point<u32> = Point::new(
+    //     oscillator::sine(ctx.frame_count, 0.001, 10, ctx.win.w-10) as u32,
+    //     oscillator::sine(ctx.frame_count, 0.002, 10, ctx.win.h-10) as u32,
+    // );
+    // //
+    // // let x_rnd = ctx.rng.get_u32(&MinMax{min: 0, max: 35}) ;
+    // // let y_rnd = ctx.rng.get_u32(&MinMax{min: 0, max: 35}) ;
+    // // let pix_x:u32 = glow_center.x+x_rnd;
+    // // let pix_y:u32 = glow_center.y+y_rnd;
+    // // ctx.set_pixel(pix_x, pix_y, 0xffffffff);
+    // //
+    //
+    // let brush_side = 14;
+    // ctx.brush = Brush::new_rectangle(brush_side,brush_side);
+    //
+    // spray::simple(
+    //     ctx,
+    //     glow_center.x,
+    //     glow_center.y,
+    //     32,
+    //     0xffffffff,
+    // );
+    //
+    //
+    // spray::simple(
+    //     ctx,
+    //     ctx.win.w / 2,
+    //     ctx.win.h / 2,
+    //     250,
+    //     0xffffffff,
+    // );
+
 
     //----------------------------------------------------------------------------------------------
     // The usual scanline effect. Classic stuff! 😌
