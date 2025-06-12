@@ -25,90 +25,6 @@ pub struct BrushUserData {
     // pub brush_context: GraphContext
 }
 
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-
-// const TILE_COLORS: [u32; 4] = [
-//     DesertDusk::GOLDEN_SAND,
-//     DesertDusk::DESERT_ROSE,
-//     DesertDusk::RUSTY_ORANGE,
-//     DesertDusk::CLAY_BROWN,
-// ];
-
-// fn render_cell(ctx: &mut GraphContext<DemoUserData>, cell: &Region<i32>, light: u8) {
-//
-//     // let mixer = DesertDusk::SHADOW_BROWN;
-//     let mixer = ForestMist::DEEP_BARK;
-//     let steps: usize = 255;
-//
-//     let step = steps.saturating_sub(light as usize);
-//     // let step = steps.saturating_sub(light) as usize;
-//
-//     let tile_colors = [
-//         gradient::linear_step(TILE_COLORS[0], mixer, steps, step),
-//         gradient::linear_step(TILE_COLORS[1], mixer, steps, step),
-//         gradient::linear_step(TILE_COLORS[2], mixer, steps, step),
-//         gradient::linear_step(TILE_COLORS[3], mixer, steps, step),
-//     ];
-//
-//     ////////////////////////////////////////////
-//     // Check if the cell already has the designated colors
-//     // If it does, we don't need to re-render it on this step.
-//     // let  sample_point:Point<u32> = cell.top_left().convert();
-//     let sample_point: Point<u32> = (cell.top_left() + Point::new(4, 2)).convert();
-//     let pixel_index = (sample_point.y * ctx.win.w + sample_point.x) as usize;
-//     let sample_color = ctx.frame_buf[pixel_index];
-//     if sample_color == tile_colors[0] {
-//         return;
-//     }
-//     // FIXME: This optimisation is very important! It allows us to skip rendering
-//     // FIXME: cells that are not changing on this frame.
-//     // FIXME: But it does not allow us to use the scanline effect.
-//     // FIXME: Let's make an extra context in the user data and use it for all the rendering logic
-//     // FIXME: And then just copy its frame buffer to the main context's framebuffer,
-//     // FIXME: right before applying the scanline and other effects (if any).
-//
-//
-//     ////////////////////////////////////////////
-//
-//     let line_color = Some(gradient::linear_step(
-//         DesertDusk::SANDSTONE,
-//         mixer,
-//         steps,
-//         step,
-//     ));
-//
-//     let mut rect_area = cell.rect_area();
-//     rect_area.color = line_color;
-//
-//     line::between_two_points(
-//         ctx,
-//         &cell.top_left().convert(),
-//         &cell.bottom_right().convert(),
-//         line_color,
-//     );
-//
-//     line::between_two_points(
-//         ctx,
-//         &cell.top_right().convert(),
-//         &cell.bottom_left().convert(),
-//         line_color,
-//     );
-//
-//     rectangle::outline(ctx, &rect_area);
-//
-//     let mut pixel = (cell.top_left() + Point::new(4, 2)).to_pixel(tile_colors[0]);
-//     fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
-//
-//     pixel = (cell.top_right() + Point::new(-2, 4)).to_pixel(tile_colors[1]);
-//     fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
-//
-//     pixel = (cell.bottom_right() + Point::new(-4, -2)).to_pixel(tile_colors[2]);
-//     fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
-//
-//     pixel = (cell.bottom_left() + Point::new(2, -4)).to_pixel(tile_colors[3]);
-//     fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
-// }
 
 pub fn get_brush_user_data() -> BrushUserData {
     BrushUserData {
@@ -125,7 +41,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     //----------------------------------------------------------------------------------------------
     ctx.set_frame_buf_to(FrameBuffer::Draft);
 
-     
+
 
     let cfg = SprayDemoSceneConfig {
         // Background color of the entire scene
@@ -147,43 +63,51 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         blend: BlendSettings {
             frequency: 4,           // blend_freq
             color: 0x03_03_03_ff,   // blend_color
+            // color: 0x00_04_06_ff,   //TODO: this blend_color is AWESOME! DEFINITELY USE IT!
         },
 
         // Outer brush styling
         outer_brush: BrushSettings {
-            // dimensions: Dimensions2d::square(48), // brush_side_outer
-            dimensions: Dimensions2d::new(48, 40), // brush_side_inner
-            density: 88,                          // density_outer
+            dimensions: Dimensions2d::square(60), // brush_side_outer
+            density: 130,                          // density_outer
             colors: vec![
                 RetroNeon::DEEP_SPACE_BLUE,
+                RetroNeon::CYBER_BLUE ,
+                RetroNeon::PSYCHEDELIC_BLUE,
                 RetroNeon::ELECTRIC_BLUE,
-                RetroNeon::DIGITAL_GOLD,
+                RetroNeon::PULSING_PURPLE
+
             ],
         },
 
         // Inner brush styling
         inner_brush: BrushSettings {
-            // dimensions: Dimensions2d::square(14), // brush_side_inner
             dimensions: Dimensions2d::new(42, 12), // brush_side_inner
-            density: 150, // density_inner
+            density: 260, // density_inner
             colors: vec![
                 RetroNeon::STROBE_WHITE,
-                RetroNeon::LASER_LIME,
-                RetroNeon::PULSING_PURPLE,
+                // RetroNeon::LASER_LIME,
                 RetroNeon::STROBE_WHITE,
+                // RetroNeon::DIGITAL_GOLD,
+                RetroNeon::STROBE_WHITE,
+                RetroNeon::CYBER_YELLOW,
+                RetroNeon::STROBE_WHITE,
+                // RetroNeon::FUTURE_BRONZE,
+                // RetroNeon::STROBE_WHITE,
             ],
         },
 
         // Bounds for the animated spray path (X and Y)
         path_bounds: PathBounds {
             x: Bound {
-                lower: 42, // path_x_lower_bound
-                upper: 42 // path_x_upper_bound
+                lower: 38, // path_x_lower_bound
+                upper: 38 // path_x_upper_bound
             },
             y: {
-                
-                let y = oscillator::sine(ctx.frame_count, 0.0014, 48, 60) as u32;
-                
+
+                let y = oscillator::sine(ctx.frame_count, 0.001, 48, 62) as u32;
+                // let y = 52;
+
                 Bound {
                     lower: y, // path_y_lower_bound
                     upper: y, // path_y_upper_bound
@@ -262,7 +186,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         });
         // #############################################################################################
     }
- 
+
     // clear_screen(ctx);
 
     //// really cool!
@@ -350,7 +274,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // Copy the draft buffer to the primary frame buffer
     ctx.copy_frame_buf(FrameBuffer::Draft, FrameBuffer::Primary);
     // The usual scanline effect. Classic stuff! 😌
-    scanline::window(ctx, 1, 58);
+    scanline::window(ctx, 1, 54);
 
     //
     //----------------------------------------------------------------------------------------------
