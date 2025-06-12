@@ -43,9 +43,12 @@ pub mod demo {
     pub mod user_data;
 
     pub mod elements {
+        pub mod d_014_spray_config;
         pub mod cube;
         pub mod snake;
     }
+
+
     //     /// A minimal example of displaying and animating a square on the screen
     //     pub mod bouncy;
     //     /// Demo of slower but more accurate Float alpha blending
@@ -62,18 +65,14 @@ pub mod demo {
     // }
     //
     // pub mod screen_saver;
+
+
 }
 
-use wasm_bindgen::prelude::*;
+pub(crate) mod global_consts;
 
-/// Width of the window, in pixels
-const WIN_WIDTH: u32 = 480;
-/// Height of the window, in pixels
-const WIN_HEIGHT: u32 = 240;
-/// Framebuffer size, in pixels (u32)
-const BUF_LEN: usize = (WIN_WIDTH * WIN_HEIGHT) as usize;
-/// Framebuffer size, in bytes
-const BUF_SIZE_BYTES: usize = BUF_LEN * 4;
+use wasm_bindgen::prelude::*;
+use crate::global_consts::{BUF_LEN, BUF_SIZE_BYTES, WIN_HEIGHT, WIN_WIDTH};
 
 /// JavaScript and HTML Canvas use ABGR model, hence
 /// the result produced by Graph1 needs to be converted from RGBA to ABGR.

@@ -1,41 +1,28 @@
 use crate::demo::user_data::DemoUserData;
-use graph1::core::context::GraphContext;
-use std::collections::HashMap;
+use graph1::core::context::{FrameBuffer,  GraphContext};
 
-use graph1::utils::color::palettes::{DesertDusk, ForestMist, OceanBreeze, RetroNeon};
-use graph1::utils::{clear_screen, grid};
+use graph1::utils::clear_screen;
+use graph1::utils::color::palettes::RetroNeon;
 
-use graph1::primitives::{neighborhood, plane::RectArea, point::Point, Pixel};
-use graph1::text::font::{PixelFont, Spacing};
-use graph1::text::printer;
-use graph1::utils::color::gradient;
+use graph1::primitives::{plane::RectArea, point::Point};
 
-use graph1::utils::grid::uniform::{Neighbor, UniformGrid};
+use graph1::utils::grid::uniform::UniformGrid;
 use graph1::utils::math::oscillator;
 
-use crate::utils::console_log;
 use graph1::core::context_utils::line_clipping_style::LineClippingStyle;
-use graph1::draw;
+use graph1::draw::rectangle;
 use graph1::draw::tools::brush::Brush;
-use graph1::draw::tools::{fill, spray};
-use graph1::draw::{line, rectangle};
-use graph1::fx::glitch::HorizontalGlitchProps;
-use graph1::fx::{glitch, scanline};
-use graph1::primitives::math::MinMax;
-use graph1::sprites::axonometric;
-use graph1::sprites::axonometric::Bar3DProps;
-use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
-use graph1::utils::color::alpha::set_alpha;
-use graph1::utils::math::geometry::region::Region;
-use graph1::utils::math::rng::XorShiftRng;
+use graph1::draw::tools::spray;
+use graph1::fx::scanline;
+use graph1::primitives::math::{Bound, Shell};
+use graph1::primitives::plane::Dimensions2d;
+use graph1::utils::color::math::{rgba_operation, ColorOperation};
+use crate::demo::elements::d_014_spray_config::{BlendSettings, BrushSettings, PathBounds, SprayDemoSceneConfig};
 
 //---------------------------------------------------------------------
 // Configure the user data for typing text in Basic Concepts pt. 1
 pub struct BrushUserData {
-    //     pub text_color_props: printer::ColorProperties<'static>,
-    //     pub text_font: Option<PixelFont>,
-    //     pub text: Vec<String>,
-    //     pub background_color: Option<u32>,
+    // pub brush_context: GraphContext
 }
 
 //---------------------------------------------------------------------
@@ -124,56 +111,99 @@ pub struct BrushUserData {
 // }
 
 pub fn get_brush_user_data() -> BrushUserData {
-    BrushUserData {}
+    BrushUserData {
+        // brush_context: GraphContext::new(
+        //     WindowContext::new(WIN_WIDTH, WIN_HEIGHT, Some(0x00_00_00_ff), Some(0x00_00_00_ff)),
+        //     true, false, None, 1, None
+        // ),
+    }
 }
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-    let background_color = RetroNeon::DEEP_SPACE_BLUE;
-    let grid_outer_color = RetroNeon::ELECTRIC_BLUE;
-    let grid_inner_color = RetroNeon::DIGITAL_GOLD;
+    //
+    // Perform all the graphical operations on the draft buffer!
+    //----------------------------------------------------------------------------------------------
+    ctx.set_frame_buf_to(FrameBuffer::Draft);
 
-    // Frequencies
-    let freq_x = 0.0045;
-    let freq_y = 0.0090;
+     
 
-    // let freq_x = 0.0033;
-    // let freq_y = 0.0055;
+    let cfg = SprayDemoSceneConfig {
+        // Background color of the entire scene
+        background_color: RetroNeon::DEEP_SPACE_BLUE,
 
-    // Outer brush properties
-    let brush_side_outer = 54;
-    let density_outer = 22;
-    let colors_outer = [
-        RetroNeon::DEEP_SPACE_BLUE,
-        RetroNeon::ELECTRIC_BLUE,
-        RetroNeon::CYBER_YELLOW,
-    ];
+        // Outer and inner grid line colors
+        grid_colors: Shell {
+            outer: RetroNeon::ELECTRIC_BLUE,     // grid_outer_color
+            inner: RetroNeon::DIGITAL_GOLD,      // grid_inner_color
+        },
 
-    // Inner brush properties
-    let brush_side_inner = 14;
-    let density_inner = 150;
-    let colors_inner = [
-        RetroNeon::STROBE_WHITE,
-        RetroNeon::MAGENTA_GLOW,
-        RetroNeon::STROBE_WHITE,
-        RetroNeon::CYBER_YELLOW,
-        RetroNeon::STROBE_WHITE,
-        RetroNeon::LASER_LIME,
-        RetroNeon::STROBE_WHITE,
-    ];
+        // Frequencies for X and Y axis distortion
+        frequency: Point {
+            x: 0.0045, // freq_x
+            y: 0.0090, // freq_y
+        },
 
-    // Path bounds
-    let path_x_lower_bound = 24;
-    let path_x_upper_bound = 24;
+        // Blend modulation frequency and color
+        blend: BlendSettings {
+            frequency: 4,           // blend_freq
+            color: 0x03_03_03_ff,   // blend_color
+        },
 
-    let path_y_lower_bound = oscillator::sine(ctx.frame_count, 0.0007, 48, 60) as u32;
-    let path_y_upper_bound = path_y_lower_bound;
+        // Outer brush styling
+        outer_brush: BrushSettings {
+            // dimensions: Dimensions2d::square(48), // brush_side_outer
+            dimensions: Dimensions2d::new(48, 40), // brush_side_inner
+            density: 88,                          // density_outer
+            colors: vec![
+                RetroNeon::DEEP_SPACE_BLUE,
+                RetroNeon::ELECTRIC_BLUE,
+                RetroNeon::DIGITAL_GOLD,
+            ],
+        },
 
-    // let path_y_lower_bound = 60;
-    // let path_y_upper_bound = 60;
+        // Inner brush styling
+        inner_brush: BrushSettings {
+            // dimensions: Dimensions2d::square(14), // brush_side_inner
+            dimensions: Dimensions2d::new(42, 12), // brush_side_inner
+            density: 150, // density_inner
+            colors: vec![
+                RetroNeon::STROBE_WHITE,
+                RetroNeon::LASER_LIME,
+                RetroNeon::PULSING_PURPLE,
+                RetroNeon::STROBE_WHITE,
+            ],
+        },
 
-    // Grid cell rendering properties
-    let cell_outer_delta = 4; // can be both positive and negative
-    let cell_inner_delta = 8; // can be both positive and negative
+        // Bounds for the animated spray path (X and Y)
+        path_bounds: PathBounds {
+            x: Bound {
+                lower: 42, // path_x_lower_bound
+                upper: 42 // path_x_upper_bound
+            },
+            y: {
+                
+                let y = oscillator::sine(ctx.frame_count, 0.0014, 48, 60) as u32;
+                
+                Bound {
+                    lower: y, // path_y_lower_bound
+                    upper: y, // path_y_upper_bound
+                }
+            },
+        },
+
+        // Grid cell delta sizes for outer and inner squares
+        cell_deltas: Shell {
+            outer: 4, // cell_outer_delta
+            inner: 8, // cell_inner_delta
+        },
+    };
+
+
+
+
+
+    //**********************************************************************************************
+
 
     //
     //
@@ -181,18 +211,20 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // initial context setup
     if ctx.frame_count == 0 {
         ctx.win.foreground_color = RetroNeon::STROBE_WHITE;
-        ctx.win.background_color = background_color;
+        ctx.win.background_color = cfg.background_color;
         ctx.alpha.enabled = false;
         ctx.alpha.set_method_float();
         clear_screen(ctx);
     }
 
-    if ctx.frame_count % 8 == 0 {
+    // if ctx.frame_count % 8 == 0 {
+    // if ctx.frame_count % 16 == 0 {
+    if 0 == 0 {
         // #############################################################################################
         // THE GRID
 
-        let num_cols = 12;
-        let num_rows = 6;
+        let num_cols = 10;
+        let num_rows = 5;
 
         let cell_width = ctx.win.w_i32 / num_cols;
         let cell_height = ctx.win.h_i32 / num_rows;
@@ -204,37 +236,33 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             RectArea::new(0, 0, cell_width, cell_height, None),
             num_rows as usize,
             num_cols as usize,
-            Some(vec![grid_outer_color]),
+            Some(vec![ cfg.grid_colors.outer ]),
         );
+
 
         grid.iter().enumerate().for_each(|(i, cell)| {
             let mut react_area = cell.rect_area();
 
+
+
             react_area.top_left =
-                react_area.top_left + Point::new(cell_outer_delta, cell_outer_delta);
-            react_area.dimensions.w -= cell_outer_delta * 2;
-            react_area.dimensions.h -= cell_outer_delta * 2;
+                react_area.top_left + Point::new(cfg.cell_deltas.outer, cfg.cell_deltas.outer);
+            react_area.dimensions.w -= cfg.cell_deltas.outer * 2;
+            react_area.dimensions.h -= cfg.cell_deltas.outer * 2;
 
             rectangle::outline(ctx, &react_area);
 
             react_area.top_left =
-                react_area.top_left + Point::new(cell_inner_delta, cell_inner_delta);
-            react_area.dimensions.w -= cell_inner_delta * 2;
-            react_area.dimensions.h -= cell_inner_delta * 2;
-            react_area.color = Some(grid_inner_color);
+                react_area.top_left + Point::new(cfg.cell_deltas.inner, cfg.cell_deltas.inner);
+            react_area.dimensions.w -= cfg.cell_deltas.inner * 2;
+            react_area.dimensions.h -= cfg.cell_deltas.inner * 2;
+            react_area.color = Some(cfg.grid_colors.inner);
 
             rectangle::outline(ctx, &react_area);
         });
         // #############################################################################################
     }
-
-    // TODO: Parameterize the scanline effect, both cases!
-    if ctx.frame_count % 8 == 0 {
-        scanline::window(ctx, 1, 26);
-    } else if ctx.frame_count % 26 == 0 {
-        scanline::window(ctx, 3, 8);
-    }
-
+ 
     // clear_screen(ctx);
 
     //// really cool!
@@ -268,6 +296,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // let freq_x = 0.005 * (ctx.frame_count % 32 ) as f64;
     // let freq_y = 0.010 * (ctx.frame_count % 32 ) as f64;
 
+    // Psychedelic stuff! 🥳
+    // let freq_x: f64 = 0.0041;
+    // let freq_y: f64 = 0.0094;
+
     // Quantum craziness 2! 🤪
     // let freq_x = 0.005 / (ctx.frame_count % 32 ) as f64;
     // let freq_y = 0.010 / (ctx.frame_count % 32 ) as f64;
@@ -275,52 +307,64 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // let freq_x =  oscillator::linear(ctx.frame_count, 0.0001, 2, 22);
     let x = oscillator::sine(
         ctx.frame_count,
-        freq_x,
-        path_x_lower_bound,
-        ctx.win.w - path_x_upper_bound,
+        cfg.frequency.x,
+        cfg.path_bounds.x.lower,
+        ctx.win.w - cfg.path_bounds.x.lower,
     );
 
     let y = oscillator::sine(
         ctx.frame_count,
-        freq_y,
-        path_y_lower_bound,
-        ctx.win.h - path_y_upper_bound,
+        cfg.frequency.y,
+        cfg.path_bounds.y.lower,
+        ctx.win.h - cfg.path_bounds.y.upper,
     );
 
     let brush_head: Point<u32> = Point::new(x as u32, y as u32);
 
-    // let colors = [RetroNeon::NEON_MINT, RetroNeon::STROBE_WHITE];
-    // let colors_outer = [RetroNeon::STROBE_WHITE,RetroNeon::DEEP_TEAL,RetroNeon::VIBRANT_CYAN,RetroNeon::NEON_MINT ];
-    // let colors = [ RetroNeon::FUCHSIA_BLAZE, RetroNeon::MATRIX_GREEN];
-
     //==============================================================================================
     // OUTER BRUSH
-    ctx.brush = Brush::new_rectangle(brush_side_outer, brush_side_outer);
+    ctx.brush = Brush::new_rectangle(cfg.outer_brush.dimensions.w, cfg.outer_brush.dimensions.h);
     spray::simple(
         ctx,
         brush_head.x,
         brush_head.y,
-        density_outer,
-        Vec::from(colors_outer),
+        cfg.outer_brush.density,
+        &cfg.outer_brush.colors,
     );
 
     //==============================================================================================
     // INNER BRUSH
-    ctx.brush = Brush::new_rectangle(brush_side_inner, brush_side_inner);
+    ctx.brush = Brush::new_rectangle(cfg.inner_brush.dimensions.w, cfg.inner_brush.dimensions.h);
     spray::simple(
         ctx,
         brush_head.x,
         brush_head.y,
-        density_inner,
-        Vec::from(colors_inner),
+        cfg.inner_brush.density,
+        &cfg.inner_brush.colors,
     );
 
     //----------------------------------------------------------------------------------------------
+
+    // Use  the primary frame buffer again
+    ctx.set_frame_buf_to(FrameBuffer::Primary);
+    // Copy the draft buffer to the primary frame buffer
+    ctx.copy_frame_buf(FrameBuffer::Draft, FrameBuffer::Primary);
     // The usual scanline effect. Classic stuff! 😌
-    // scanline::window(ctx, 1, 5);
+    scanline::window(ctx, 1, 58);
 
     //
     //----------------------------------------------------------------------------------------------
 
-    //
+    // Gradually fade out the content of the draft buffer
+    if ctx.frame_count % cfg.blend.frequency == 0 {
+        // apply some alpha to the draft buffer
+        for i in 0..ctx.draft_buf.len() {
+            ctx.draft_buf[i] = rgba_operation(
+                ctx.draft_buf[i],
+                cfg.blend.color,
+                ColorOperation::Subtract,
+                false,
+            );
+        }
+    }
 }
