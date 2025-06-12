@@ -1,6 +1,5 @@
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::{FrameBuffer, GraphContext};
-use std::ptr;
 
 use graph1::utils::clear_screen;
 use graph1::utils::color::palettes::RetroNeon;
@@ -31,6 +30,11 @@ pub struct BrushUserData {
 
 pub fn get_brush_user_data() -> BrushUserData {
     let greens = gradient::linear(RetroNeon::MATRIX_GREEN, 0x00_00_00_ff, 255);
+
+    let reds_whites = gradient::linear(RetroNeon::GLITCH_RED, RetroNeon::STROBE_WHITE, 255);
+    let reds_blacks = gradient::linear(RetroNeon::GLITCH_RED, 0x00_00_00_ff, 255);
+    let orange_reds = gradient::linear(RetroNeon::GLITCH_RED, RetroNeon::NEON_ORANGE, 255);
+    let orange_whites = gradient::linear(RetroNeon::NEON_ORANGE, RetroNeon::STROBE_WHITE, 255);
 
     BrushUserData {
         scene_configs: vec![
@@ -193,11 +197,93 @@ pub fn get_brush_user_data() -> BrushUserData {
                                   // color: 0x00_04_06_ff,   //TODO: this blend_color is AWESOME! DEFINITELY USE IT!
                 },
             },
+            //
+            // ###[ HOT METAL ]######################################################################
+            //
+            SprayDemoSceneConfig {
+                grid_num_cols: 16,
+                grid_num_rows: 8,
+
+                // Background color of the entire scene
+                background_color: reds_blacks[244],
+
+                // Outer and inner grid line colors
+                grid_colors: Shell {
+                    outer: RetroNeon::VAPORWAVE_GRAY,
+                    // inner: gradient::linear_step(RetroNeon::GLITCH_RED, RetroNeon::FUTURE_BRONZE, 32, 24),
+                    inner: RetroNeon::FUTURE_BRONZE,
+                },
+
+                // Grid cell delta sizes for outer and inner squares
+                cell_deltas: Shell {
+                    outer: 10,
+                    inner: 2,
+                },
+
+                frequency: Point {
+                    x: 0.006094,
+                    y: 0.018,
+                },
+
+                // Outer brush styling
+                outer_brush: BrushSettings {
+                    dimensions: Dimensions2d::square(28),
+                    density: 64,
+                    colors: vec![
+                        RetroNeon::STROBE_WHITE,
+                        orange_reds[100],
+                        reds_whites[200],
+                        orange_whites[200],
+                    ],
+                },
+
+                // Inner brush styling
+                inner_brush: BrushSettings {
+                    dimensions: Dimensions2d::new(16, 24),
+                    density: 222,
+                    colors: vec![
+                        RetroNeon::STROBE_WHITE,
+                        RetroNeon::ELECTRIC_BLUE,
+                        reds_whites[200],
+                        RetroNeon::STROBE_WHITE,
+                        // reds_whites[120],
+                        RetroNeon::STROBE_WHITE,
+                        RetroNeon::CHROME_CYAN,
+                        // RetroNeon::GLITCH_RED,
+                        RetroNeon::PSYCHEDELIC_BLUE,
+                        RetroNeon::STROBE_WHITE,
+                        orange_whites[180],
+                        RetroNeon::STROBE_WHITE,
+                        // orange_whites[20],
+                        RetroNeon::STROBE_WHITE,
+                        RetroNeon::CHROME_CYAN,
+                        // orange_whites[30],
+                        RetroNeon::STROBE_WHITE,
+                        RetroNeon::ELECTRIC_BLUE,
+                    ],
+                },
+
+                // Bounds for the animated spray path (X and Y)
+                path_bounds: PathBounds {
+                    x: Bound {
+                        lower: 42,
+                        upper: 42,
+                    },
+                    y: {
+                        Bound {
+                            lower: 42,
+                            upper: 42,
+                        }
+                    },
+                },
+
+                // Blend modulation frequency and color
+                blend: BlendSettings {
+                    frequency: 8,
+                    color: 0x01_04_06_ff,
+                },
+            },
         ],
-        // brush_context: GraphContext::new(
-        //     WindowContext::new(WIN_WIDTH, WIN_HEIGHT, Some(0x00_00_00_ff), Some(0x00_00_00_ff)),
-        //     true, false, None, 1, None
-        // ),
     }
 }
 
@@ -207,27 +293,34 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     //----------------------------------------------------------------------------------------------
     ctx.set_frame_buf_to(FrameBuffer::Draft);
 
-    /*  // This is a temporary hack to switch between two scenes
-        let mut cfg = ctx.user_data.brush_demo.scene_configs[0].clone();
+    // Select the scene configuration based on the frame count
+    //----------------------------------------------------------------------------------------------
+    let mut cfg: SprayDemoSceneConfig = ctx.user_data.brush_demo.scene_configs[0].clone();
 
-        if ctx.frame_count == 1600 {
-            cfg = ctx.user_data.brush_demo.scene_configs[1].clone();
-            ctx.win.background_color = cfg.background_color;
-            clear_screen(ctx);
-        }
+    let scene_selector = ctx.frame_count % 7500;
 
-        if ctx.frame_count > 1600 {
-            cfg = ctx.user_data.brush_demo.scene_configs[1].clone();
-        }
-    */
-    let cfg = ctx.user_data.brush_demo.scene_configs[1].clone();
+    if scene_selector == 2500 {
+        cfg = ctx.user_data.brush_demo.scene_configs[1].clone();
+        ctx.win.background_color = cfg.background_color;
+    }
 
-    // cfg.path_bounds.y.lower = oscillator::sine(ctx.frame_count, 0.01, 44, 64) as u32;
-    // cfg.path_bounds.y.upper = cfg.path_bounds.y.lower;
+    if scene_selector > 2500 && scene_selector < 5000 {
+        cfg = ctx.user_data.brush_demo.scene_configs[1].clone();
+    }
+
+    if scene_selector == 5000 {
+        cfg = ctx.user_data.brush_demo.scene_configs[2].clone();
+        ctx.win.background_color = cfg.background_color;
+    }
+
+    if scene_selector > 5000 {
+        cfg = ctx.user_data.brush_demo.scene_configs[2].clone();
+    }
+
+    // let cfg = ctx.user_data.brush_demo.scene_configs[2].clone();
 
     //**********************************************************************************************
 
-    //
     //
     //
     // initial context setup
@@ -239,96 +332,50 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         clear_screen(ctx);
     }
 
-    // if ctx.frame_count % 8 == 0 {
-    // if ctx.frame_count % 16 == 0 {
-    if 0 == 0 {
-        // #############################################################################################
-        // THE GRID
+    // #############################################################################################
+    // THE GRID
 
-        let num_cols = cfg.grid_num_cols;
-        let num_rows = cfg.grid_num_rows;
+    let num_cols = cfg.grid_num_cols;
+    let num_rows = cfg.grid_num_rows;
 
-        let cell_width = ctx.win.w_i32 / num_cols;
-        let cell_height = ctx.win.h_i32 / num_rows;
+    let cell_width = ctx.win.w_i32 / num_cols;
+    let cell_height = ctx.win.h_i32 / num_rows;
 
-        ctx.line.set_int_no_aa(Some(1));
-        ctx.line.clipping = LineClippingStyle::CohenSutherland;
+    ctx.line.set_int_no_aa(Some(1));
+    ctx.line.clipping = LineClippingStyle::CohenSutherland;
 
-        let grid: UniformGrid<i32> = UniformGrid::new(
-            RectArea::new(0, 0, cell_width, cell_height, None),
-            num_rows as usize,
-            num_cols as usize,
-            Some(vec![cfg.grid_colors.outer]),
-        );
+    let grid: UniformGrid<i32> = UniformGrid::new(
+        RectArea::new(0, 0, cell_width, cell_height, None),
+        num_rows as usize,
+        num_cols as usize,
+        Some(vec![cfg.grid_colors.outer]),
+    );
 
-        grid.iter().enumerate().for_each(|(i, cell)| {
-            let mut react_area = cell.rect_area();
+    grid.iter().enumerate().for_each(|(i, cell)| {
+        let mut react_area = cell.rect_area();
 
-            react_area.top_left =
-                react_area.top_left + Point::new(cfg.cell_deltas.outer, cfg.cell_deltas.outer);
-            react_area.dimensions.w -= cfg.cell_deltas.outer * 2;
-            react_area.dimensions.h -= cfg.cell_deltas.outer * 2;
+        react_area.top_left =
+            react_area.top_left + Point::new(cfg.cell_deltas.outer, cfg.cell_deltas.outer);
+        react_area.dimensions.w -= cfg.cell_deltas.outer * 2;
+        react_area.dimensions.h -= cfg.cell_deltas.outer * 2;
 
-            rectangle::outline(ctx, &react_area);
+        rectangle::outline(ctx, &react_area);
 
-            react_area.top_left =
-                react_area.top_left + Point::new(cfg.cell_deltas.inner, cfg.cell_deltas.inner);
-            react_area.dimensions.w -= cfg.cell_deltas.inner * 2;
-            react_area.dimensions.h -= cfg.cell_deltas.inner * 2;
-            react_area.color = Some(cfg.grid_colors.inner);
+        react_area.top_left =
+            react_area.top_left + Point::new(cfg.cell_deltas.inner, cfg.cell_deltas.inner);
+        react_area.dimensions.w -= cfg.cell_deltas.inner * 2;
+        react_area.dimensions.h -= cfg.cell_deltas.inner * 2;
+        react_area.color = Some(cfg.grid_colors.inner);
 
-            rectangle::outline(ctx, &react_area);
-        });
-        // #############################################################################################
-    }
+        rectangle::outline(ctx, &react_area);
+    });
+    // #############################################################################################
 
-    // clear_screen(ctx);
-
-    //// really cool!
-    //     let freq_x = 0.004;
-    //     let freq_y = 0.009;
-
-    //  Infinity classic! 🥰
-    // let freq_x = 0.001;
-    // let freq_y = 0.002;
-
-    // Infinity speedy!
-    // let freq_x = 0.005;
-    // let freq_y = 0.010;
-
-    // Funny Ditch! 🥳
-    // let freq_x = 0.0025;
-    // let freq_y = 0.009;
-
-    // // Eary classic!
-    // let freq_x = 0.0025;
-    // let freq_y = 0.010;
-
-    //  Double pretzel! 🥨
-    // let freq_x = 0.0033;
-    // let freq_y = 0.0055;
-
-    // let freq_x = 0.003257 / (ctx.frame_count % 4 ) as f64;
-    // let freq_y = 0.0028291 / (ctx.frame_count % 4 ) as f64;
-
-    // Quantum craziness! 🤪
-    // let freq_x = 0.005 * (ctx.frame_count % 32 ) as f64;
-    // let freq_y = 0.010 * (ctx.frame_count % 32 ) as f64;
-
-    // Psychedelic stuff! 🥳
-    // let freq_x: f64 = 0.0041;
-    // let freq_y: f64 = 0.0094;
-
-    // Quantum craziness 2! 🤪
-    // let freq_x = 0.005 / (ctx.frame_count % 32 ) as f64;
-    // let freq_y = 0.010 / (ctx.frame_count % 32 ) as f64;
-
-    // let freq_x =  oscillator::linear(ctx.frame_count, 0.0001, 2, 22);
     let x = oscillator::sine(
         ctx.frame_count,
         cfg.frequency.x,
         cfg.path_bounds.x.lower,
-        ctx.win.w - cfg.path_bounds.x.lower,
+        ctx.win.w - cfg.path_bounds.x.upper,
     );
 
     let y = oscillator::sine(
