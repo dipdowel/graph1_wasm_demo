@@ -43,7 +43,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
 
 
-    let cfg = SprayDemoSceneConfig {
+    let mut cfg = SprayDemoSceneConfig {
         // Background color of the entire scene
         background_color: RetroNeon::DEEP_SPACE_BLUE,
 
@@ -62,7 +62,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         // Blend modulation frequency and color
         blend: BlendSettings {
             frequency: 4,           // blend_freq
-            color: 0x03_03_03_ff,   // blend_color
+            color: 0x04_04_03_ff,   // blend_color
             // color: 0x00_04_06_ff,   //TODO: this blend_color is AWESOME! DEFINITELY USE IT!
         },
 
@@ -86,14 +86,12 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             density: 260, // density_inner
             colors: vec![
                 RetroNeon::STROBE_WHITE,
-                // RetroNeon::LASER_LIME,
                 RetroNeon::STROBE_WHITE,
-                // RetroNeon::DIGITAL_GOLD,
                 RetroNeon::STROBE_WHITE,
                 RetroNeon::CYBER_YELLOW,
                 RetroNeon::STROBE_WHITE,
-                // RetroNeon::FUTURE_BRONZE,
-                // RetroNeon::STROBE_WHITE,
+                RetroNeon::NEON_ORANGE,
+
             ],
         },
 
@@ -104,13 +102,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
                 upper: 38 // path_x_upper_bound
             },
             y: {
-
-                let y = oscillator::sine(ctx.frame_count, 0.001, 48, 62) as u32;
-                // let y = 52;
-
                 Bound {
-                    lower: y, // path_y_lower_bound
-                    upper: y, // path_y_upper_bound
+                    lower: 44, // path_y_lower_bound
+                    upper: 44, // path_y_upper_bound
                 }
             },
         },
@@ -118,11 +112,12 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         // Grid cell delta sizes for outer and inner squares
         cell_deltas: Shell {
             outer: 4, // cell_outer_delta
-            inner: 8, // cell_inner_delta
+            inner: 14, // cell_inner_delta
         },
     };
 
-
+    // cfg.path_bounds.y.lower = oscillator::sine(ctx.frame_count, 0.01, 44, 64) as u32;
+    // cfg.path_bounds.y.upper = cfg.path_bounds.y.lower;
 
 
 
