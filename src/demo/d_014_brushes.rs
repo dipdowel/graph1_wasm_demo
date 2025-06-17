@@ -12,19 +12,25 @@ use graph1::utils::math::oscillator;
 use crate::demo::elements::d_014_spray_config::{
     BlendSettings, BrushSettings, PathBounds, SprayDemoSceneConfig,
 };
+use crate::global_consts::{WIN_HEIGHT, WIN_WIDTH};
 use graph1::core::context_utils::line_clipping_style::LineClippingStyle;
 use graph1::draw::rectangle;
 use graph1::draw::tools::brush::Brush;
 use graph1::draw::tools::spray;
+use graph1::fx;
 use graph1::fx::scanline;
 use graph1::primitives::math::{Bound, Shell};
 use graph1::primitives::plane::Dimensions2d;
 use graph1::utils::color::gradient;
 use graph1::utils::color::math::{rgba_operation, ColorOperation};
 
+
 //---------------------------------------------------------------------
 // Configure the user data for typing text in Basic Concepts pt. 1
 pub struct BrushUserData {
+    /// Dimensions of the window, used to calculate the brush sizes in the scenes
+    pub win: Dimensions2d,
+    pub num_pixels: u32,
     pub scene_configs: Vec<SprayDemoSceneConfig>,
 }
 
@@ -36,7 +42,12 @@ pub fn get_brush_user_data() -> BrushUserData {
     let orange_reds = gradient::linear(RetroNeon::GLITCH_RED, RetroNeon::NEON_ORANGE, 255);
     let orange_whites = gradient::linear(RetroNeon::NEON_ORANGE, RetroNeon::STROBE_WHITE, 255);
 
+    let win = Dimensions2d::new(WIN_WIDTH, WIN_HEIGHT);
+    let num_pixels = win.w * win.h;
+
     BrushUserData {
+        win,
+        num_pixels,
         scene_configs: vec![
             //
             // ###[ INFINITY ]######################################################################
@@ -67,10 +78,23 @@ pub fn get_brush_user_data() -> BrushUserData {
                                   // color: 0x00_04_06_ff,   //TODO: this blend_color is AWESOME! DEFINITELY USE IT!
                 },
 
+                /*
+                pub const WIN_WIDTH: u32 = 480;
+                pub const WIN_HEIGHT: u32 = 240;
+                num_pixels: u32 = 480 * 240 = 115200
+                 */
+
                 // Outer brush styling
-                outer_brush: BrushSettings {
-                    dimensions: Dimensions2d::square(60), // brush_side_outer
-                    density: 130,                         // density_outer
+                outer_brush:{
+                    let div_w = 8;
+                    let div_h = 4;
+                    let div_d = 886;
+                    BrushSettings {
+                        div_w,
+                        div_h,
+                        div_d,
+                    dimensions: Dimensions2d::new(win.w / div_w, win.h / div_h),
+                    density: num_pixels / div_d,
                     colors: vec![
                         RetroNeon::DEEP_SPACE_BLUE,
                         RetroNeon::CYBER_BLUE,
@@ -78,12 +102,22 @@ pub fn get_brush_user_data() -> BrushUserData {
                         RetroNeon::ELECTRIC_BLUE,
                         RetroNeon::PULSING_PURPLE,
                     ],
-                },
+                }},
+
+
+
 
                 // Inner brush styling
-                inner_brush: BrushSettings {
-                    dimensions: Dimensions2d::new(42, 12), // brush_side_inner
-                    density: 260,                          // density_inner
+                inner_brush:{
+                    let div_w = 11;
+                    let div_h = 20;
+                    let div_d = 600;
+                    BrushSettings {
+                        div_w,
+                        div_h,
+                        div_d,
+                    dimensions: Dimensions2d::new(win.w / div_w, win.h / div_h),
+                    density: num_pixels / div_d,
                     colors: vec![
                         RetroNeon::STROBE_WHITE,
                         RetroNeon::STROBE_WHITE,
@@ -92,7 +126,7 @@ pub fn get_brush_user_data() -> BrushUserData {
                         RetroNeon::STROBE_WHITE,
                         RetroNeon::NEON_ORANGE,
                     ],
-                },
+                }},
 
                 // Bounds for the animated spray path (X and Y)
                 path_bounds: PathBounds {
@@ -143,9 +177,16 @@ pub fn get_brush_user_data() -> BrushUserData {
                 },
 
                 // Outer brush styling
-                outer_brush: BrushSettings {
-                    dimensions: Dimensions2d::square(52),
-                    density: 44,
+                outer_brush: {
+                    let div_w = 9;
+                    let div_h = 5;
+                    let div_d = 2618;
+                    BrushSettings {
+                    div_w,
+                    div_h,
+                    div_d,
+                    dimensions: Dimensions2d::new(win.w / div_w, win.h / div_h),
+                    density: num_pixels / div_d,
                     colors: vec![
                         greens[25],
                         greens[50],
@@ -154,12 +195,21 @@ pub fn get_brush_user_data() -> BrushUserData {
                         greens[125],
                         greens[150],
                     ],
-                },
+                }
+            },
+
 
                 // Inner brush styling
-                inner_brush: BrushSettings {
-                    dimensions: Dimensions2d::square(12),
-                    density: 128,
+                inner_brush: {
+                    let div_w = 40;
+                    let div_h = 20;
+                    let div_d = 900;
+                    BrushSettings {
+                        div_w,
+                        div_h,
+                        div_d,
+                        dimensions: Dimensions2d::new(win.w / div_w, win.h / div_h),
+                        density: num_pixels / div_d,
                     colors: vec![
                         RetroNeon::STROBE_WHITE,
                         RetroNeon::CYBER_YELLOW,
@@ -173,7 +223,9 @@ pub fn get_brush_user_data() -> BrushUserData {
                         RetroNeon::LASER_LIME,
                         RetroNeon::CYBER_YELLOW,
                         RetroNeon::STROBE_WHITE,
+                        RetroNeon::NEON_ORANGE,
                     ],
+                }
                 },
 
                 // Bounds for the animated spray path (X and Y)
@@ -225,22 +277,65 @@ pub fn get_brush_user_data() -> BrushUserData {
                     y: 0.018,
                 },
 
+
+
                 // Outer brush styling
-                outer_brush: BrushSettings {
-                    dimensions: Dimensions2d::square(28),
-                    density: 64,
+                outer_brush: {
+                    let div_w = 16;
+                    let div_h = 8;
+                    let div_d = 1800;
+                    BrushSettings {
+                        div_w,
+                        div_h,
+                        div_d,
+                        dimensions: Dimensions2d::new(win.w / div_w, win.h / div_h),
+                        density: num_pixels / div_d,
                     colors: vec![
                         RetroNeon::STROBE_WHITE,
                         orange_reds[100],
                         reds_whites[200],
                         orange_whites[200],
                     ],
+                }
                 },
 
+
+
+
+
+                /*
+        pub const WIN_WIDTH: u32 = 480;
+        pub const WIN_HEIGHT: u32 = 240;
+        num_pixels: u32 = 480 * 240 = 115200
+*/
+                /*
+                // Outer brush styling
+                outer_brush:{
+                    let div_w = 8;
+                    let div_h = 4;
+                    let div_d = 886;
+                    BrushSettings {
+                        div_w,
+                        div_h,
+                        div_d,
+                    dimensions: Dimensions2d::new(win.w / div_w, win.h / div_h),
+                    density: num_pixels / div_d,
+                        */
+
+
+
                 // Inner brush styling
-                inner_brush: BrushSettings {
-                    dimensions: Dimensions2d::new(16, 24),
-                    density: 222,
+                inner_brush:{
+                    let div_w = 30;
+                    let div_h = 10;
+                    let div_d = 518;
+
+                    BrushSettings {
+                        div_w,
+                        div_h,
+                        div_d,
+                        dimensions: Dimensions2d::new(win.w / div_w, win.h / div_h),
+                        density: num_pixels / div_d,
                     colors: vec![
                         RetroNeon::STROBE_WHITE,
                         RetroNeon::ELECTRIC_BLUE,
@@ -261,7 +356,9 @@ pub fn get_brush_user_data() -> BrushUserData {
                         RetroNeon::STROBE_WHITE,
                         RetroNeon::ELECTRIC_BLUE,
                     ],
+                }
                 },
+
 
                 // Bounds for the animated spray path (X and Y)
                 path_bounds: PathBounds {
@@ -288,6 +385,7 @@ pub fn get_brush_user_data() -> BrushUserData {
 }
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
+
     //
     // Perform all the graphical operations on the draft buffer!
     //----------------------------------------------------------------------------------------------
@@ -318,6 +416,38 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     }
 
     // let cfg = ctx.user_data.brush_demo.scene_configs[2].clone();
+
+    // Check if the window dimensions have changed and update the user data and brush sizes accordingly
+    // if ctx.user_data.brush_demo.win.w != ctx.win.w || ctx.user_data.brush_demo.win.h != ctx.win.h {
+        // Update the window dimensions in the user data
+
+        ctx.user_data.brush_demo.win = ctx.win.dimensions.clone();
+
+        let num_pixels = ctx.win.w * ctx.win.h;
+        // Update the number of pixels in the user data
+        ctx.user_data.brush_demo.num_pixels = num_pixels;
+
+
+        let mut ratio_factor = 1;
+
+        let min = u32::min(ctx.win.w, ctx.win.h);
+        let max = u32::max(ctx.win.w, ctx.win.h);
+        if min != 0  {
+            ratio_factor = max / min;
+        }
+
+
+        // Update the brush sizes based on the new window dimensions
+        cfg.outer_brush.dimensions.w = ctx.win.w / cfg.outer_brush.div_w;
+        cfg.outer_brush.dimensions.h = ctx.win.h / cfg.outer_brush.div_h * ratio_factor;
+        cfg.outer_brush.density = num_pixels / cfg.outer_brush.div_d;
+
+        cfg.inner_brush.dimensions.w = ctx.win.w / cfg.inner_brush.div_w;
+        cfg.inner_brush.dimensions.h = ctx.win.h / cfg.inner_brush.div_h * ratio_factor;
+        cfg.inner_brush.density = num_pixels / cfg.inner_brush.div_d;
+
+    // }
+
 
     //**********************************************************************************************
 
@@ -400,7 +530,14 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     //==============================================================================================
     // INNER BRUSH
-    ctx.brush = Brush::new_rectangle(cfg.inner_brush.dimensions.w, cfg.inner_brush.dimensions.h);
+
+    if ctx.win.w == WIN_WIDTH && ctx.win.h == WIN_HEIGHT {
+        ctx.brush = Brush::new_rectangle(cfg.inner_brush.dimensions.w, cfg.inner_brush.dimensions.h);
+    } else {
+        ctx.brush = Brush::new_circle(cfg.inner_brush.dimensions.h as f64*0.64);
+    }
+
+
     spray::simple(
         ctx,
         brush_head.x,
@@ -423,14 +560,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // Gradually fade out the content of the draft buffer
     if ctx.frame_count % cfg.blend.frequency == 0 {
-        // apply some alpha to the draft buffer
-        for i in 0..ctx.draft_buf.len() {
-            ctx.draft_buf[i] = rgba_operation(
-                ctx.draft_buf[i],
-                cfg.blend.color,
-                ColorOperation::Subtract,
-                false,
-            );
-        }
+        ctx.set_frame_buf_to(FrameBuffer::Draft);
+        fx::fade(ctx, cfg.blend.color, ColorOperation::Subtract, false);
+        ctx.set_frame_buf_to(FrameBuffer::Primary);
     }
 }

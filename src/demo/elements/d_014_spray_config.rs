@@ -39,6 +39,9 @@ pub struct BrushSettings {
     pub dimensions: Dimensions2d<u32>, 
     pub density: u32,
     pub colors: Vec<u32>,
+    pub div_w: u32,
+    pub div_h: u32,
+    pub div_d: u32,
 }
 
 /// Bounds for rendering or animation path.
