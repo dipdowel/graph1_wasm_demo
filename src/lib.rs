@@ -3,7 +3,12 @@ mod utils;
 
 use crate::demo::user_data::DemoUserData;
 
-use crate::demo::{d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_003_basic_concepts_pt3, d_004_bouncy, d_005_alpha, d_006_luminance_vs_intensity, d_007_shapes_and_quadrants, d_008_polygons, d_009_lines, d_010_quadrants, d_011_curves, d_012_grid, d_013_grid_neighbors, d_014_brushes};
+use crate::demo::{
+    d_000_intro, d_001_basic_concepts_pt1, d_002_basic_concepts_pt2, d_003_basic_concepts_pt3,
+    d_004_bouncy, d_005_alpha, d_006_luminance_vs_intensity, d_007_shapes_and_quadrants,
+    d_008_polygons, d_009_lines, d_010_quadrants, d_011_curves, d_012_grid, d_013_grid_neighbors,
+    d_014_brushes, d_015_transformations
+};
 use crate::utils::console_log;
 use graph1::core::context::{GraphContext, WindowContext};
 use graph1::utils::color;
@@ -37,17 +42,16 @@ pub mod demo {
     pub mod d_012_grid;
     pub mod d_013_grid_neighbors;
     pub mod d_014_brushes;
-
+    pub mod d_015_transformations;
 
     /// User data, used to store arbitrary data that needs to be persisted between frames
     pub mod user_data;
 
     pub mod elements {
-        pub mod d_014_spray_config;
         pub mod cube;
+        pub mod d_014_spray_config;
         pub mod snake;
     }
-
 
     //     /// A minimal example of displaying and animating a square on the screen
     //     pub mod bouncy;
@@ -65,14 +69,12 @@ pub mod demo {
     // }
     //
     // pub mod screen_saver;
-
-
 }
 
 pub(crate) mod global_consts;
 
-use wasm_bindgen::prelude::*;
 use crate::global_consts::{BUF_LEN, BUF_SIZE_BYTES, WIN_HEIGHT, WIN_WIDTH};
+use wasm_bindgen::prelude::*;
 
 /// JavaScript and HTML Canvas use ABGR model, hence
 /// the result produced by Graph1 needs to be converted from RGBA to ABGR.
@@ -192,6 +194,7 @@ pub fn update_frame(frame: usize) -> PixelStats {
                 12 => d_012_grid::render_frame(&mut ctx),
                 13 => d_013_grid_neighbors::render_frame(&mut ctx),
                 14 => d_014_brushes::render_frame(&mut ctx),
+                15 => d_015_transformations::render_frame(&mut ctx),
 
                 // 5 => circles::render_frame(&mut ctx),
                 _ => d_011_curves::render_frame(&mut ctx),
