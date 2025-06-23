@@ -136,12 +136,12 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if !show_control_points {
         // Color filling of the polygon and the curved body
         let mut pix = Pixel::from(ctx.win.center.to_pixel(RetroNeon::CYBER_YELLOW));
-        fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pix);
+        fill::paint_bucket( ctx,  &pix);
         ctx.line.width_int = 3;
         polygon(ctx, &polygon_props);
         ctx.line.width_int = 1;
-        pix.color = RetroNeon::VIBRANT_CYAN;
-        fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pix);
+        pix.color = RetroNeon::VIBRANT_CYAN;        
+        fill::paint_bucket( ctx,  &pix);
     }
     ctx.win.foreground_color = RetroNeon::STROBE_WHITE;
 

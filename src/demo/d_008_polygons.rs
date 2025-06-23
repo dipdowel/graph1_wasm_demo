@@ -137,7 +137,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     for i in -12..12 {
         let mut pixel = ctx.win.center.to_pixel(gradient[NUM_GRADIENT_STEPS / 4]);
         pixel.x = (pixel.x as i32 + i * 8) as u32;
-        fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
+        fill::paint_bucket(ctx,  &pixel);
     }
 
     // Initial state of the star properties

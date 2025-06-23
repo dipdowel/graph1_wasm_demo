@@ -65,11 +65,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let start = Instant::now(); // Start timer
 
 
-    fill::scanline_wavefront(
-        &mut ctx.frame_buf,
-        &ctx.win.dimensions,
-        &starting_pixel
-    );
+    fill::paint_bucket(ctx,&starting_pixel);
 
 
     // fill::flood(

@@ -136,7 +136,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // Fill the stone with colors
     for fill_pixel in fill_pixels {
-        fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &fill_pixel);
+        fill::paint_bucket(ctx, &fill_pixel);
     }
 
     scanline::window(ctx, 1, 58);

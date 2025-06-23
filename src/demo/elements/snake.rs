@@ -72,7 +72,7 @@ impl Snake {
             gradient::linear_step(0x00_00_00_ff, ctx.win.background_color, 200, 182);
 
         // clear screen
-        draw::tools::fill::buffer(&mut ctx.frame_buf, tile_container_bg_color, 1);
+        draw::tools::fill::frame_buffer(&mut ctx, Some(tile_container_bg_color));
 
         // FIXME: uncomment?
         // clear_screen(&mut ctx);

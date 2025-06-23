@@ -111,16 +111,18 @@ fn render_cell(ctx: &mut GraphContext<DemoUserData>, cell: &Region<i32>, light: 
     rectangle::outline(ctx, &rect_area);
 
     let mut pixel = (cell.top_left() + Point::new(4, 2)).to_pixel(tile_colors[0]);
-    fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
+    
+    fill::paint_bucket( ctx,  &pixel);
 
     pixel = (cell.top_right() + Point::new(-2, 4)).to_pixel(tile_colors[1]);
-    fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
-
+    
+    fill::paint_bucket( ctx,  &pixel);
+    
     pixel = (cell.bottom_right() + Point::new(-4, -2)).to_pixel(tile_colors[2]);
-    fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
-
-    pixel = (cell.bottom_left() + Point::new(2, -4)).to_pixel(tile_colors[3]);
-    fill::flood(&mut ctx.frame_buf, &ctx.win.dimensions, &pixel);
+    
+    fill::paint_bucket( ctx,  &pixel);
+    pixel = (cell.bottom_left() + Point::new(2, -4)).to_pixel(tile_colors[3]);    
+    fill::paint_bucket( ctx,  &pixel);
 }
 
 pub fn get_grid_user_data() -> GridUserData {
