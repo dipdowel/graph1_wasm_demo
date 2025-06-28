@@ -161,7 +161,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         oscillator::sine(ctx.frame_count, 0.0085, 4, height_bound) as u32,
         oscillator::sine(ctx.frame_count, 0.0090, 4, height_bound) as u32,
     ];
-
+   
+    let mut bar_props_vec: Vec<Bar3DProps> = Vec::new();
+    
     //
     //----------------------------------------------------------------------------------------------
     // Iterate over the grid cells and draw a 3D bar per each cell
@@ -169,16 +171,28 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         // if i != 9 {     return; }
         // Let's use the bottom-left corner of each cell as the base point for the current 3D bar
         let cell_point = (*cell).bottom_left();
-        props_bar_3d.x = cell_point.x;
-        props_bar_3d.y = cell_point.y;
+        
+        let mut bar_props = props_bar_3d.clone();
+
+
+        bar_props.x = cell_point.x;
+        bar_props.y = cell_point.y;
         // props_bar_3d.y = cell_point.y - 20;
         // Let's pick up the height from the oscillated values, using the index to rotate through them
-        props_bar_3d.height = osc[i % osc.len()] as i32;
-        axonometric::bar_3d(ctx, &props_bar_3d);
+        bar_props.height = osc[i % osc.len()] as i32;
+
+        bar_props_vec.push(bar_props);
+        
+        
         // An extra offset to make each row look 1 step different from the previous one
         osc.rotate_left(1);
     });
+    
+    
+    
+    axonometric::bars_3d(ctx, &bar_props_vec);
 
+    
     //
     //----------------------------------------------------------------------------------------------
     // Text rendering preparation
