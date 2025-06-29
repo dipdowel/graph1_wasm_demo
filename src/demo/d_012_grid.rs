@@ -35,7 +35,7 @@ pub struct GridUserData {
 
 pub fn get_grid_user_data() -> GridUserData {
     GridUserData {
-        background_color: Some(set_alpha(OceanBreeze::AQUAMARINE, 80)),
+        background_color: Some(set_alpha(OceanBreeze::AQUAMARINE, 90)),
         text_color_props: printer::ColorProperties {
             // color: Some(OceanBreeze::FOAM_WHITE),
             color: Some(OceanBreeze::SEAFOAM),
@@ -197,16 +197,18 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     //----------------------------------------------------------------------------------------------
     // Text rendering preparation
 
-    let text_offset = Point { x: 68, y: 42 };
-    let text_bg_offset = Point { x: 4, y: 4 };
+     let text_bg_offset = Point { x: 4, y: 4 };
 
     let text_color_prop = ctx.user_data.grid.text_color_props;
     let text_font = ctx.user_data.grid.text_font.clone().unwrap();
 
-    let text_dst = ctx.win.quadrants.bottom_left.center() + text_offset;
-    let text_bg_dst = text_dst - text_bg_offset;
+    let text_x = ctx.win.center.x - 52;
+    let text_y = ctx.win.quadrants.bottom_left.bottom().y - 18;
 
-    rectangle::filled(
+     let text_dst = Point::new(text_x , text_y );
+
+    let text_bg_dst = text_dst - text_bg_offset;
+     rectangle::filled(
         ctx,
         &RectArea::new(
             0,
@@ -216,8 +218,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             ctx.user_data.grid.background_color,
         ),
     );
-
-    //----------------------------------------------------------------------------------------------
+     //----------------------------------------------------------------------------------------------
     // The usual scanline effect. Classic stuff! 😌
     scanline::window(ctx, 1, 66);
 
