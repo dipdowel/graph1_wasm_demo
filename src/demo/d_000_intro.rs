@@ -30,6 +30,7 @@ const NOISE_PROPS: WhiteNoiseProps = WhiteNoiseProps {
     max_alpha: 0xff,
     operation: Some(ColorOperation::Add),
     step: Some(4),
+    noise_size: None,
 };
 
 pub fn get_intro_user_data<'a>() -> IntroUserData<'a> {
@@ -55,7 +56,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     ctx.user_data
         .intro
         .noise
-        .generate_32(&mut ctx.frame_buf, None, None);
+        .generate_32(&mut ctx.frame_buf, None, None, &mut ctx.gpu_context);
 
     let cube_size = 60.0;
 
