@@ -94,6 +94,16 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         text = ctx.user_data.grid.text[2].clone();
     }
 
+
+    // DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+    // let mut num_cols: i32 = 8;
+    // let mut num_rows: i32 = 2;
+    //
+    // if ctx.frame_count % 1800 == 600 {
+    //     ctx.frame_count = 1;
+    // }
+    // DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+
     let mut cell_width = ctx.win.w_i32 / num_cols;
     let mut cell_height = ctx.win.h_i32 / num_rows;
 
@@ -174,7 +184,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         
         let mut bar_props = props_bar_3d.clone();
 
-
         bar_props.x = cell_point.x;
         bar_props.y = cell_point.y;
         // props_bar_3d.y = cell_point.y - 20;
@@ -183,13 +192,11 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
         bar_props_vec.push(bar_props);
         
-        
         // An extra offset to make each row look 1 step different from the previous one
         osc.rotate_left(1);
     });
-    
-    
-    
+
+     
     axonometric::bars_3d(ctx, &bar_props_vec);
 
     
@@ -202,12 +209,12 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let text_color_prop = ctx.user_data.grid.text_color_props;
     let text_font = ctx.user_data.grid.text_font.clone().unwrap();
 
-    let text_x = ctx.win.center.x - 52;
-    let text_y = ctx.win.quadrants.bottom_left.bottom().y - 18;
+    let text_x = ctx.win.center.x.saturating_sub(52);
+    let text_y = ctx.win.quadrants.bottom_left.bottom().y.saturating_sub(18);
 
      let text_dst = Point::new(text_x , text_y );
 
-    let text_bg_dst = text_dst - text_bg_offset;
+    let text_bg_dst = text_dst.saturating_sub(text_bg_offset);
      rectangle::filled(
         ctx,
         &RectArea::new(

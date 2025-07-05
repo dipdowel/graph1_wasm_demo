@@ -124,7 +124,7 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
 
             // Create a context with the basic configuration
             let ctx: GraphContext<DemoUserData> =
-                GraphContext::new(win_ctx, true, true, None, 1, None);
+                GraphContext::new(win_ctx, true, 1, None, 1, None);
 
             // Place the context into the global container
             // so that it persists between frames

@@ -65,7 +65,7 @@ impl Snake {
             body.push((start_x, start_y + i));
         }
 
-        let mut ctx: GraphContext = GraphContext::new(window_context, true, true, None, 1, None);
+        let mut ctx: GraphContext = GraphContext::new(window_context, true, 0, None, 1, None);
         let rng = XorShiftRng::new(seed, seed as u64);
 
         let tile_container_bg_color =

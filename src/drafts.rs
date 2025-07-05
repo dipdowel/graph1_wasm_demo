@@ -42,7 +42,7 @@ fn main() {
     let mut ctx: GraphContext<UserData> =
         GraphContext::new(WindowContext::default(),
                           false,
-                          false,
+                          0,
                           bouncy_user_data,
                           1,
                           None

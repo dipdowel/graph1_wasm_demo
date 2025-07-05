@@ -1,5 +1,5 @@
 use crate::demo::user_data::DemoUserData;
-use graph1::core::context::{FrameBuffer, GraphContext};
+use graph1::core::context::{GraphContext};
 
 use graph1::utils::clear_screen;
 use graph1::utils::color::palettes::RetroNeon;
@@ -386,11 +386,6 @@ pub fn get_brush_user_data() -> BrushUserData {
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
-    //
-    // Perform all the graphical operations on the draft buffer!
-    //----------------------------------------------------------------------------------------------
-    ctx.set_frame_buf_to(FrameBuffer::Draft);
-
     // Select the scene configuration based on the frame count
     //----------------------------------------------------------------------------------------------
     let mut cfg: SprayDemoSceneConfig = ctx.user_data.brush_demo.scene_configs[0].clone();
@@ -546,22 +541,12 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         &cfg.inner_brush.colors,
     );
 
-    //----------------------------------------------------------------------------------------------
-
-    // Use  the primary frame buffer again
-    ctx.set_frame_buf_to(FrameBuffer::Primary);
-    // Copy the draft buffer to the primary frame buffer
-    ctx.copy_frame_buf(FrameBuffer::Draft, FrameBuffer::Primary);
-    // The usual scanline effect. Classic stuff! 😌
-    scanline::window(ctx, 1, 54);
 
     //
     //----------------------------------------------------------------------------------------------
 
     // Gradually fade out the content of the draft buffer
     if ctx.frame_count % cfg.blend.frequency == 0 {
-        ctx.set_frame_buf_to(FrameBuffer::Draft);
         fx::fade(ctx, cfg.blend.color, ColorOperation::Subtract, false);
-        ctx.set_frame_buf_to(FrameBuffer::Primary);
     }
 }

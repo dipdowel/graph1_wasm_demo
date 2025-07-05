@@ -1,5 +1,5 @@
 use crate::demo::user_data::DemoUserData;
-use graph1::core::context::{FrameBuffer, GraphContext};
+use graph1::core::context::{ GraphContext};
 
 use graph1::utils::clear_screen;
 use graph1::utils::color::palettes::RetroNeon;
@@ -20,7 +20,7 @@ use graph1::draw::rectangle;
 use graph1::draw::tools::brush::Brush;
 use graph1::draw::tools::{fill, spray};
 use graph1::{draw, fx};
-use graph1::buffer_op::{horizontal_lines_x3, horizontal_lines_x4, horizontal_lines_x4_threaded, horizontal_lines_x3_threaded};
+// use graph1::buffer_op::{horizontal_lines_x3, horizontal_lines_x4, horizontal_lines_x4_threaded, horizontal_lines_x3_threaded};
 use graph1::fx::scanline;
 use graph1::primitives::math::{Bound, MinMax, Shell};
 use graph1::primitives::plane::Dimensions2d;
@@ -111,14 +111,14 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     }
 
  
-    
-    horizontal_lines_x3_threaded(
-        &mut ctx.frame_buf,
-        &ctx.win.dimensions,
-        &lines,
-        ctx.num_threads
-
-    );
+    //
+    // horizontal_lines_x3_threaded(
+    //     &mut ctx.frame_buf,
+    //     &ctx.win.dimensions,
+    //     &lines,
+    //     ctx.num_threads
+    //
+    // );
 
 
 
