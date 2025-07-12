@@ -517,8 +517,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     ctx.brush = Brush::new_rectangle(cfg.outer_brush.dimensions.w, cfg.outer_brush.dimensions.h);
     spray::simple(
         ctx,
-        brush_head.x,
-        brush_head.y,
+        &brush_head,
         cfg.outer_brush.density,
         &cfg.outer_brush.colors,
     );
@@ -535,8 +534,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     spray::simple(
         ctx,
-        brush_head.x,
-        brush_head.y,
+        &brush_head,
         cfg.inner_brush.density,
         &cfg.inner_brush.colors,
     );
