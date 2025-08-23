@@ -8,11 +8,23 @@ edition = "2021"
 opt-level = 's' # or 's' for size optimization with a balance between size and speed
 lto=true
 
+[package.metadata.wasm-pack.profile.dev]
+wasm-opt = false
+
+
+[package.metadata.wasm-pack.profile.release]
+# -Oz = optimize for smallest size
+wasm-opt = ["-Oz"]
+
+
+
 [dependencies]
 wasm-bindgen = "0.2.95"
 web-sys = { version = "0.3.56", features = ["console"] }
 wasm-bindgen-futures = "0.4.45"
 graph1 = { path = "../graph1" }
+
+console_error_panic_hook = "0.1.7"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

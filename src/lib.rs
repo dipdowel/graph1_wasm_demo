@@ -107,12 +107,25 @@ const DEFAULT_INIT_RESULT: InitStateResult = InitStateResult {
 /// Global context container, maintains the state between frames
 static mut CONTEXT_CONTAINER: Option<GraphContext<DemoUserData>> = None;
 
+/// Call once at startup in dev builds to get readable JS console panics.
+#[cfg(debug_assertions)]
+pub fn install_panic_hook() {
+    // wasm-bindgen feature "console_error_panic_hook"
+    console_error_panic_hook::set_once();
+}
+
+
 #[wasm_bindgen]
 /// Initialize the WASM module:
 /// 1. Create the `GraphContext` context and store it in the global container.
 /// 2. Inform the JS-world on where to look for the frame buffer, what its size is, etc.
 pub fn init_state(frame: Option<usize>) -> InitStateResult {
     let frame: usize = frame.unwrap_or(0);
+
+    #[cfg(debug_assertions)]{
+        install_panic_hook();
+    }
+
     unsafe {
         if CONTEXT_CONTAINER.is_none() {
             let win_ctx = WindowContext::new(

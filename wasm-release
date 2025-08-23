@@ -7,7 +7,7 @@ rm -rf ./pkg
 #RUSTFLAGS="--cfg=target_os=\"wasm32\"" wasm-pack build --target web --out-name graph1_web_demo -- --features web --no-default-features
 #wasm-pack build --out-name graph1_web_demo
 #RUSTFLAGS="--cfg=target_os=\"wasm32\"" wasm-pack build --target web --out-name graph1_web_demo  --no-default-features
-wasm-pack build --target web --out-name graph1_web_demo  --no-default-features
+wasm-pack build --release  --target web --out-name graph1_web_demo  --no-default-features
 
 
 # Make sure our custom `index.html` is there.
