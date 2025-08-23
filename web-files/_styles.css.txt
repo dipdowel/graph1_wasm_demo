@@ -74,8 +74,8 @@ h3 {
     margin-top: 32px;
 }
 h4 {
-    color: #a8ff60;
-    text-shadow: 0 0 8px rgba(168, 255, 96, 0.7);
+    color: #99ffcc;
+    text-shadow: 0 0 8px rgba(153, 255, 204, 0.7);
     margin-top: 28px;
 }
 h5 {
@@ -83,8 +83,9 @@ h5 {
     text-shadow: 0 0 8px rgba(255, 102, 102, 0.7);
 }
 h6 {
-    color: #99ffcc;
-    text-shadow: 0 0 8px rgba(153, 255, 204, 0.7);
+    color: #a8ff60;
+    text-shadow: 0 0 8px rgba(168, 255, 96, 0.7);
+
 }
 
 #content {

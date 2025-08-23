@@ -1,4 +1,5 @@
  /* dark.css - GitHub Dark Theme Specific Styles */
+
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); /* Specific font import */
 
  body {
@@ -32,10 +33,11 @@
      font-weight: 600;
  }
 
- h1 { font-size: 2em; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
+
+ h1 {  font-size: 2em; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
  h2 { font-size: 1.5em; border-bottom: 1px solid #21262d; padding-bottom: .3em; }
  h3 { font-size: 1.25em; }
- h4 { font-size: 1em; }
+ h4 { color: #94cfff; font-size: 1em; }
  h5 { font-size: 0.875em; }
  h6 { font-size: 0.85em; color: #8b949e; }
 

@@ -33,9 +33,9 @@
  h1 { color: #ff77ff; text-transform: uppercase; text-shadow: 0 0 8px rgba(255, 119, 255, 0.7); }
  h2 { color: #ffbf00; text-shadow: 0 0 8px rgba(255, 191, 0, 0.7); margin-top: 32px; }
  h3 { color: #33ccff; text-shadow: 0 0 8px rgba(51, 204, 255, 0.7); margin-top: 32px; }
- h4 { color: #a8ff60; text-shadow: 0 0 8px rgba(168, 255, 96, 0.7); margin-top: 28px; }
+ h4 { color: #99ffcc; text-shadow: 0 0 8px rgba(153, 255, 204, 0.7); margin-top: 28px; }
  h5 { color: #ff6666; text-shadow: 0 0 8px rgba(255, 102, 102, 0.7); }
- h6 { color: #99ffcc; text-shadow: 0 0 8px rgba(153, 255, 204, 0.7); }
+ h6 { color: #a8ff60; text-shadow: 0 0 8px rgba(168, 255, 96, 0.7); }
 
  #content {
      background: rgba(20, 20, 50, 0.85); /* Dark transparent blue */
