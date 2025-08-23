@@ -1,6 +1,6 @@
 # Bézier curves
 
-Graph1 supports rendering [Bézier curves](https://en.wikipedia.org/wiki/B%C3%A9zier_curve), including visualization of control points and tangents for interactive and animated curve demos.
+`Graph1` supports rendering [Bézier curves](https://en.wikipedia.org/wiki/B%C3%A9zier_curve), including visualization of control points and tangents for interactive and animated curve demos.
 
 ---
 

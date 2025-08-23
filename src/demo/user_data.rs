@@ -6,6 +6,7 @@ use crate::demo::d_005_alpha::{AlphaUserData, ALPHA_USER_DATA};
 use crate::demo::d_006_luminance_vs_intensity::{GhostsUserData, GHOSTS_USER_DATA};
 use crate::demo::d_011_curves::{BezierCurvesUserData, BEZIER_CURVES_USER_DATA};
 use crate::demo::d_012_grid::{get_grid_user_data, GridUserData};
+use crate::demo::d_013_text::{get_text_user_data, TextUserData};
 use crate::demo::d_014_brushes::{get_brush_user_data, BrushUserData};
 use crate::demo::elements::snake::Snake;
 
@@ -22,6 +23,7 @@ pub struct DemoUserData<'a> {
     pub snake: Snake,
     pub bezier_curves: BezierCurvesUserData,
     pub grid: GridUserData,
+    pub text: TextUserData,
     pub brush_demo:BrushUserData
 }
 
@@ -37,6 +39,7 @@ impl<'a> Default for DemoUserData<'a> {
             intro: get_intro_user_data::<'a>(),
             bezier_curves: BEZIER_CURVES_USER_DATA,
             grid: get_grid_user_data(),
+            text: get_text_user_data(),
             brush_demo: get_brush_user_data()
         }
     }

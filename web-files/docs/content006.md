@@ -1,8 +1,8 @@
 # Colors
 ## Desaturation
 
-| <!-- -->    | <!-- -->                                                                                                           |
-|-------------|--------------------------------------------------------------------------------------------------------------------|
+| <!-- -->    | <!-- -->                                                                                                         |
+|-------------|------------------------------------------------------------------------------------------------------------------|
 | 💡         | In the context of Graph1 `Desaturation` means removing colors from <br/>an image, making it effectively grayscale. |
 
 If you need to desaturate an image or a part thereof, Graph1 provides two modules for that:
