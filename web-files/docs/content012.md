@@ -1,27 +1,38 @@
 # Grid & 3D Bars
 
-## Grid
+## Grids in `Graph1`
   
-As of version `0.0.5-alpha`, `Graph1` provides [UniformGrid](https://github.com/dipdowel/graph1/blob/develop/src/utils/grid/uniform/uniform_grid.rs). The `UniformGrid` is a 2D grid structure made of rectangular regions (cells) that are evenly spaced and arranged in rows and columns. It's flexible, allowing you to both access and manipulate the cells as well as reshape the grid itself. 
+As of version `0.0.5-alpha`, the following grids are available:<br>
+**1. The [UniformGrid](https://github.com/dipdowel/graph1/blob/develop/src/utils/grid/uniform.rs)** is a 2D grid structure made of rectangular regions (cells) that are evenly spaced and arranged in rows and columns. It's flexible, allowing you to both access and manipulate the cells as well as reshape the grid itself. <br>
+**2. The [FlexRowGrid](https://github.com/dipdowel/graph1/blob/develop/src/utils/grid/flex_row.rs)** is similar to the `UniformGrid`, however, each row can have its own height and each cell in a row can have its own width.
 
- 
 
 
 
-| <!-- -->    | <!-- -->                                                                                                                                                                                                             |
-|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 💡         | Each cell is powered by the [Region<T>](https://github.com/dipdowel/graph1/blob/develop/src/utils/math/geometry/region.rs) structure, see the [Quadrants](/?demo=10) demo page for some more details on `Region<T>`. |
+| <!-- -->    | <!-- -->                                                                                                                                                                                                                         |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 💡         | Each cell of the grid is powered by the [Region<T>](https://github.com/dipdowel/graph1/blob/develop/src/utils/math/geometry/region.rs) structure, see the [Quadrants](/?demo=10) demo page for some more details on `Region<T>`. |
 
 
 The grid simplifies positioning and aligning graphical elements on the screen. It can be used to  create layouts,
 visualize coordinates, etc.
-In this demo the 3D bars are positioned using 3 grids of the following sizes:
+src/utils/grid/
+
+
+
+## Rendering
+
+[grid::render()](https://github.com/dipdowel/graph1/blob/develop/src/utils/grid/render.rs) performs a quick visualization of any kind of grid. The grid can be visualized as cell outlines or filled cells. Such visualization is useful for debugging or understanding the grid structure.
+
+## `UniformGrid`
+
+In this demo utilizes `UniformGrid` for positioning of the 3D bars. 3 grids of the following sizes were used:
 - 8 x 2
 - 16 x 5
 - 24 x 3
 
 
-src/utils/grid/uniform/render.rs
+
 
 ### Features
 
@@ -49,8 +60,13 @@ The grid is well-suited for applications in graphics, simulations, and procedura
 * Terrain or texture generation.
 * Any situation where structured, evenly spaced regions need to be manipulated or queried efficiently.
 
+## `FlexRowGrid`
+
+#### 🚧 Under construction 🚧
+Please stay tuned for updates!
+
 - - - 
-src/sprites/axonometric/bar_3d.rs
+ 
 
 
 ## 3D Bars

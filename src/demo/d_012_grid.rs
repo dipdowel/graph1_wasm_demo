@@ -244,7 +244,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         &text,
     );
 
-    grid::render(ctx, &grid, true);
+    // grid::render(ctx, &grid, true);
 
     //
     //----------------------------------------------------------------------------------------------

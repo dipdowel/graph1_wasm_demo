@@ -10,7 +10,7 @@ use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
 
 use graph1::utils::color::palettes::{DesertDusk, ForestMist, OceanBreeze, RetroNeon};
 
-use graph1::utils::grid::row_flex::{RowFlexGrid, FlexRow};
+use graph1::utils::grid::flex_row::{FlexRowGrid, FlexRow};
 
 use graph1::primitives::{neighborhood, plane::RectArea, point::Point, Pixel};
 use graph1::primitives::align::Align;
@@ -139,7 +139,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ),
     ];
 
-    let layout = RowFlexGrid::new(
+    let layout = FlexRowGrid::new(
         Point::new(0, 0),
       Some(rows),
         Some(400),
