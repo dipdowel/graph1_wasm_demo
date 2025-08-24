@@ -7,7 +7,7 @@ use graph1::utils::color::palettes::RetroNeon;
 use graph1::primitives::{plane::RectArea, point::Point, Pixel};
 use std::time::Instant;
 
-use graph1::utils::grid::uniform::UniformGrid;
+
 use graph1::utils::math::oscillator;
 
 use crate::demo::elements::d_014_spray_config::{

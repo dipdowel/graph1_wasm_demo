@@ -1,7 +1,7 @@
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
 
-use graph1::utils::clear_screen;
+use graph1::utils::{clear_screen, grid};
 use graph1::utils::color::palettes::{OceanBreeze, RetroNeon};
 
 use graph1::primitives::{plane::RectArea, point::Point};
@@ -9,7 +9,6 @@ use graph1::text::font::{PixelFont, Spacing};
 use graph1::text::printer;
 use graph1::utils::color::gradient;
 
-use graph1::utils::grid::uniform::UniformGrid;
 use graph1::utils::math::oscillator;
 
 use graph1::core::context_utils::line_clipping_style::LineClippingStyle;
@@ -20,6 +19,7 @@ use graph1::sprites::axonometric;
 use graph1::sprites::axonometric::Bar3DProps;
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
 use graph1::utils::color::alpha::set_alpha;
+use graph1::utils::grid::uniform::UniformGrid;
 
 //---------------------------------------------------------------------
 // Configure the user data for typing text in Basic Concepts pt. 1
@@ -243,6 +243,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         &text_color_prop,
         &text,
     );
+
+    grid::render(ctx, &grid, true);
 
     //
     //----------------------------------------------------------------------------------------------
