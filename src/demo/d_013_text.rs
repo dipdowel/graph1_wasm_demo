@@ -20,6 +20,7 @@ use graph1::text::font::{PixelFont, Spacing};
 use graph1::text::printer;
 use graph1::utils::{clear_screen, grid};
 use crate::global_consts::{WIN_HEIGHT, WIN_WIDTH};
+
 /*
 use graph1::utils::{clear_screen, grid};
 use std::collections::HashMap;
@@ -28,7 +29,7 @@ use graph1::utils::color::gradient;
 use graph1::utils::grid::uniform::{Neighbor, UniformGrid};
 use graph1::utils::math::oscillator;
 
-use crate::utils::console_log;
+
 use graph1::core::context_utils::line_clipping_style::LineClippingStyle;
 use graph1::draw;
 use graph1::draw::tools::{fill, spray};
@@ -90,7 +91,7 @@ pub fn get_text_user_data() -> TextUserData {
 
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-
+    clear_screen(ctx);
     //
     // FIXME: this is a working examples
     //
@@ -105,48 +106,79 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     );
 
 
+    /*
     // ================ CURSOR ===================
-    //  WIN_WIDTH
-
-
-    // Blinking cursor
     let color: u32 = if (ctx.frame_count / 40) % 2 == 0 {
         ctx.win.background_color
     } else {
         ctx.win.foreground_color
     };
     draw::rectangle::filled(ctx, &RectArea::new(400, 104, 12, 28, Some(color)));
+    */
 
-    let row_height = WIN_HEIGHT / 3;
+    let row_height = WIN_HEIGHT / 5;
     let rows:Vec<FlexRow<u32>> = vec![
-        FlexRow::new(
-        row_height,
-        vec![WIN_WIDTH/4; 4],
-        vec![RetroNeon::MATRIX_GREEN,RetroNeon::CYBERPUNK_FUCHSIA],
-        Align::Left,
-    ),
+
         FlexRow::new(
             row_height,
-            vec![WIN_WIDTH; 1],
+            // vec![WIN_WIDTH; 1],
+            vec![WIN_WIDTH/2; 1],
             vec![RetroNeon::MATRIX_GREEN,RetroNeon::CYBERPUNK_FUCHSIA],
-            Align::Left,
+            Align::Center,
         ),
+
         FlexRow::new(
             row_height,
-            vec![WIN_WIDTH/2; 2],
+            // vec![WIN_WIDTH/4; 4],
+            vec![WIN_WIDTH/8; 2],
             vec![RetroNeon::MATRIX_GREEN,RetroNeon::CYBERPUNK_FUCHSIA],
-            Align::Left,
+            Align::Center,
         ),
+
+        FlexRow::new(
+            row_height,
+            // vec![WIN_WIDTH/2; 2],
+            vec![WIN_WIDTH/8; 5],
+            vec![RetroNeon::MATRIX_GREEN,RetroNeon::CYBERPUNK_FUCHSIA],
+            Align::Center,
+        ),
+
+
+        FlexRow::new(
+            row_height,
+            vec![WIN_WIDTH/8; 3],
+            vec![RetroNeon::HOT_PINK],
+            // Align::Left
+            // Align::Center
+            Align::Right
+        )
+
+
     ];
 
-    let layout = FlexRowGrid::new(
+    let mut layout_grid = FlexRowGrid::new(
         Point::new(0, 0),
       Some(rows),
-        Some(400),
+        // Some(WIN_WIDTH),
+        None
     );
 
 
-    grid::render(ctx, &layout, true);
+    layout_grid.add_row(FlexRow::new(
+        row_height,
+        vec![WIN_WIDTH/3; 1],
+        vec![RetroNeon::DIGITAL_GOLD],
+        Align::Left
+        // Align::Center
+        // Align::Right
+    ));
+
+
+
+    grid::render(ctx, &layout_grid, true);
+
+
+
 
     /*
 
