@@ -2,9 +2,11 @@ use graph1::{buffer_op, draw};
 use graph1::buffer_op::scale::scale_direction::ScaleDirection;
 use crate::demo::user_data::DemoUserData;
 use graph1::core::context::GraphContext;
+use graph1::core::default_colors;
 use graph1::draw::polygons;
 use graph1::draw::polygons::StarProperties;
 use graph1::draw::tools::fill;
+use graph1::fx::scanline;
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
 
 
@@ -14,13 +16,15 @@ use graph1::utils::grid::flex_row::{FlexRowGrid, FlexRow};
 
 use graph1::primitives::{neighborhood, plane::RectArea, point::Point, Pixel};
 use graph1::primitives::align::Align;
+use graph1::primitives::helper_types::PixelColorTransformerFn;
 use graph1::primitives::math::Displacement;
 use graph1::primitives::plane::Dimensions2d;
 use graph1::text::font::{PixelFont, Spacing};
 use graph1::text::printer;
 use graph1::utils::{clear_screen, grid};
+use graph1::utils::color::gradient;
 use crate::global_consts::{WIN_HEIGHT, WIN_WIDTH};
-
+use crate::utils::console_log;
 /*
 use graph1::utils::{clear_screen, grid};
 use std::collections::HashMap;
@@ -55,13 +59,17 @@ pub struct TextUserData {
     // pub background_color: Option<u32>,
 }
 
-
+const DARK_BROWN:u32 = 0x342B17ff;
 pub fn get_text_user_data() -> TextUserData {
+
+    let text_color = gradient::linear_step(RetroNeon::FUTURE_BRONZE, DARK_BROWN , 200, 120);
+    // let text_color = RetroNeon::FUTURE_BRONZE;
+
     TextUserData {
 
         color_props: printer::ColorProperties {
-            // color: Some(OceanBreeze::FOAM_WHITE),
-            color: Some(OceanBreeze::SEAFOAM),
+            // color: Some( RetroNeon::DIGITAL_GOLD      ),
+            color: Some(  text_color  ),
             color_transformer: None,
             data: None,
         },
@@ -69,10 +77,10 @@ pub fn get_text_user_data() -> TextUserData {
         // so that we don't have to instantiate it on every frame
         font: Some(instantiate_embedded_font(
             EmbeddedFonts::MatriksUaxactun,
-            3,
+            2,
             Some(Spacing {
-                kerning_px: 4,
-                leading_px: 2,
+                kerning_px: 2,
+                leading_px: 4,
             }),
             None,
         )),
@@ -89,21 +97,196 @@ pub fn get_text_user_data() -> TextUserData {
 //---------------------------------------------------------------------
 
 
+const TEXT_LINE_1: &str = "Welcome to Graph1 text!";
+
+const TITLE_1: &str = "Graph1 text";
+
+const TEXT_LINES:[&str; 4] = [
+                              "TODO:",
+                              "- Write some intro on texts",
+                              "- Introduce the available fonts",
+                              "- Credit Marcel for 'Matriks Uaxactun'",
+];
+
+
+
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-    clear_screen(ctx);
+
+
+    let font = ctx.user_data.text.font.clone().unwrap();
+
+    if ctx.frame_count == 0 {
+
+        // Activate another frame buffer (index 1)
+        // We'll prepare some assets in thet buffer,
+        // and we'll copy them to the main frame buffer during the animation.
+        let res = ctx.set_active_frame_buf(1);
+
+        ctx.win.background_color = default_colors::TRANSPARENT_BLACK;
+        ctx.win.foreground_color = RetroNeon::STROBE_WHITE;
+        clear_screen(ctx);
+
+        let title_font = instantiate_embedded_font(
+            EmbeddedFonts::MatriksUaxactun,
+            7,
+            Some(Spacing {
+                kerning_px: 5,
+                leading_px: 2,
+            }),
+            None,
+        );
+
+        let color_transformer: PixelColorTransformerFn = | _, x:u32, y: u32,  w:u32, _, _ | -> u32 {
+            if x == 0 || x == w-1{
+                return RetroNeon::FUTURE_BRONZE;
+            }
+            if y % 2 == 0  {
+                return RetroNeon::DIGITAL_GOLD;
+            }
+             RetroNeon::LASER_LIME
+        };
+        let title_font_props: printer::ColorProperties = printer::ColorProperties {
+            // color: Some(DARK_BROWN),
+            color: None,
+            // color_transformer: None,
+            color_transformer: Some(color_transformer),
+            data: None
+        };
+
+        printer::print_line(
+            ctx,
+            &Point { x: 14+24, y: 10 },
+            &title_font,
+            &title_font_props,
+            &"Graph1",
+        );
+
+        printer::print_line(
+            ctx,
+            &Point { x: 14+278, y: 10 },
+            &title_font,
+            &title_font_props,
+            &"Text",
+        );
+
+
+        /*
+        let color_props = ctx.user_data.text.color_props;
+        printer::print(
+            ctx,
+            &Point { x: 24, y: 110 },
+            &font,
+            &color_props,
+            &TEXT_LINES,
+            printer::Align::Left,
+        );
+        */
+
+
+
+
+
+        // scanline::window(ctx, 1, 106);
+
+        // let active_buf_idx = ctx.get_active_frame_buf_index();
+        // console_log(&format!("active_buf_idx: {:?}", active_buf_idx));
+
+
+
+
+
+
+
+
+
+        ctx.win.background_color = RetroNeon::DIGITAL_GOLD;
+        ctx.win.foreground_color = RetroNeon::STROBE_WHITE;
+
+        // FIXME: Don't forget to switch back to the main frame buffer (index 0)
+        // switch back to the main frame buffer (index 0)
+        // let res = ctx.set_active_frame_buf(0);
+
+    }
+
+}
+
+
+
+
+    // font.
+    //
+    // TEXT_LINE_1.chars().for_each(|c| {
+    //     let glyph = font.get_glyph(&c);
+    //     if let Some(g) = glyph {
+    //         let src_area = RectArea::new(0, 0, g.width, g.height, None);
+    //         buffer_op::copy::rect::within_buf(
+    //             &mut ctx.frame_buf,
+    //             &ctx.win.dimensions,
+    //             &src_area,
+    //             &Point { x: 10 + (char_num as u32) * 12, y: 50 },
+    //             2,
+    //             Some(&Displacement { dx: 1, dy: 1 }),
+    //             ScaleDirection::Up,
+    //         );
+    //     }
+    // })
+
+    // let char_num = (ctx.frame_count / 6) % 95;
+    // let a = font.get_glyph(&'W');
+
+
+
+    // clear_screen(ctx);
     //
     // FIXME: this is a working examples
     //
-    let color_props = ctx.user_data.grid.text_color_props;
-    let font = ctx.user_data.text.font.clone().unwrap();
-    printer::print_line(
+
+    // console_log(&format!("Color props: {:?}", color_props));
+    // console_log(&format!("RetroNeon::MATRIX_GREEN: {:?}", RetroNeon::MATRIX_GREEN));
+
+
+    /*
+    printer::print(
         ctx,
-        &Point { x: 40, y: 110 },
+        &Point { x: 10, y: 10 },
         &font,
         &color_props,
-        &" Check... check... ⁴€←↑→↓−∕✔✕� ",
+        &[" Check... check... ⁴€←↑→↓−∕✔✕� ",
+        " The quick brown fox jumps over the lazy dog. 0123456789 ",
+        " Sphinx of black quartz, judge my vow. ",
+        " Pack my box with five dozen liquor jugs. ",
+        " How vexingly quick daft zebras jump! ",
+        " Bright vixens jump; dozy fowl quack. ",
+        " Jackdaws love my big sphinx of quartz. "],
+        graph1::text::printer::Align::Left
     );
+     */
+
+    /*
+    let loader_symbol = match ctx.frame_count % 80 {
+        0..10 => "R",
+        11..20 => "Ro",
+        21..30 => "Rob",
+        31..40 => "robo",
+        41..50 => "robot",
+        51..60 => "ROBOTR",
+        // _ => ".....|",
+        61..70 => "Robotro",
+        71..80 => "robotron",
+        _ => "",
+    };
+    printer::print_line(
+        ctx,
+        &Point { x: 10, y: 10 },
+        &font,
+        &color_props,
+        &loader_symbol,
+    );
+     */
+
+
+
 
 
     /*
@@ -116,56 +299,45 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     draw::rectangle::filled(ctx, &RectArea::new(400, 104, 12, 28, Some(color)));
     */
 
-    let row_height = WIN_HEIGHT / 5;
+    /*
+    let height_block = WIN_HEIGHT / 8;
     let rows:Vec<FlexRow<u32>> = vec![
 
         FlexRow::new(
-            row_height,
-            // vec![WIN_WIDTH; 1],
-            vec![WIN_WIDTH/2; 1],
+            height_block * 2,
+            vec![WIN_WIDTH; 1],
             vec![RetroNeon::MATRIX_GREEN,RetroNeon::CYBERPUNK_FUCHSIA],
             Align::Center,
         ),
 
         FlexRow::new(
-            row_height,
-            // vec![WIN_WIDTH/4; 4],
-            vec![WIN_WIDTH/8; 2],
+            height_block * 2,
+
+            vec![WIN_WIDTH/3, WIN_WIDTH/3*2],
             vec![RetroNeon::MATRIX_GREEN,RetroNeon::CYBERPUNK_FUCHSIA],
             Align::Center,
         ),
 
         FlexRow::new(
-            row_height,
+            height_block*4,
             // vec![WIN_WIDTH/2; 2],
-            vec![WIN_WIDTH/8; 5],
+            vec![WIN_WIDTH],
             vec![RetroNeon::MATRIX_GREEN,RetroNeon::CYBERPUNK_FUCHSIA],
             Align::Center,
         ),
-
-
-        FlexRow::new(
-            row_height,
-            vec![WIN_WIDTH/8; 3],
-            vec![RetroNeon::HOT_PINK],
-            // Align::Left
-            // Align::Center
-            Align::Right
-        )
-
 
     ];
 
     let mut layout_grid = FlexRowGrid::new(
         Point::new(0, 0),
       Some(rows),
-        // Some(WIN_WIDTH),
-        None
+        Some(WIN_WIDTH),
+        // None
     );
 
 
     layout_grid.add_row(FlexRow::new(
-        row_height,
+        height_block,
         vec![WIN_WIDTH/3; 1],
         vec![RetroNeon::DIGITAL_GOLD],
         Align::Left
@@ -176,7 +348,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
 
     grid::render(ctx, &layout_grid, true);
-
+*/
 
 
 
@@ -190,7 +362,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
      */
 
 
-}
 
 /*
         pub fn within_buf(
