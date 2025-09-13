@@ -1,55 +1,16 @@
-use graph1::{buffer_op, draw};
-use graph1::buffer_op::scale::scale_direction::ScaleDirection;
 use crate::demo::user_data::DemoUserData;
+use graph1::buffer_op::scale;
 use graph1::core::context::GraphContext;
-use graph1::core::default_colors;
-use graph1::draw::polygons;
-use graph1::draw::polygons::StarProperties;
-use graph1::draw::tools::fill;
 use graph1::fx::scanline;
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
-
-
-use graph1::utils::color::palettes::{DesertDusk, ForestMist, OceanBreeze, RetroNeon};
-
-use graph1::utils::grid::flex_row::{FlexRowGrid, FlexRow};
-
-use graph1::primitives::{neighborhood, plane::RectArea, point::Point, Pixel};
-use graph1::primitives::align::Align;
-use graph1::primitives::helper_types::PixelColorTransformerFn;
+use graph1::utils::color::palettes::RetroNeon;
 use graph1::primitives::math::Displacement;
-use graph1::primitives::plane::Dimensions2d;
+use graph1::primitives::{plane::RectArea, point::Point};
 use graph1::text::font::{PixelFont, Spacing};
 use graph1::text::printer;
-use graph1::utils::{clear_screen, grid};
-use graph1::utils::color::gradient;
-use crate::global_consts::{WIN_HEIGHT, WIN_WIDTH};
-use crate::utils::console_log;
-/*
-use graph1::utils::{clear_screen, grid};
-use std::collections::HashMap;
+use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
 
-use graph1::utils::grid::uniform::{Neighbor, UniformGrid};
-use graph1::utils::math::oscillator;
-
-
-use graph1::core::context_utils::line_clipping_style::LineClippingStyle;
-use graph1::draw;
-use graph1::draw::tools::{fill, spray};
-use graph1::draw::{line, rectangle};
-use graph1::draw::tools::brush::Brush;
-use graph1::fx::glitch::HorizontalGlitchProps;
-use graph1::fx::{glitch, scanline};
-use graph1::primitives::math::MinMax;
-use graph1::sprites::axonometric;
-use graph1::sprites::axonometric::Bar3DProps;
-
-use graph1::utils::color::alpha::set_alpha;
-use graph1::utils::math::geometry::region::Region;
-use graph1::utils::math::rng::XorShiftRng;
-use crate::demo::d_012_grid::GridUserData;
-*/
 //---------------------------------------------------------------------
 // Configure the user data for typing text in Basic Concepts pt. 1
 pub struct TextUserData {
@@ -61,6 +22,12 @@ pub struct TextUserData {
 
 const DARK_BROWN:u32 = 0x342B17ff;
 pub fn get_text_user_data() -> TextUserData {
+
+    // TODO: Check whether this initialization is even needed at all...
+    // TODO: Check whether this initialization is even needed at all...
+    // TODO: Check whether this initialization is even needed at all...
+    // TODO: Check whether this initialization is even needed at all...
+    // TODO: Check whether this initialization is even needed at all...
 
     let text_color = gradient::linear_step(RetroNeon::FUTURE_BRONZE, DARK_BROWN , 200, 120);
     // let text_color = RetroNeon::FUTURE_BRONZE;
@@ -85,130 +52,79 @@ pub fn get_text_user_data() -> TextUserData {
             None,
         )),
 
-        // text: vec![
-        //     "Grid:  8x2".to_string(),
-        //     "Grid: 16x5".to_string(),
-        //     "Grid: 24x3".to_string(),
-        // ],
     }
 }
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 
-
-const TEXT_LINE_1: &str = "Welcome to Graph1 text!";
-
-const TITLE_1: &str = "Graph1 text";
-
-const TEXT_LINES:[&str; 4] = [
-                              "TODO:",
-                              "- Write some intro on texts",
-                              "- Introduce the available fonts",
-                              "- Credit Marcel for 'Matriks Uaxactun'",
-];
-
-
-
-
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
+    clear_screen(ctx);
 
-
-    let font = ctx.user_data.text.font.clone().unwrap();
+    // let font = ctx.user_data.text.font.clone().unwrap();
+    let frame_count = ctx.frame_count as u32;
 
     if ctx.frame_count == 0 {
+        // TODO: consider moving the zero-frame initialization to a separate function
+        // TODO: consider moving the zero-frame initialization to a separate function
+        // TODO: consider moving the zero-frame initialization to a separate function
+
+        ctx.win.background_color = RetroNeon::ELECTRIC_BLUE;
+        ctx.win.foreground_color = RetroNeon::CYBER_YELLOW;
+        clear_screen(ctx);
 
         // Activate another frame buffer (index 1)
         // We'll prepare some assets in thet buffer,
         // and we'll copy them to the main frame buffer during the animation.
-        let res = ctx.set_active_frame_buf(1);
-
-        ctx.win.background_color = default_colors::TRANSPARENT_BLACK;
-        ctx.win.foreground_color = RetroNeon::STROBE_WHITE;
+         ctx.set_active_frame_buf(1).ok();
         clear_screen(ctx);
 
         let title_font = instantiate_embedded_font(
             EmbeddedFonts::MatriksUaxactun,
-            7,
+            4,
             Some(Spacing {
-                kerning_px: 5,
+                kerning_px: 4,
                 leading_px: 2,
             }),
             None,
         );
 
-        let color_transformer: PixelColorTransformerFn = | _, x:u32, y: u32,  w:u32, _, _ | -> u32 {
-            if x == 0 || x == w-1{
-                return RetroNeon::FUTURE_BRONZE;
-            }
-            if y % 2 == 0  {
-                return RetroNeon::DIGITAL_GOLD;
-            }
-             RetroNeon::LASER_LIME
-        };
         let title_font_props: printer::ColorProperties = printer::ColorProperties {
-            // color: Some(DARK_BROWN),
-            color: None,
-            // color_transformer: None,
-            color_transformer: Some(color_transformer),
+            color: Some(RetroNeon::CYBER_YELLOW),
+            color_transformer: None,
             data: None
         };
 
         printer::print_line(
             ctx,
-            &Point { x: 14+24, y: 10 },
+            &Point { x: 0, y: 30 },
             &title_font,
             &title_font_props,
-            &"Graph1",
+            &"   Pixel fonts!  ←     ",
         );
 
-        printer::print_line(
-            ctx,
-            &Point { x: 14+278, y: 10 },
-            &title_font,
-            &title_font_props,
-            &"Text",
-        );
-
-
-        /*
-        let color_props = ctx.user_data.text.color_props;
-        printer::print(
-            ctx,
-            &Point { x: 24, y: 110 },
-            &font,
-            &color_props,
-            &TEXT_LINES,
-            printer::Align::Left,
-        );
-        */
-
-
-
-
-
-        // scanline::window(ctx, 1, 106);
-
-        // let active_buf_idx = ctx.get_active_frame_buf_index();
-        // console_log(&format!("active_buf_idx: {:?}", active_buf_idx));
-
-
-
-
-
-
-
-
-
-        ctx.win.background_color = RetroNeon::DIGITAL_GOLD;
-        ctx.win.foreground_color = RetroNeon::STROBE_WHITE;
-
-        // FIXME: Don't forget to switch back to the main frame buffer (index 0)
-        // switch back to the main frame buffer (index 0)
-        // let res = ctx.set_active_frame_buf(0);
-
+        // Switch back to the main frame buffer (index 0)
+        ctx.set_active_frame_buf(0).ok();
     }
 
+
+    let win_dims = ctx.win.dimensions.clone();
+    let buf_result = ctx.get_multi_frame_bufs(&[0,1]).expect("Failed to get multiple frame buffers");
+    let dst_buf = buf_result.active;
+    let src_buf = buf_result.immut[0].frame_buf;
+
+    scale::up::sparse::to_another_buf(
+        &src_buf,
+        &win_dims,
+        &RectArea::new(frame_count, 30, 278, 200, None),
+        dst_buf,
+        &win_dims,
+        &Point { x: 4, y: 36 },
+        3,
+        &Displacement { dx: 1, dy: 1 },
+        1,
+    );
+     scanline::window(ctx, 2, 16);
 }
 
 
