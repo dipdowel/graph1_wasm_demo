@@ -357,7 +357,7 @@
 
         // Throttle the framerate (just in case, if someone has a too good of a computer
         let lastTimestamp = 0;
-        let maxFPS = 120;
+        let maxFPS = 100;
         let period = 1000 / maxFPS; // ms for each frame
 
 
@@ -386,7 +386,8 @@
           applyGlowEffect(pixel_stats);
 
           frame_count++;
-          isPaused = true;  // FIXME: REMOVE THIS LINE!
+          // console.log(" -> frame_count:", frame_count);
+          // isPaused = true;  // FIXME: REMOVE THIS LINE!
         }
 
         renderFunction = render;
