@@ -2,7 +2,7 @@ use crate::demo::user_data::DemoUserData;
 use crate::utils::console_log;
 use graph1::buffer_op::scale;
 use graph1::core::context::GraphContext;
-use graph1::draw;
+use graph1::{buffer_op, draw};
 use graph1::fx::scanline;
 use graph1::primitives::math::Displacement;
 use graph1::primitives::{plane::RectArea, point::Point};
@@ -17,10 +17,8 @@ use graph1::utils::color::palettes::RetroNeon;
 //---------------------------------------------------------------------
 // Configure the user data for typing text in Basic Concepts pt. 1
 pub struct TextUserData {
-    pub color_props: printer::ColorProperties<'static>,
-    pub font: Option<PixelFont>,
-    // pub text: Vec<String>,
-    // pub background_color: Option<u32>,
+    pub cursor_area: Option<RectArea>,
+    pub cursor_data: Option<Vec<u32>>
 }
 
 const DARK_BROWN: u32 = 0x342B17ff;
@@ -37,23 +35,8 @@ pub fn get_text_user_data() -> TextUserData {
     // let text_color = RetroNeon::FUTURE_BRONZE;
 
     TextUserData {
-        color_props: printer::ColorProperties {
-            // color: Some( RetroNeon::DIGITAL_GOLD      ),
-            color: Some(text_color),
-            color_transformer: None,
-            data: None,
-        },
-        // Let's put an instantiated font into the user data
-        // so that we don't have to instantiate it on every frame
-        font: Some(instantiate_embedded_font(
-            EmbeddedFonts::MatriksUaxactun,
-            2,
-            Some(Spacing {
-                kerning_px: 2,
-                leading_px: 4,
-            }),
-            None,
-        )),
+        cursor_area: None,
+        cursor_data: None,
     }
 }
 
@@ -139,6 +122,57 @@ fn scroll_the_title(ctx: &mut GraphContext<DemoUserData>) {
 
 //---------------------------------------------------------------------
 
+/// Store the area under the cursor for later restoration
+/// NB: This function assumes the area is fully inside the frame buffer!
+fn store_area_under_cursor(ctx: &mut GraphContext<DemoUserData>, cursor:&RectArea) {
+        ctx.user_data.text.cursor_area = Some(cursor.clone());
+        buffer_op::copy::rect::to_another_buf(
+            &ctx.frame_buf,
+            &ctx.win.dimensions,
+            cursor,
+            // &mut ctx.user_data.text.cursor_data.get_or_insert(vec![0; (cursor.dimensions.w * cursor.dimensions.h) as usize]),
+            &mut ctx.user_data.text.cursor_data.insert(vec![0; (cursor.dimensions.w * cursor.dimensions.h) as usize]),
+            &ctx.user_data.text.cursor_area.unwrap().dimensions ,
+            &Point { x: 0, y: 0 },
+            false,
+            1,
+        )
+}
+
+/// Restore the area under the cursor from previously stored data
+/// NB: This function assumes the area is fully inside the frame buffer!
+fn restore_area_under_cursor(ctx: &mut GraphContext<DemoUserData>) {
+
+    if ctx.user_data.text.cursor_area.is_none(){
+        return;
+    }
+
+    let cursor_dims = &ctx.user_data.text.cursor_area.unwrap().dimensions.clone();
+
+    let cursor = match &ctx.user_data.text.cursor_area {
+        Some(c) => c,
+        None => return,
+    };
+    let cursor_data = match &ctx.user_data.text.cursor_data {
+        Some(d) => d,
+        None => return,
+    };
+
+    buffer_op::copy::rect::to_another_buf(
+        &cursor_data,
+        &cursor_dims,
+        &ctx.user_data.text.cursor_area.unwrap(),
+        &mut ctx.frame_buf,
+        &ctx.win.dimensions,
+        &cursor.top_left,
+        false,
+        1,
+    )
+}
+
+
+
+
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     let frame_count = ctx.frame_count as u32;
@@ -174,7 +208,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     let text = [
         "Marcel van Deijl designed two fonts",
-        "that are shipped with Graph1:",
+        "which are shipped with Graph1:",
         "",
         "→ Matriks Uaxactun",
         "→ Matriks Uaxactun Mono",
@@ -196,15 +230,18 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             Align::Left
         );
 
-    /*
+
+
     // Blinking cursor
-    let color: u32 = if (ctx.frame_count / 20) % 2 == 0 {
-        ctx.win.background_color
+    if (ctx.frame_count / 20) % 2 == 0 {
+        let cursor = RectArea::new(26+12*7 , 20, 12, 28, None);
+        store_area_under_cursor(ctx, &cursor);
+        draw::rectangle::filled(ctx, &cursor);
     } else {
-        ctx.win.foreground_color
+
+        restore_area_under_cursor(ctx);
     };
-    draw::rectangle::filled(ctx, &RectArea::new(26+12* frame_count/10 , 20, 12, 28, Some(color)));
-*/
+
 
 
     // console_log(&format!("Area: {:?}", area));
@@ -440,3 +477,16 @@ Some(vec![
         );
     }
 */
+
+
+
+/*
+        src_buf: &[u32],
+        src_dims: &Dimensions2d<u32>,
+        src_area: &RectArea<u32>,
+        dst_buf: &mut [u32],
+        dst_dims: &Dimensions2d<u32>,
+        dst_start: &Point<u32>,
+        use_absolute_alpha: bool,
+        num_threads: usize,
+ */
