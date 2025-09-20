@@ -135,9 +135,11 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
                 Some(RetroNeon::LASER_LIME), // foreground color RGBA
             );
 
+            // FIXME: Once dynamic creation of frame buffers is available
+            // FIXME: use that instead of hardcoding number of buffers here!
             // Create a context with the basic configuration
             let ctx: GraphContext<DemoUserData> =
-                GraphContext::new(win_ctx, true, 2, None, 1, None);
+                GraphContext::new(win_ctx, true, 3, None, 1, None);
 
             // Place the context into the global container
             // so that it persists between frames
