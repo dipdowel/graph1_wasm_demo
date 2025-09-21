@@ -139,7 +139,7 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
             // FIXME: use that instead of hardcoding number of buffers here!
             // Create a context with the basic configuration
             let ctx: GraphContext<DemoUserData> =
-                GraphContext::new(win_ctx, true, 3, None, 1, None);
+                GraphContext::new(win_ctx, true, 5, None, 1, None);
 
             // Place the context into the global container
             // so that it persists between frames
