@@ -136,10 +136,10 @@ const TEXT_FONT_SPACING: Spacing = Spacing {
 const MARCEL_PAGE_TEXT: [&str; 8] = [
     "Marcel van Deijl designed two fonts",
     "which are shipped with Graph1:",
-    "••••••••••••••••••••••••••••••",
-    "→ Matriks Uaxactun",
-    "→ Matriks Uaxactun Mono",
-    "••••••••••••••••••••••••••••••",
+    " ", //"• • • • • • • • • • • • • ",
+    "  → Matriks Uaxactun      ",
+    "  → Matriks Uaxactun Mono ",
+    " ", //"• • • • • • • • • • • • • ",
     "Each font contains 222 characters,",
     "that covers most European languages",
     // "",
@@ -242,7 +242,6 @@ fn scroll_the_title(ctx: &mut GraphContext<DemoUserData>) {
 fn store_area_under_cursor(ctx: &mut GraphContext<DemoUserData>, cursor: &RectArea) {
     ctx.user_data.text.cursor_area = Some(cursor.clone());
 
-
     if ctx.user_data.text.cursor_data.len() == 0 {
         let cursor_data_size = (cursor.dimensions.w * cursor.dimensions.h) as usize;
         ctx.user_data.text.cursor_data = vec![BLACK; cursor_data_size];
@@ -260,8 +259,6 @@ fn store_area_under_cursor(ctx: &mut GraphContext<DemoUserData>, cursor: &RectAr
         false,
         1,
     );
-
-
 }
 
 /// Restore the area under the cursor from previously stored data
@@ -335,148 +332,80 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     if frame_count > MARCEL_START {
         ctx.set_active_frame_buf(BUF_2_PAGE_MARCEL).ok();
-        let rand_mod = ctx.rng.get_u32(&MinMax { min: 3, max: 7 });
-        if frame_count % rand_mod == 0 {
-            let idx = ctx.user_data.text.char_cell_idx;
 
-            // FIXME: uncomment
-            // ctx.user_data.text.char_cell_idx += 1;
+        // FIXME: uncomment
+        // let rand_mod = ctx.rng.get_u32(&MinMax { min: 3, max: 7 });
+        // if frame_count % rand_mod == 0 {
+        //     if ctx.user_data.text.cursor_state == ON {
+        //         restore_area_under_cursor(ctx);
+        //         ctx.user_data.text.cursor_state = OFF;
+        //
+        //     }
+        //     ctx.user_data.text.char_cell_idx += 1;
+        // }
 
-            let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(idx);
 
-            if char_cell_coords.is_some() {
-                let char_cell_coords = char_cell_coords.unwrap();
-
-                let char_cell = ctx
-                    .user_data
-                    .text
-                    .page_marcel_grid
-                    .as_ref()
-                    .unwrap()
-                    .get_cell(char_cell_coords.0, char_cell_coords.1)
-                    .unwrap()
-                    .rect_area()
-                    .clone();
-                // draw::rectangle::outline(ctx, &char_cell.unwrap().rect_area());
-
-                // ctx.user_data.text.cur_char_cell = Some(char_cell);
-                ctx.user_data.text.cursor_area = Some(char_cell);
-            }
-        }
-
-        let next_cursor_state = if ctx.frame_count % 50 == 0 {
+        let next_cursor_state = if ctx.frame_count % 40 == 0 {
             !ctx.user_data.text.cursor_state
         } else {
             ctx.user_data.text.cursor_state
         };
+
+        let idx = ctx.user_data.text.char_cell_idx;
+        let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(idx);
         // The cursor logic must begin here!
+        if char_cell_coords.is_some() {
+            let char_cell_coords = char_cell_coords.unwrap();
+            let (row, col) = (char_cell_coords.0, char_cell_coords.1);
+            let cursor = ctx
+                .user_data
+                .text
+                .page_marcel_grid
+                .as_ref()
+                .unwrap()
+                .get_cell(row, col)
+                .unwrap()
+                .rect_area()
+                .clone();
 
-        if next_cursor_state != ctx.user_data.text.cursor_state {
+            // ctx.user_data.text.cursor_area = Some(cursor);
 
-            if ctx.user_data.text.cursor_state == OFF {
+            if next_cursor_state != ctx.user_data.text.cursor_state {
 
-                let idx = ctx.user_data.text.char_cell_idx;
-                let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(idx);
-
-                if char_cell_coords.is_some() {
-                    let char_cell_coords = char_cell_coords.unwrap();
-                    let mut cursor = ctx
-                        .user_data
-                        .text
-                        .page_marcel_grid.as_ref()
-                        .unwrap()
-                        .get_cell(char_cell_coords.0, char_cell_coords.1)
-                        .unwrap()
-                        .rect_area()
-                        .clone();
-
-                    cursor.color = Some(RetroNeon::CYBER_BLUE);
+                if ctx.user_data.text.cursor_state == OFF {
                     store_area_under_cursor(ctx, &cursor);
                     draw::rectangle::filled(ctx, &cursor);
                 }
+
+                if ctx.user_data.text.cursor_state == ON {
+                    restore_area_under_cursor(ctx);
+                }
             }
-
-            if ctx.user_data.text.cursor_state == ON {
-                restore_area_under_cursor(ctx);
-            }
-
-
         }
 
+
+        // Update the cursor state in user data
+        ctx.user_data.text.cursor_state = next_cursor_state;
+        //---------------------------------------------------------------
         // All cursor logic must end before this line!
-        ctx.user_data.text.cursor_state = next_cursor_state;
-
-        println!(
-            "ctx.user_data.text.cursor_state: {}",
-            ctx.user_data.text.cursor_state
-        );
-
-        // // if ctx.user_data.text.cur_char_cell.is_some(){
-        //
-        // // Blinking cursor
-        // if (ctx.frame_count / 20) % 2 == 0 {
-        //     let cursor = RectArea::new(26 , 20, 12, 28, None);
-        //     store_area_under_cursor(ctx, &cursor);
-        //     draw::rectangle::filled(ctx, &cursor);
-        // } else {
-        //     restore_area_under_cursor(ctx);
-        // };
-
-        /*
-        let next_cursor_state = if ctx.frame_count % 20 == 0 {
-            !ctx.user_data.text.cursor_state
-        } else {
-            ctx.user_data.text.cursor_state
-        };
 
 
-        if next_cursor_state != ctx.user_data.text.cursor_state {
 
-            if next_cursor_state && ctx.user_data.text.cursor_area.is_some() {
-                let cursor = ctx.user_data.text.cursor_area.unwrap().clone();
-                store_area_under_cursor(ctx, &cursor);
-                draw::rectangle::filled(ctx, &cursor);
-            }
 
-            if !next_cursor_state && ctx.user_data.text.cursor_data.is_some() {
-                restore_area_under_cursor(ctx);
-            }
 
-        }
-        ctx.user_data.text.cursor_state = next_cursor_state;
-        */
 
-        // ctx.user_data.text.cursor_on = !ctx.user_data.text.cursor_on;
-        /*
-
-                let cursor_exists = ctx.user_data.text.cursor_area.is_some();
-
-                    // Blinking cursor
-                    if cursor_exists {
-
-                        if ctx.user_data.text.cursor_state {
-
-                            let cursor_exists = ctx.user_data.text.cursor_area.is_some();
-
-                            let cursor = ctx.user_data.text.cursor_area.unwrap().clone();
-                            // let cursor = RectArea::new(26+12*7 , 20, 12, 28, None);
-
-                            draw::rectangle::filled(ctx, &cursor);
-                            println!("flip");
-                        }
-                        else {
-                            restore_area_under_cursor(ctx);
-                            println!("flop");
-                        };            }
-        */
-
-        /*        */
-
-        // }
-
-        // if char_cell_idx < ctx.user_data.text.page_marcel_char_cells.len() {
-        // }
     }
+
+
+
+
+
+
+
+
+
+
+
 
     //
     // if frame_count  < 500 {
