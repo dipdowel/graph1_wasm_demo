@@ -4,61 +4,68 @@ use graph1::buffer_op::scale;
 use graph1::core::context::GraphContext;
 use graph1::core::context_utils::context_snapshot::ContextSnapshot;
 use graph1::fx::scanline;
-use graph1::primitives::math::Displacement;
+use graph1::primitives::data_structs::variant::Variant;
+use graph1::primitives::math::{Displacement, MinMax};
 use graph1::primitives::plane::Dimensions2d;
 use graph1::primitives::{plane::RectArea, point::Point};
+use graph1::text::char_grid::MonospacedCharGrid;
 use graph1::text::font::{PixelFont, Spacing};
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
-use graph1::text::printer;
 use graph1::text::printer::Align;
+use graph1::text::{char_grid, printer};
 use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
 use graph1::utils::color::palettes::RetroNeon;
 use graph1::{buffer_op, draw};
 
-//---------------------------------------------------------------------
-// Configure the user data for typing text in Basic Concepts pt. 1
+const ON: bool = true;
+const OFF: bool = false;
+
+// Configure the user data for the demo
 pub struct TextUserData {
+    // cur_char_cell: Option<RectArea>,
+    cursor_state: bool,
+
+    /// Area under the cursor (for restoring after blinking)
     cursor_area: Option<RectArea>,
-    cursor_data: Option<Vec<u32>>,
-    text_font_scale: u8,
-    text_area_1: Option<RectArea>,
-    glyph_dims: Option<Dimensions2d>,
-    text_font_spacing: Spacing,
+    /// Pixel data under the cursor (for restoring after blinking)
+    cursor_data: Vec<u32>,
+    /// Character grid for the text page with the "Marcel van Deijl" text
+    page_marcel_grid: Option<MonospacedCharGrid>,
+    /// Coordinates of all character cells on the "Marcel van Deijl" text page
+    page_marcel_char_cells: Vec<(usize, usize)>,
+    /// Index of the current character cell to interact with
+    char_cell_idx: usize,
 }
 
-const DARK_BROWN: u32 = 0x342B17ff;
 const BLACK: u32 = 0x000000ff;
+
 pub fn get_text_user_data() -> TextUserData {
-    // TODO: Check whether this initialization is even needed at all...
-    // TODO: Check whether this initialization is even needed at all...
-    // TODO: Check whether this initialization is even needed at all...
-    // TODO: Check whether this initialization is even needed at all...
-    // TODO: Check whether this initialization is even needed at all...
-
-    let text_color = gradient::linear_step(RetroNeon::FUTURE_BRONZE, DARK_BROWN, 200, 120);
-
-    // let text_color = RetroNeon::FUTURE_BRONZE;
-
     TextUserData {
+        cursor_state: OFF,
+        // cur_char_cell: None,
         cursor_area: None,
-        cursor_data: None,
-        text_area_1: None,
-        glyph_dims: None,
-        text_font_spacing: Spacing {
-            kerning_px: 2,
-            leading_px: 3,
-        },
-        text_font_scale: 2,
+        cursor_data: vec![],
+        page_marcel_grid: None,
+        page_marcel_char_cells: vec![],
+        char_cell_idx: 0,
     }
 }
 
+//
+//
+// ===[ NAMED CONSTANTS FOR FRAME BUFFERS ]========================================================
+//
 const BUF_0_MAIN: usize = 0;
 const BUF_1_SCROLLER: usize = 1;
 const BUF_2_PAGE_MARCEL: usize = 2;
 const BUF_3_PAGE_N3TRUNN3R: usize = 3;
 
-//---------------------------------------------------------------------
+//
+//
+// ===[ PREPARE SCROLLING TITLE ]===================================================================
+//
+const SCROLLER_TEXT: &str = "   Pixel fonts!  ←     ";
 
 fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
     let original_window = ctx.win.get_context();
@@ -94,7 +101,7 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
         &Point { x: 1, y: 30 },
         &title_font,
         &title_font_props,
-        &"   Pixel fonts!  ←     ",
+        &SCROLLER_TEXT,
     );
 
     title_font_props.color = Some(RetroNeon::CYBER_YELLOW);
@@ -104,7 +111,7 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
         &Point { x: 0, y: 29 },
         &title_font,
         &title_font_props,
-        &"   Pixel fonts!  ←     ",
+        &SCROLLER_TEXT,
     );
 
     // restore the original window context
@@ -113,6 +120,33 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
     // Switch back to the main frame buffer (index 0)
     ctx.set_active_frame_buf(BUF_0_MAIN).ok();
 }
+
+//
+//
+// ===[ PREPARE TEXT PAGES ]========================================================================
+//
+const TEXT_FONT_SCALE: u8 = 2;
+const TEXT_FONT_SPACING: Spacing = Spacing {
+    kerning_px: 2,
+    leading_px: 3,
+};
+// —
+// –
+
+const MARCEL_PAGE_TEXT: [&str; 8] = [
+    "Marcel van Deijl designed two fonts",
+    "which are shipped with Graph1:",
+    "••••••••••••••••••••••••••••••",
+    "→ Matriks Uaxactun",
+    "→ Matriks Uaxactun Mono",
+    "••••••••••••••••••••••••••••••",
+    "Each font contains 222 characters,",
+    "that covers most European languages",
+    // "",
+    // "→ Red Alert Inet",
+    // "→ Red Alert Lan",
+    // "     by N3trunn3r",
+];
 
 fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
     let original_window = ctx.win.get_context();
@@ -125,8 +159,8 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
 
     let text_font = instantiate_embedded_font(
         EmbeddedFonts::MatriksUaxactunMono,
-        ctx.user_data.text.text_font_scale,
-        Some(ctx.user_data.text.text_font_spacing.clone()),
+        TEXT_FONT_SCALE,
+        Some(TEXT_FONT_SPACING),
         None,
     );
 
@@ -136,26 +170,6 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
         data: None,
     };
 
-    let text = [
-        "Marcel van Deijl designed two fonts",
-        "which are shipped with Graph1:",
-        "",
-        "→ Matriks Uaxactun",
-        "→ Matriks Uaxactun Mono",
-        "",
-        "Each font contains 222 characters,",
-        "that covers most European languages",
-        // "",
-        // "→ Red Alert Inet",
-        // "→ Red Alert Lan",
-        // "     by N3trunn3r",
-    ];
-
-    let glyph_dims = text_font.get_glyph(&'A').dimensions;
-    ctx.user_data.text.glyph_dims.get_or_insert(glyph_dims);
-
-    // println!("Glyph A: {:?}", glyph);
-
     let text_top_left: Point = Point { x: 26, y: 20 };
 
     let text_dims = printer::print(
@@ -163,15 +177,33 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
         &text_top_left,
         &text_font,
         &title_font_props,
-        &text,
+        &MARCEL_PAGE_TEXT,
         Align::Left,
     );
 
-    ctx.user_data.text.text_area_1.get_or_insert(RectArea {
-        dimensions: text_dims,
-        color: None,
-        top_left: text_top_left,
-    });
+    let dimensions_input: Variant<&[&str], Dimensions2d> = Variant::Primary(&MARCEL_PAGE_TEXT);
+
+    let page_marcel_grid = MonospacedCharGrid::new(
+        &text_font,
+        dimensions_input,
+        text_top_left,
+        Some(RetroNeon::NEON_PINK),
+    )
+    .expect("Failed to create MonospacedCharGrid for Marcel page");
+
+    ctx.user_data
+        .text
+        .page_marcel_grid
+        .get_or_insert(page_marcel_grid);
+
+    for (line_idx, char_idx) in MARCEL_PAGE_TEXT.iter().enumerate() {
+        for (char_index, ch) in char_idx.chars().enumerate() {
+            ctx.user_data
+                .text
+                .page_marcel_char_cells
+                .push((line_idx, char_index));
+        }
+    }
 
     // restore the original window context
     ctx.win.set_context(original_window);
@@ -203,25 +235,33 @@ fn scroll_the_title(ctx: &mut GraphContext<DemoUserData>) {
 
 //---------------------------------------------------------------------
 
+// fn get_char_grid()
+
 /// Store the area under the cursor for later restoration
 /// NB: This function assumes the area is fully inside the frame buffer!
 fn store_area_under_cursor(ctx: &mut GraphContext<DemoUserData>, cursor: &RectArea) {
     ctx.user_data.text.cursor_area = Some(cursor.clone());
+
+
+    if ctx.user_data.text.cursor_data.len() == 0 {
+        let cursor_data_size = (cursor.dimensions.w * cursor.dimensions.h) as usize;
+        ctx.user_data.text.cursor_data = vec![BLACK; cursor_data_size];
+    }
+
+    ctx.user_data.text.cursor_area = Some(cursor.clone());
+
     buffer_op::copy::rect::to_another_buf(
         &ctx.frame_buf,
         &ctx.win.dimensions,
         cursor,
-        // &mut ctx.user_data.text.cursor_data.get_or_insert(vec![0; (cursor.dimensions.w * cursor.dimensions.h) as usize]),
-        &mut ctx.user_data.text.cursor_data.insert(vec![
-            0;
-            (cursor.dimensions.w * cursor.dimensions.h)
-                as usize
-        ]),
-        &ctx.user_data.text.cursor_area.unwrap().dimensions,
+        &mut ctx.user_data.text.cursor_data,
+        &cursor.dimensions,
         &Point { x: 0, y: 0 },
         false,
         1,
-    )
+    );
+
+
 }
 
 /// Restore the area under the cursor from previously stored data
@@ -230,22 +270,15 @@ fn restore_area_under_cursor(ctx: &mut GraphContext<DemoUserData>) {
     if ctx.user_data.text.cursor_area.is_none() {
         return;
     }
-
-    let cursor_dims = &ctx.user_data.text.cursor_area.unwrap().dimensions.clone();
-
-    let cursor = match &ctx.user_data.text.cursor_area {
-        Some(c) => c,
-        None => return,
-    };
-    let cursor_data = match &ctx.user_data.text.cursor_data {
-        Some(d) => d,
-        None => return,
-    };
+    let cursor = &ctx.user_data.text.cursor_area.unwrap().clone();
+    let mut src_area = cursor.clone();
+    src_area.top_left.x = 0;
+    src_area.top_left.y = 0;
 
     buffer_op::copy::rect::to_another_buf(
-        &cursor_data,
-        &cursor_dims,
-        &ctx.user_data.text.cursor_area.unwrap(),
+        &ctx.user_data.text.cursor_data,
+        &cursor.dimensions,
+        &src_area,
         &mut ctx.frame_buf,
         &ctx.win.dimensions,
         &cursor.top_left,
@@ -266,13 +299,21 @@ const SCROLL_FADE_END: u32 = 480;
 const MARCEL_START: u32 = 480;
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-    // ctx.set_active_frame_buf(BUF_0_MAIN).ok();
     let frame_count = ctx.frame_count as u32;
 
     // Init the demo on frame 0
     if ctx.frame_count == 0 {
         prepare_scrolling_title(ctx);
         prepare_text_pages(ctx);
+    }
+
+    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+    if ctx.frame_count < MARCEL_START as usize {
+        ctx.frame_count = MARCEL_START as usize;
     }
 
     // Scroll the title across the screen
@@ -294,31 +335,149 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     if frame_count > MARCEL_START {
         ctx.set_active_frame_buf(BUF_2_PAGE_MARCEL).ok();
+        let rand_mod = ctx.rng.get_u32(&MinMax { min: 3, max: 7 });
+        if frame_count % rand_mod == 0 {
+            let idx = ctx.user_data.text.char_cell_idx;
 
-        // let text_area = ctx.user_data.text.text_area_1.clone();
+            // FIXME: uncomment
+            // ctx.user_data.text.char_cell_idx += 1;
+
+            let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(idx);
+
+            if char_cell_coords.is_some() {
+                let char_cell_coords = char_cell_coords.unwrap();
+
+                let char_cell = ctx
+                    .user_data
+                    .text
+                    .page_marcel_grid
+                    .as_ref()
+                    .unwrap()
+                    .get_cell(char_cell_coords.0, char_cell_coords.1)
+                    .unwrap()
+                    .rect_area()
+                    .clone();
+                // draw::rectangle::outline(ctx, &char_cell.unwrap().rect_area());
+
+                // ctx.user_data.text.cur_char_cell = Some(char_cell);
+                ctx.user_data.text.cursor_area = Some(char_cell);
+            }
+        }
+
+        let next_cursor_state = if ctx.frame_count % 50 == 0 {
+            !ctx.user_data.text.cursor_state
+        } else {
+            ctx.user_data.text.cursor_state
+        };
+        // The cursor logic must begin here!
+
+        if next_cursor_state != ctx.user_data.text.cursor_state {
+
+            if ctx.user_data.text.cursor_state == OFF {
+
+                let idx = ctx.user_data.text.char_cell_idx;
+                let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(idx);
+
+                if char_cell_coords.is_some() {
+                    let char_cell_coords = char_cell_coords.unwrap();
+                    let mut cursor = ctx
+                        .user_data
+                        .text
+                        .page_marcel_grid.as_ref()
+                        .unwrap()
+                        .get_cell(char_cell_coords.0, char_cell_coords.1)
+                        .unwrap()
+                        .rect_area()
+                        .clone();
+
+                    cursor.color = Some(RetroNeon::CYBER_BLUE);
+                    store_area_under_cursor(ctx, &cursor);
+                    draw::rectangle::filled(ctx, &cursor);
+                }
+            }
+
+            if ctx.user_data.text.cursor_state == ON {
+                restore_area_under_cursor(ctx);
+            }
 
 
-        let kerning = ctx.user_data.text.text_font_spacing.kerning_px as u32;
-        let leading = ctx.user_data.text.text_font_spacing.leading_px as u32;
-        let scale_factor = ctx.user_data.text.text_font_scale as u32;
+        }
 
-        let glyph = ctx.user_data.text.glyph_dims.unwrap();
+        // All cursor logic must end before this line!
+        ctx.user_data.text.cursor_state = next_cursor_state;
 
-        let char_cell = RectArea {
-            top_left:ctx.user_data.text.text_area_1.unwrap().top_left,
-            dimensions:Dimensions2d{
-                w: glyph.w + scale_factor * kerning,
-                h: glyph.h + scale_factor * leading,
-            },
-            color:Some(RetroNeon::NEON_PINK)
+        println!(
+            "ctx.user_data.text.cursor_state: {}",
+            ctx.user_data.text.cursor_state
+        );
+
+        // // if ctx.user_data.text.cur_char_cell.is_some(){
+        //
+        // // Blinking cursor
+        // if (ctx.frame_count / 20) % 2 == 0 {
+        //     let cursor = RectArea::new(26 , 20, 12, 28, None);
+        //     store_area_under_cursor(ctx, &cursor);
+        //     draw::rectangle::filled(ctx, &cursor);
+        // } else {
+        //     restore_area_under_cursor(ctx);
+        // };
+
+        /*
+        let next_cursor_state = if ctx.frame_count % 20 == 0 {
+            !ctx.user_data.text.cursor_state
+        } else {
+            ctx.user_data.text.cursor_state
         };
 
-        draw::rectangle::outline(ctx, &char_cell);
 
+        if next_cursor_state != ctx.user_data.text.cursor_state {
 
+            if next_cursor_state && ctx.user_data.text.cursor_area.is_some() {
+                let cursor = ctx.user_data.text.cursor_area.unwrap().clone();
+                store_area_under_cursor(ctx, &cursor);
+                draw::rectangle::filled(ctx, &cursor);
+            }
 
-        // ctx.user_data.text.glyph_dims
+            if !next_cursor_state && ctx.user_data.text.cursor_data.is_some() {
+                restore_area_under_cursor(ctx);
+            }
+
+        }
+        ctx.user_data.text.cursor_state = next_cursor_state;
+        */
+
+        // ctx.user_data.text.cursor_on = !ctx.user_data.text.cursor_on;
+        /*
+
+                let cursor_exists = ctx.user_data.text.cursor_area.is_some();
+
+                    // Blinking cursor
+                    if cursor_exists {
+
+                        if ctx.user_data.text.cursor_state {
+
+                            let cursor_exists = ctx.user_data.text.cursor_area.is_some();
+
+                            let cursor = ctx.user_data.text.cursor_area.unwrap().clone();
+                            // let cursor = RectArea::new(26+12*7 , 20, 12, 28, None);
+
+                            draw::rectangle::filled(ctx, &cursor);
+                            println!("flip");
+                        }
+                        else {
+                            restore_area_under_cursor(ctx);
+                            println!("flop");
+                        };            }
+        */
+
+        /*        */
+
+        // }
+
+        // if char_cell_idx < ctx.user_data.text.page_marcel_char_cells.len() {
+        // }
     }
+
     //
     // if frame_count  < 500 {
     //     scanline::window(ctx, 2, 16);
@@ -332,7 +491,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             store_area_under_cursor(ctx, &cursor);
             draw::rectangle::filled(ctx, &cursor);
         } else {
-
             restore_area_under_cursor(ctx);
         };
     */
@@ -542,3 +700,46 @@ Some(vec![
        use_absolute_alpha: bool,
        num_threads: usize,
 */
+
+/*
+
+/// Calculate the area of a single character cell (glyph + spacing)
+/// # Arguments
+/// * `ctx` - The graphics context containing user data and font information.
+/// * `char_x` - The horizontal character index in the char grid (not the pixel position!).
+/// * `char_y` - The vertical character index in the char grid (not the pixel position!).
+/// # Returns
+/// A `RectArea` representing the area of the character cell.
+fn get_char_cell(ctx: &mut GraphContext<DemoUserData>, char_x: u32, char_y: u32) -> RectArea {
+    let kerning = ctx.user_data.text.text_font_spacing.kerning_px as u32;
+    let leading = ctx.user_data.text.text_font_spacing.leading_px as u32;
+    let scale_factor = ctx.user_data.text.text_font_scale as u32;
+
+    let glyph = ctx.user_data.text.glyph_dims.unwrap();
+
+    let top_left = ctx
+        .user_data
+        .text
+        .text_area_marcel
+        .unwrap()
+        .top_left
+        .clone();
+    let top_left = Point {
+        x: top_left.x + char_x * (glyph.w + scale_factor * kerning),
+        y: top_left.y + char_y * (glyph.h + scale_factor * leading),
+    };
+
+    let dimensions = Dimensions2d {
+        w: glyph.w + scale_factor * kerning,
+        h: glyph.h + scale_factor * leading,
+    };
+
+    let char_cell = RectArea {
+        top_left,
+        dimensions,
+        color: Some(RetroNeon::NEON_PINK),
+    };
+
+    char_cell
+}
+ */
