@@ -384,7 +384,33 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     }
 
     if frame_count > MARCEL_START {
-        ctx.set_active_frame_buf(BUF_2_PAGE_MARCEL).ok();
+        let mut char_dst_area = RectArea::new(0, 0, 1, 1, None);
+        if ctx.user_data.text.cursor_area.is_some() {
+            char_dst_area = ctx.user_data.text.cursor_area.unwrap().clone()
+        }
+
+
+        // ctx.set_active_frame_buf(BUF_2_PAGE_MARCEL).ok();
+
+        let win_dims = ctx.win.dimensions.clone();
+        let mut buf_result = ctx
+            // .get_multi_frame_bufs(&[0, 1])
+            .get_multi_frame_bufs(&[BUF_2_PAGE_MARCEL])
+            .expect("Failed to get multiple frame buffers");
+        // let dst_buf = buf_result.active;
+        let src_buf = buf_result.immut[0].frame_buf;
+
+
+        buffer_op::copy::rect::to_another_buf(
+            src_buf,
+            &win_dims,
+            &char_dst_area,
+            &mut buf_result.active,
+            &win_dims,
+            &char_dst_area.top_left,
+            false,
+            1,
+        );
 
 
         let next_char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(ctx.user_data.text.char_cell_idx);
