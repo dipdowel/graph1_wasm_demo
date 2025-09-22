@@ -18,13 +18,14 @@ use graph1::utils::color::gradient;
 use graph1::utils::color::palettes::RetroNeon;
 use graph1::{buffer_op, draw};
 use graph1::utils::grid::grid_position::GridPosition;
+use graph1::utils::math::rng::XorShiftRng;
 
 const ON: bool = true;
 const OFF: bool = false;
 
 // Configure the user data for the demo
 pub struct TextUserData {
-    // cur_char_cell: Option<RectArea>,
+
     cursor_state: bool,
 
     /// Area under the cursor (for restoring after blinking)
@@ -38,6 +39,10 @@ pub struct TextUserData {
     page_marcel_grid: Option<MonospacedCharGrid>,
     /// Coordinates of all character cells on the "Marcel van Deijl" text page
     page_marcel_char_cells: Vec<(usize, usize)>,
+
+    /// Index of the character cell with the checkmark (✔) on the "Marcel van Deijl" text page
+    page_marcel_checkmark_char_idx:usize,
+
     /// Index of the current character cell to interact with
     char_cell_idx: usize,
 }
@@ -48,14 +53,28 @@ const TRANSPARENT: u32 = 0x00000000;
 pub fn get_text_user_data() -> TextUserData {
     TextUserData {
         cursor_state: OFF,
-        // cur_char_cell: None,
         cursor_area: None,
         cursor_data: vec![],
         cursor_position: GridPosition::new(0,0),
         page_marcel_grid: None,
         page_marcel_char_cells: vec![],
+        page_marcel_checkmark_char_idx: 0,
         char_cell_idx: 0,
     }
+}
+
+
+fn reset(ctx: &mut GraphContext<DemoUserData>) {
+    ctx.user_data.text.cursor_state = OFF;
+    ctx.user_data.text.cursor_area = None;
+    ctx.user_data.text.cursor_data = vec![];
+    ctx.user_data.text.cursor_position = GridPosition::new(0,0);
+    ctx.user_data.text.page_marcel_grid = None;
+    ctx.user_data.text.page_marcel_char_cells = vec![];
+    ctx.user_data.text.page_marcel_checkmark_char_idx = 0;
+    ctx.user_data.text.char_cell_idx = 0;
+
+    ctx.rng = XorShiftRng::default();
 }
 
 //
@@ -83,9 +102,9 @@ const DARK_GREEN:u32 = 0x00_04_00_ff;
 const MARCEL_BG_COLOR: u32 = DARK_GREEN ;
 // const MARCEL_TEXT_COLOR: u32 = RetroNeon::CIRCUIT_GREEN  ;
 // const MARCEL_TEXT_COLOR: u32 = RetroNeon::ACID_GREEN  ;
-const MARCEL_TEXT_COLOR: u32 = 0x4f_ff_23_ff ;
+const MARCEL_TEXT_COLOR: u32 = 0x6f_ff_43_ff ;
 // const MARCEL_CURSOR_COLOR: u32 = RetroNeon::TOXIC_GREEN   ;
- const MARCEL_CURSOR_COLOR: u32 = 0x11_bb_05_ff  ;
+const MARCEL_CURSOR_COLOR: u32 = 0x11_bb_05_ff  ;
 
 
 // RetroNeon::TOXIC_GREEN
@@ -100,10 +119,9 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
     let original_window = ctx.win.get_context();
 
     ctx.set_active_frame_buf(BUF_1_SCROLLER).ok();
-
     ctx.win.background_color = SCROLLER_BG_COLOR;
     ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
-    clear_screen(ctx);
+    clear_screen(ctx); // Clear the main buffer first
 
     // Title that will be scrolled across the screen
     let title_font = instantiate_embedded_font(
@@ -183,6 +201,9 @@ const MARCEL_PAGE_TEXT: [&str; 8] = [
     // "     by N3trunn3r",
 ];
 
+///
+/// Prepare the text pages
+///
 fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
     let original_window = ctx.win.get_context();
 
@@ -237,6 +258,13 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
                 .text
                 .page_marcel_char_cells
                 .push((line_idx, char_index));
+
+            // Save the index of the checkmark character (✔) in the text,
+            // so we can skip it during the initial text rendering, that's needed for a further animation
+            if ch == '✔' {
+                ctx.user_data.text.page_marcel_checkmark_char_idx = ctx.user_data.text.page_marcel_char_cells.len();
+            }
+
         }
     }
 
@@ -246,6 +274,9 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
     ctx.set_active_frame_buf(BUF_0_MAIN).ok();
 }
 
+///
+/// Scroll the title across the screen
+///
 fn scroll_the_title(ctx: &mut GraphContext<DemoUserData>) {
     let frame_count = ctx.frame_count as u32;
     let win_dims = ctx.win.dimensions.clone();
@@ -371,6 +402,9 @@ const SCROLL_FADE_START: u32 = 408;
 const SCROLL_FADE_END: u32 = 455;
 
 const MARCEL_START: u32 = 455;
+const MARCEL_CHECKMARK: u32 = 1977;
+const MARCEL_END: u32 = 2000;
+
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
@@ -378,22 +412,26 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     // Init the demo on frame 0
     if ctx.frame_count == 0 {
+        reset(ctx);
         prepare_scrolling_title(ctx);
         prepare_text_pages(ctx);
+        ctx.win.background_color = SCROLLER_BG_COLOR;
+        ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
+        clear_screen(ctx); // Clear the main buffer first
     }
 
     /*
-    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-    if ctx.frame_count < MARCEL_START as usize {
-        ctx.frame_count = MARCEL_START as usize;
-        ctx.win.background_color = MARCEL_BG_COLOR;
-        clear_screen(ctx);
-    }
-     */
+            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+            if ctx.frame_count < MARCEL_START as usize {
+                ctx.frame_count = MARCEL_START as usize;
+                ctx.win.background_color = MARCEL_BG_COLOR;
+                clear_screen(ctx);
+            }
+        */
 
     // Scroll the title across the screen
     if frame_count > SCROLL_START && frame_count < SCROLL_END {
@@ -414,7 +452,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         scanline::window(ctx, 2, 26);
     }
 
-    if frame_count > MARCEL_START {
+    if frame_count > MARCEL_START && frame_count < MARCEL_CHECKMARK {
         let mut char_dst_area = RectArea::new(0, 0, 1, 1, None);
         if ctx.user_data.text.cursor_area.is_some() {
             char_dst_area = ctx.user_data.text.cursor_area.unwrap().clone();
@@ -466,7 +504,21 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         // The speed of cursor movement is randomized here
         let rand_mod = ctx.rng.get_u32(&MinMax { min, max });
 
-        if frame_count % rand_mod == 0 {
+        let checkmark_idx = ctx.user_data.text.page_marcel_checkmark_char_idx;
+
+        // Skip rendering the checkmark character (✔) during the initial text rendering
+        if ctx.user_data.text.char_cell_idx == checkmark_idx {
+            ctx.user_data.text.char_cell_idx += 1;
+            return;
+        }
+
+        let keep_on_rendering = ctx.user_data.text.char_cell_idx < ctx.user_data.text.page_marcel_char_cells.len();
+
+        if (!keep_on_rendering){
+            println!("FRAME: {}", ctx.frame_count);
+        }
+
+        if keep_on_rendering && frame_count % rand_mod == 0 {
             // get coords (row, column) of the current char cell
             let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(ctx.user_data.text.char_cell_idx);
             ctx.user_data.text.cursor_state = ON;
@@ -481,6 +533,48 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         scanline::window(ctx, 1, 15);
 
     }
+
+    if frame_count == MARCEL_CHECKMARK {
+
+        ctx.user_data.text.cursor_state = OFF;
+        let checkmark_coords = ctx.user_data.text.page_marcel_char_cells.get(ctx.user_data.text.page_marcel_checkmark_char_idx-1);
+        if checkmark_coords.is_some() {
+            let (row, col) = (checkmark_coords.unwrap().0, checkmark_coords.unwrap().1);
+            let new_position = GridPosition::new(row, col);
+
+            set_cursor(ctx, new_position); // TODO uncomment!
+        }
+
+        let char_dst_area = ctx.user_data.text.cursor_area.unwrap().clone();
+
+        let win_dims = ctx.win.dimensions.clone();
+        let mut buf_result = ctx
+            // .get_multi_frame_bufs(&[0, 1])
+            .get_multi_frame_bufs(&[BUF_2_PAGE_MARCEL])
+            .expect("Failed to get multiple frame buffers");
+        // let dst_buf = buf_result.active;
+        let src_buf = buf_result.immut[0].frame_buf;
+
+
+
+
+        buffer_op::copy::rect::to_another_buf(
+            src_buf,
+            &win_dims,
+            &char_dst_area,
+            &mut buf_result.active,
+            &win_dims,
+            &char_dst_area.top_left,
+            true,
+            1,
+        );
+
+
+
+
+
+    }
+
 
 }
 
