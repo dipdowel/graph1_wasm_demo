@@ -43,6 +43,7 @@ pub struct TextUserData {
 }
 
 const BLACK: u32 = 0x000000ff;
+const TRANSPARENT: u32 = 0x00000000;
 
 pub fn get_text_user_data() -> TextUserData {
     TextUserData {
@@ -68,6 +69,29 @@ const BUF_3_PAGE_N3TRUNN3R: usize = 3;
 
 //
 //
+// ===[ COLORS ]========================================================
+//
+const SCROLLER_BG_COLOR: u32 = RetroNeon::ELECTRIC_BLUE;
+const SCROLLER_TEXT_COLOR: u32 = RetroNeon::CYBER_YELLOW;
+
+// const MARCEL_BG_COLOR: u32 = RetroNeon::DEEP_SPACE_BLUE;
+// const MARCEL_TEXT_COLOR: u32 = RetroNeon::NEON_MAGENTA ;
+// const MARCEL_CURSOR_COLOR: u32 = RetroNeon::ELECTRIC_PURPLE ;
+
+const DARK_GREEN:u32 = 0x00_04_00_ff;
+
+const MARCEL_BG_COLOR: u32 = DARK_GREEN ;
+// const MARCEL_TEXT_COLOR: u32 = RetroNeon::CIRCUIT_GREEN  ;
+// const MARCEL_TEXT_COLOR: u32 = RetroNeon::ACID_GREEN  ;
+const MARCEL_TEXT_COLOR: u32 = 0x4f_ff_23_ff ;
+// const MARCEL_CURSOR_COLOR: u32 = RetroNeon::TOXIC_GREEN   ;
+ const MARCEL_CURSOR_COLOR: u32 = 0x11_bb_05_ff  ;
+
+
+// RetroNeon::TOXIC_GREEN
+
+//
+//
 // ===[ PREPARE SCROLLING TITLE ]===================================================================
 //
 const SCROLLER_TEXT: &str = "   Pixel fonts!  ←     ";
@@ -77,8 +101,8 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
 
     ctx.set_active_frame_buf(BUF_1_SCROLLER).ok();
 
-    ctx.win.background_color = RetroNeon::ELECTRIC_BLUE;
-    ctx.win.foreground_color = RetroNeon::CYBER_YELLOW;
+    ctx.win.background_color = SCROLLER_BG_COLOR;
+    ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
     clear_screen(ctx);
 
     // Title that will be scrolled across the screen
@@ -140,13 +164,13 @@ const TEXT_FONT_SPACING: Spacing = Spacing {
 //which are shipped with Graph1:
 const MARCEL_PAGE_TEXT: [&str; 8] = [
     " Graph1 is shipped with a pixel ",
-    " font family \"Matriks Uaxactun\",",
-    " designed by Marcel van Deijl." ,
-    "---------------------------------",
-    " You're reading this in:",
-    "  → [✔] Matriks Uaxactun Mono",
-    "  → [ ] Matriks Uaxactun Regular",
-    "---------------------------------",
+    " font family \"Matriks Uaxactun\", ",
+    " designed by Marcel van Deijl. " ,
+    "--------------------------------- ",
+    " You're reading this in: ",
+    "  → [✔] Matriks Uaxactun Mono ",
+    "  → [ ] Matriks Uaxactun Regular ",
+    "---------------------------------     ",
 
     // " → Matriks Uaxactun Mono",
 
@@ -164,8 +188,8 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
 
     ctx.set_active_frame_buf(BUF_2_PAGE_MARCEL).ok();
 
-    ctx.win.background_color = BLACK;
-    ctx.win.foreground_color = RetroNeon::MATRIX_GREEN;
+    ctx.win.background_color = TRANSPARENT;
+    ctx.win.foreground_color = MARCEL_TEXT_COLOR;
     clear_screen(ctx);
 
     let text_font = instantiate_embedded_font(
@@ -176,12 +200,12 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
     );
 
     let title_font_props: printer::ColorProperties = printer::ColorProperties {
-        color: Some(RetroNeon::ACID_GREEN),
+        color: Some(MARCEL_TEXT_COLOR),
         color_transformer: None,
         data: None,
     };
 
-    let text_top_left: Point = Point { x: 26, y: 18 };
+    let text_top_left: Point = Point { x: 26, y: 19 };
 
     let text_dims = printer::print(
         ctx,
@@ -198,7 +222,7 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
         &text_font,
         dimensions_input,
         text_top_left,
-        Some(RetroNeon::MATRIX_GREEN),
+        Some(MARCEL_CURSOR_COLOR),
     )
         .expect("Failed to create MonospacedCharGrid for Marcel page");
 
@@ -344,11 +368,12 @@ fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos:GridPosition) {
 const SCROLL_START: u32 = 0;
 const SCROLL_END: u32 = 412;
 const SCROLL_FADE_START: u32 = 408;
-const SCROLL_FADE_END: u32 = 480;
+const SCROLL_FADE_END: u32 = 455;
 
-const MARCEL_START: u32 = 480;
+const MARCEL_START: u32 = 455;
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
+
     let frame_count = ctx.frame_count as u32;
 
     // Init the demo on frame 0
@@ -357,6 +382,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         prepare_text_pages(ctx);
     }
 
+    /*
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
@@ -364,33 +390,37 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     if ctx.frame_count < MARCEL_START as usize {
         ctx.frame_count = MARCEL_START as usize;
+        ctx.win.background_color = MARCEL_BG_COLOR;
+        clear_screen(ctx);
     }
+     */
 
     // Scroll the title across the screen
     if frame_count > SCROLL_START && frame_count < SCROLL_END {
         clear_screen(ctx);
         scroll_the_title(ctx);
+        scanline::window(ctx, 2, 26);
     }
 
     // Fade the screen out into [black?]
     if frame_count > SCROLL_FADE_START && frame_count < SCROLL_FADE_END {
         ctx.win.background_color = gradient::linear_step(
             RetroNeon::ELECTRIC_BLUE,
-            BLACK,
+            MARCEL_BG_COLOR,
             (SCROLL_FADE_END - SCROLL_FADE_START) as usize,
             ctx.frame_count.saturating_sub(SCROLL_FADE_START as usize),
         );
         clear_screen(ctx);
+        scanline::window(ctx, 2, 26);
     }
 
     if frame_count > MARCEL_START {
         let mut char_dst_area = RectArea::new(0, 0, 1, 1, None);
         if ctx.user_data.text.cursor_area.is_some() {
-            char_dst_area = ctx.user_data.text.cursor_area.unwrap().clone()
+            char_dst_area = ctx.user_data.text.cursor_area.unwrap().clone();
+            char_dst_area.top_left.x= char_dst_area.top_left.x.saturating_sub(char_dst_area.dimensions.w);
         }
 
-
-        // ctx.set_active_frame_buf(BUF_2_PAGE_MARCEL).ok();
 
         let win_dims = ctx.win.dimensions.clone();
         let mut buf_result = ctx
@@ -408,23 +438,36 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             &mut buf_result.active,
             &win_dims,
             &char_dst_area.top_left,
-            false,
+            true,
             1,
         );
 
 
         let next_char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(ctx.user_data.text.char_cell_idx);
-        let mut min = 6;
-        let mut max = 10;
-        if next_char_cell_coords.is_some() && next_char_cell_coords.unwrap().1 == 0 {
-            min = 59 ;
-            max = 63;
+
+        // `min` and `max` define the speed range of the cursor
+        let mut min = 4;
+        let mut max = 9;
+
+        // Slow down the cursor when it junps to the new line
+        if next_char_cell_coords.is_some() {
+            if  next_char_cell_coords.unwrap().1 == 0 {
+                min = 59 ;
+                max = 63;
+            }
+
+            if  next_char_cell_coords.unwrap().0 == 3 ||  next_char_cell_coords.unwrap().0 == 7{
+                min = 4 ;
+                max = 5;
+            }
+
         }
 
-        // FIXME: uncomment
+        // The speed of cursor movement is randomized here
         let rand_mod = ctx.rng.get_u32(&MinMax { min, max });
+
         if frame_count % rand_mod == 0 {
-            ctx.user_data.text.char_cell_idx += 1;
+            // get coords (row, column) of the current char cell
             let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(ctx.user_data.text.char_cell_idx);
             ctx.user_data.text.cursor_state = ON;
             if char_cell_coords.is_some() {
@@ -432,55 +475,58 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
                 let (row, col) = (char_cell_coords.0, char_cell_coords.1);
                 let new_position = GridPosition::new(row, col);
                 set_cursor(ctx, new_position); // TODO uncomment!
-
-            }
-
-        }
-
-
-        /*
-        let next_cursor_state = if ctx.frame_count % 30 == 0 {
-            !ctx.user_data.text.cursor_state
-        } else {
-            ctx.user_data.text.cursor_state
-        };
-
-        let idx = ctx.user_data.text.char_cell_idx;
-        let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(idx);
-        // The cursor logic must begin here!
-        if char_cell_coords.is_some() {
-            let char_cell_coords = char_cell_coords.unwrap();
-            let (row, col) = (char_cell_coords.0, char_cell_coords.1);
-            let cursor = ctx
-                .user_data
-                .text
-                .page_marcel_grid
-                .as_ref()
-                .unwrap()
-                .get_cell(row, col)
-                .unwrap()
-                .rect_area()
-                .clone();
-
-            if next_cursor_state != ctx.user_data.text.cursor_state {
-                if ctx.user_data.text.cursor_state == OFF {
-                    store_area_under_cursor(ctx, &cursor);
-                    draw::rectangle::filled(ctx, &cursor);
-                }
-                if ctx.user_data.text.cursor_state == ON {
-                    restore_area_under_cursor(ctx);
-                }
+                ctx.user_data.text.char_cell_idx += 1;
             }
         }
-
-
-        // Update the cursor state in user data
-        ctx.user_data.text.cursor_state = next_cursor_state;
-        //---------------------------------------------------------------
-        // All cursor logic must end before this line!
-*/
-
+        scanline::window(ctx, 1, 15);
 
     }
 
 }
+
+
+
+
+
+
+/*
+let next_cursor_state = if ctx.frame_count % 30 == 0 {
+    !ctx.user_data.text.cursor_state
+} else {
+    ctx.user_data.text.cursor_state
+};
+
+let idx = ctx.user_data.text.char_cell_idx;
+let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(idx);
+// The cursor logic must begin here!
+if char_cell_coords.is_some() {
+    let char_cell_coords = char_cell_coords.unwrap();
+    let (row, col) = (char_cell_coords.0, char_cell_coords.1);
+    let cursor = ctx
+        .user_data
+        .text
+        .page_marcel_grid
+        .as_ref()
+        .unwrap()
+        .get_cell(row, col)
+        .unwrap()
+        .rect_area()
+        .clone();
+
+    if next_cursor_state != ctx.user_data.text.cursor_state {
+        if ctx.user_data.text.cursor_state == OFF {
+            store_area_under_cursor(ctx, &cursor);
+            draw::rectangle::filled(ctx, &cursor);
+        }
+        if ctx.user_data.text.cursor_state == ON {
+            restore_area_under_cursor(ctx);
+        }
+    }
+}
+
+
+// Update the cursor state in user data
+ctx.user_data.text.cursor_state = next_cursor_state;
+//---------------------------------------------------------------
+// All cursor logic must end before this line!
+*/
