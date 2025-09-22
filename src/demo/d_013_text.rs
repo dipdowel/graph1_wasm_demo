@@ -17,6 +17,7 @@ use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
 use graph1::utils::color::palettes::RetroNeon;
 use graph1::{buffer_op, draw};
+use graph1::utils::grid::grid_position::GridPosition;
 
 const ON: bool = true;
 const OFF: bool = false;
@@ -30,6 +31,9 @@ pub struct TextUserData {
     cursor_area: Option<RectArea>,
     /// Pixel data under the cursor (for restoring after blinking)
     cursor_data: Vec<u32>,
+
+    cursor_position:GridPosition,
+
     /// Character grid for the text page with the "Marcel van Deijl" text
     page_marcel_grid: Option<MonospacedCharGrid>,
     /// Coordinates of all character cells on the "Marcel van Deijl" text page
@@ -46,6 +50,7 @@ pub fn get_text_user_data() -> TextUserData {
         // cur_char_cell: None,
         cursor_area: None,
         cursor_data: vec![],
+        cursor_position: GridPosition::new(0,0),
         page_marcel_grid: None,
         page_marcel_char_cells: vec![],
         char_cell_idx: 0,
@@ -127,21 +132,27 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
 //
 const TEXT_FONT_SCALE: u8 = 2;
 const TEXT_FONT_SPACING: Spacing = Spacing {
-    kerning_px: 2,
-    leading_px: 3,
+    kerning_px: 3,
+    leading_px: 4,
 };
 // —
 // –
-
+//which are shipped with Graph1:
 const MARCEL_PAGE_TEXT: [&str; 8] = [
-    "Marcel van Deijl designed two fonts",
-    "which are shipped with Graph1:",
-    " ", //"• • • • • • • • • • • • • ",
-    "  → Matriks Uaxactun      ",
-    "  → Matriks Uaxactun Mono ",
-    " ", //"• • • • • • • • • • • • • ",
-    "Each font contains 222 characters,",
-    "that covers most European languages",
+    " Graph1 is shipped with a pixel ",
+    " font family \"Matriks Uaxactun\",",
+    " designed by Marcel van Deijl." ,
+    "---------------------------------",
+    " You're reading this in:",
+    "  → [✔] Matriks Uaxactun Mono",
+    "  → [ ] Matriks Uaxactun Regular",
+    "---------------------------------",
+
+    // " → Matriks Uaxactun Mono",
+
+    // " ", //"• • • • • • • • • • • • • ",
+    // "Each font contains 222 characters,",
+    // "that covers most European languages. ",
     // "",
     // "→ Red Alert Inet",
     // "→ Red Alert Lan",
@@ -170,7 +181,7 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
         data: None,
     };
 
-    let text_top_left: Point = Point { x: 26, y: 20 };
+    let text_top_left: Point = Point { x: 26, y: 18 };
 
     let text_dims = printer::print(
         ctx,
@@ -187,9 +198,9 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
         &text_font,
         dimensions_input,
         text_top_left,
-        Some(RetroNeon::NEON_PINK),
+        Some(RetroNeon::MATRIX_GREEN),
     )
-    .expect("Failed to create MonospacedCharGrid for Marcel page");
+        .expect("Failed to create MonospacedCharGrid for Marcel page");
 
     ctx.user_data
         .text
@@ -284,6 +295,48 @@ fn restore_area_under_cursor(ctx: &mut GraphContext<DemoUserData>) {
     )
 }
 
+
+fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos:GridPosition) {
+
+    if pos == ctx.user_data.text.cursor_position {
+        return;
+    }
+    // extract row and col from pos
+    let GridPosition{row, col} = pos;
+
+    if ctx.user_data.text.cursor_state == ON {
+        // If the cursor is currently ON, we need to restore the area under it first
+        restore_area_under_cursor(ctx);
+
+        // TODO: make sure `.unwrap()` won't fail
+        let new_cursor = ctx.user_data.text.page_marcel_grid.as_ref().unwrap().get_cell(row, col);
+
+        if new_cursor.is_some() {
+            let new_cursor = new_cursor.unwrap().rect_area().clone();
+            store_area_under_cursor(ctx, &new_cursor);
+            draw::rectangle::filled(ctx, &new_cursor);
+            ctx.user_data.text.cursor_area = Some(new_cursor);
+            ctx.user_data.text.cursor_position = pos.clone();
+        }
+    }
+
+    if ctx.user_data.text.cursor_state == OFF {
+        // If the cursor is currently OFF, we just need to store the area under it
+        let new_cursor = ctx.user_data.text.page_marcel_grid.as_ref().unwrap().get_cell(row, col);
+
+        if new_cursor.is_some() {
+            let new_cursor = new_cursor.unwrap().rect_area().clone();
+            store_area_under_cursor(ctx, &new_cursor);
+            ctx.user_data.text.cursor_area = Some(new_cursor);
+            ctx.user_data.text.cursor_position = pos;
+        }
+    }
+
+    // cursor_area.top_left.x +=
+    // store_area_under_cursor(ctx, &ctx.user_data.text.cursor_area.unwrap());
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////// [ RENDER FRAME ] ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -333,19 +386,34 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if frame_count > MARCEL_START {
         ctx.set_active_frame_buf(BUF_2_PAGE_MARCEL).ok();
 
+
+        let next_char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(ctx.user_data.text.char_cell_idx);
+        let mut min = 6;
+        let mut max = 10;
+        if next_char_cell_coords.is_some() && next_char_cell_coords.unwrap().1 == 0 {
+            min = 59 ;
+            max = 63;
+        }
+
         // FIXME: uncomment
-        // let rand_mod = ctx.rng.get_u32(&MinMax { min: 3, max: 7 });
-        // if frame_count % rand_mod == 0 {
-        //     if ctx.user_data.text.cursor_state == ON {
-        //         restore_area_under_cursor(ctx);
-        //         ctx.user_data.text.cursor_state = OFF;
-        //
-        //     }
-        //     ctx.user_data.text.char_cell_idx += 1;
-        // }
+        let rand_mod = ctx.rng.get_u32(&MinMax { min, max });
+        if frame_count % rand_mod == 0 {
+            ctx.user_data.text.char_cell_idx += 1;
+            let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(ctx.user_data.text.char_cell_idx);
+            ctx.user_data.text.cursor_state = ON;
+            if char_cell_coords.is_some() {
+                let char_cell_coords = char_cell_coords.unwrap();
+                let (row, col) = (char_cell_coords.0, char_cell_coords.1);
+                let new_position = GridPosition::new(row, col);
+                set_cursor(ctx, new_position); // TODO uncomment!
+
+            }
+
+        }
 
 
-        let next_cursor_state = if ctx.frame_count % 40 == 0 {
+        /*
+        let next_cursor_state = if ctx.frame_count % 30 == 0 {
             !ctx.user_data.text.cursor_state
         } else {
             ctx.user_data.text.cursor_state
@@ -384,7 +452,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.user_data.text.cursor_state = next_cursor_state;
         //---------------------------------------------------------------
         // All cursor logic must end before this line!
-
+*/
 
 
     }
