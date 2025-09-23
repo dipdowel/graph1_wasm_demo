@@ -1,5 +1,4 @@
 use crate::demo::user_data::DemoUserData;
-use crate::utils::console_log;
 use graph1::buffer_op::scale;
 use graph1::core::context::GraphContext;
 use graph1::core::context_utils::context_snapshot::ContextSnapshot;
@@ -9,23 +8,22 @@ use graph1::primitives::math::{Displacement, MinMax};
 use graph1::primitives::plane::Dimensions2d;
 use graph1::primitives::{plane::RectArea, point::Point};
 use graph1::text::char_grid::MonospacedCharGrid;
-use graph1::text::font::{PixelFont, Spacing};
+use graph1::text::font::Spacing;
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
 use graph1::text::printer::Align;
-use graph1::text::{char_grid, printer};
+use graph1::text::printer;
 use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
 use graph1::utils::color::palettes::RetroNeon;
-use graph1::{buffer_op, draw};
 use graph1::utils::grid::grid_position::GridPosition;
 use graph1::utils::math::rng::XorShiftRng;
+use graph1::{buffer_op, draw};
 
 const ON: bool = true;
 const OFF: bool = false;
 
 // Configure the user data for the demo
 pub struct TextUserData {
-
     cursor_state: bool,
 
     /// Area under the cursor (for restoring after blinking)
@@ -33,7 +31,7 @@ pub struct TextUserData {
     /// Pixel data under the cursor (for restoring after blinking)
     cursor_data: Vec<u32>,
 
-    cursor_position:GridPosition,
+    cursor_position: GridPosition,
 
     /// Character grid for the text page with the "Marcel van Deijl" text
     page_marcel_grid: Option<MonospacedCharGrid>,
@@ -41,21 +39,21 @@ pub struct TextUserData {
     page_marcel_char_cells: Vec<(usize, usize)>,
 
     /// Index of the character cell with the checkmark (✔) on the "Marcel van Deijl" text page
-    page_marcel_checkmark_char_idx:usize,
+    page_marcel_checkmark_char_idx: usize,
 
     /// Index of the current character cell to interact with
     char_cell_idx: usize,
 }
 
-const BLACK: u32 = 0x000000ff;
-const TRANSPARENT: u32 = 0x00000000;
+const BLACK: u32 = 0x00_00_00_ff;
+const TRANSPARENT: u32 = 0x00_00_00_00;
 
 pub fn get_text_user_data() -> TextUserData {
     TextUserData {
         cursor_state: OFF,
         cursor_area: None,
         cursor_data: vec![],
-        cursor_position: GridPosition::new(0,0),
+        cursor_position: GridPosition::new(0, 0),
         page_marcel_grid: None,
         page_marcel_char_cells: vec![],
         page_marcel_checkmark_char_idx: 0,
@@ -63,17 +61,16 @@ pub fn get_text_user_data() -> TextUserData {
     }
 }
 
-
+/// Reset the demo state, reset the RNG in the context.
 fn reset(ctx: &mut GraphContext<DemoUserData>) {
     ctx.user_data.text.cursor_state = OFF;
     ctx.user_data.text.cursor_area = None;
     ctx.user_data.text.cursor_data = vec![];
-    ctx.user_data.text.cursor_position = GridPosition::new(0,0);
+    ctx.user_data.text.cursor_position = GridPosition::new(0, 0);
     ctx.user_data.text.page_marcel_grid = None;
     ctx.user_data.text.page_marcel_char_cells = vec![];
     ctx.user_data.text.page_marcel_checkmark_char_idx = 0;
     ctx.user_data.text.char_cell_idx = 0;
-
     ctx.rng = XorShiftRng::default();
 }
 
@@ -93,21 +90,10 @@ const BUF_3_PAGE_N3TRUNN3R: usize = 3;
 const SCROLLER_BG_COLOR: u32 = RetroNeon::ELECTRIC_BLUE;
 const SCROLLER_TEXT_COLOR: u32 = RetroNeon::CYBER_YELLOW;
 
-// const MARCEL_BG_COLOR: u32 = RetroNeon::DEEP_SPACE_BLUE;
-// const MARCEL_TEXT_COLOR: u32 = RetroNeon::NEON_MAGENTA ;
-// const MARCEL_CURSOR_COLOR: u32 = RetroNeon::ELECTRIC_PURPLE ;
-
-const DARK_GREEN:u32 = 0x00_04_00_ff;
-
-const MARCEL_BG_COLOR: u32 = DARK_GREEN ;
-// const MARCEL_TEXT_COLOR: u32 = RetroNeon::CIRCUIT_GREEN  ;
-// const MARCEL_TEXT_COLOR: u32 = RetroNeon::ACID_GREEN  ;
-const MARCEL_TEXT_COLOR: u32 = 0x6f_ff_43_ff ;
-// const MARCEL_CURSOR_COLOR: u32 = RetroNeon::TOXIC_GREEN   ;
-const MARCEL_CURSOR_COLOR: u32 = 0x11_bb_05_ff  ;
-
-
-// RetroNeon::TOXIC_GREEN
+const DARK_GREEN: u32 = 0x00_04_00_ff;
+const MARCEL_BG_COLOR: u32 = DARK_GREEN;
+const MARCEL_TEXT_COLOR: u32 = 0x6f_ff_43_ff;
+const MARCEL_CURSOR_COLOR: u32 = 0x11_bb_05_ff;
 
 //
 //
@@ -183,13 +169,12 @@ const TEXT_FONT_SPACING: Spacing = Spacing {
 const MARCEL_PAGE_TEXT: [&str; 8] = [
     " Graph1 is shipped with a pixel ",
     " font family \"Matriks Uaxactun\", ",
-    " designed by Marcel van Deijl. " ,
+    " designed by Marcel van Deijl. ",
     "--------------------------------- ",
     " You're reading this in: ",
     "  → [✔] Matriks Uaxactun Mono ",
     "  → [ ] Matriks Uaxactun Regular ",
     "---------------------------------     ",
-
     // " → Matriks Uaxactun Mono",
 
     // " ", //"• • • • • • • • • • • • • ",
@@ -245,7 +230,7 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
         text_top_left,
         Some(MARCEL_CURSOR_COLOR),
     )
-        .expect("Failed to create MonospacedCharGrid for Marcel page");
+    .expect("Failed to create MonospacedCharGrid for Marcel page");
 
     ctx.user_data
         .text
@@ -262,9 +247,9 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
             // Save the index of the checkmark character (✔) in the text,
             // so we can skip it during the initial text rendering, that's needed for a further animation
             if ch == '✔' {
-                ctx.user_data.text.page_marcel_checkmark_char_idx = ctx.user_data.text.page_marcel_char_cells.len();
+                ctx.user_data.text.page_marcel_checkmark_char_idx =
+                    ctx.user_data.text.page_marcel_char_cells.len();
             }
-
         }
     }
 
@@ -350,21 +335,25 @@ fn restore_area_under_cursor(ctx: &mut GraphContext<DemoUserData>) {
     )
 }
 
-
-fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos:GridPosition) {
-
+fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos: GridPosition) {
     if pos == ctx.user_data.text.cursor_position {
         return;
     }
     // extract row and col from pos
-    let GridPosition{row, col} = pos;
+    let GridPosition { row, col } = pos;
 
     if ctx.user_data.text.cursor_state == ON {
         // If the cursor is currently ON, we need to restore the area under it first
         restore_area_under_cursor(ctx);
 
         // TODO: make sure `.unwrap()` won't fail
-        let new_cursor = ctx.user_data.text.page_marcel_grid.as_ref().unwrap().get_cell(row, col);
+        let new_cursor = ctx
+            .user_data
+            .text
+            .page_marcel_grid
+            .as_ref()
+            .unwrap()
+            .get_cell(row, col);
 
         if new_cursor.is_some() {
             let new_cursor = new_cursor.unwrap().rect_area().clone();
@@ -377,7 +366,13 @@ fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos:GridPosition) {
 
     if ctx.user_data.text.cursor_state == OFF {
         // If the cursor is currently OFF, we just need to store the area under it
-        let new_cursor = ctx.user_data.text.page_marcel_grid.as_ref().unwrap().get_cell(row, col);
+        let new_cursor = ctx
+            .user_data
+            .text
+            .page_marcel_grid
+            .as_ref()
+            .unwrap()
+            .get_cell(row, col);
 
         if new_cursor.is_some() {
             let new_cursor = new_cursor.unwrap().rect_area().clone();
@@ -386,11 +381,7 @@ fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos:GridPosition) {
             ctx.user_data.text.cursor_position = pos;
         }
     }
-
-    // cursor_area.top_left.x +=
-    // store_area_under_cursor(ctx, &ctx.user_data.text.cursor_area.unwrap());
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////// [ RENDER FRAME ] ////////////////////////////////////////////////////////////////////////
@@ -405,9 +396,7 @@ const MARCEL_START: u32 = 455;
 const MARCEL_CHECKMARK: u32 = 1977;
 const MARCEL_END: u32 = 2000;
 
-
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-
     let frame_count = ctx.frame_count as u32;
 
     // Init the demo on frame 0
@@ -420,18 +409,17 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         clear_screen(ctx); // Clear the main buffer first
     }
 
-    /*
-            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-            if ctx.frame_count < MARCEL_START as usize {
-                ctx.frame_count = MARCEL_START as usize;
-                ctx.win.background_color = MARCEL_BG_COLOR;
-                clear_screen(ctx);
-            }
-        */
+    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+    // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
+    /*        if ctx.frame_count < MARCEL_START as usize {
+            ctx.frame_count = MARCEL_START  as usize - 10;
+            ctx.win.background_color = MARCEL_BG_COLOR;
+            clear_screen(ctx);
+        }
+    */
 
     // Scroll the title across the screen
     if frame_count > SCROLL_START && frame_count < SCROLL_END {
@@ -452,13 +440,55 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         scanline::window(ctx, 2, 26);
     }
 
+    //=====[ BLINKING CURSOR START ] ===============================================================
+    //
+    // Calculate the range of frames at which the cursor should be blinking on its initial position
+    let blinking_cursor_start = SCROLL_FADE_START + (SCROLL_FADE_END - SCROLL_FADE_START) / 5 * 3;
+    let blinking_cursor_end = MARCEL_START + 65;
+    if frame_count > blinking_cursor_start && frame_count < blinking_cursor_end {
+        if frame_count % 16 == 0 {
+            ctx.user_data.text.cursor_state = !ctx.user_data.text.cursor_state;
+        }
+        let mut initial_cursor = ctx
+            .user_data
+            .text
+            .page_marcel_grid
+            .as_ref()
+            .unwrap()
+            .get_proto_cell()
+            .clone();
+        initial_cursor.top_left.x += initial_cursor.dimensions.w;
+        if ctx.user_data.text.cursor_state {
+            initial_cursor.color = Some(BLACK);
+        }
+        draw::rectangle::filled(ctx, &initial_cursor);
+        scanline::window(ctx, 1, 55);
+    }
+    if frame_count == blinking_cursor_end {
+        let mut initial_cursor = ctx
+            .user_data
+            .text
+            .page_marcel_grid
+            .as_ref()
+            .unwrap()
+            .get_proto_cell()
+            .clone();
+        initial_cursor.top_left.x += initial_cursor.dimensions.w;
+        initial_cursor.color = Some(BLACK);
+        draw::rectangle::filled(ctx, &initial_cursor);
+    }
+    //
+    //=====[ BLINKING CURSOR END ] =================================================================
+
     if frame_count > MARCEL_START && frame_count < MARCEL_CHECKMARK {
         let mut char_dst_area = RectArea::new(0, 0, 1, 1, None);
         if ctx.user_data.text.cursor_area.is_some() {
             char_dst_area = ctx.user_data.text.cursor_area.unwrap().clone();
-            char_dst_area.top_left.x= char_dst_area.top_left.x.saturating_sub(char_dst_area.dimensions.w);
+            char_dst_area.top_left.x = char_dst_area
+                .top_left
+                .x
+                .saturating_sub(char_dst_area.dimensions.w);
         }
-
 
         let win_dims = ctx.win.dimensions.clone();
         let mut buf_result = ctx
@@ -467,7 +497,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             .expect("Failed to get multiple frame buffers");
         // let dst_buf = buf_result.active;
         let src_buf = buf_result.immut[0].frame_buf;
-
 
         buffer_op::copy::rect::to_another_buf(
             src_buf,
@@ -480,8 +509,11 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             1,
         );
 
-
-        let next_char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(ctx.user_data.text.char_cell_idx);
+        let next_char_cell_coords = ctx
+            .user_data
+            .text
+            .page_marcel_char_cells
+            .get(ctx.user_data.text.char_cell_idx);
 
         // `min` and `max` define the speed range of the cursor
         let mut min = 4;
@@ -489,16 +521,15 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
         // Slow down the cursor when it junps to the new line
         if next_char_cell_coords.is_some() {
-            if  next_char_cell_coords.unwrap().1 == 0 {
-                min = 59 ;
+            if next_char_cell_coords.unwrap().1 == 0 {
+                min = 59;
                 max = 63;
             }
 
-            if  next_char_cell_coords.unwrap().0 == 3 ||  next_char_cell_coords.unwrap().0 == 7{
-                min = 4 ;
+            if next_char_cell_coords.unwrap().0 == 3 || next_char_cell_coords.unwrap().0 == 7 {
+                min = 4;
                 max = 5;
             }
-
         }
 
         // The speed of cursor movement is randomized here
@@ -512,15 +543,18 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             return;
         }
 
-        let keep_on_rendering = ctx.user_data.text.char_cell_idx < ctx.user_data.text.page_marcel_char_cells.len();
+        let keep_on_rendering =
+            ctx.user_data.text.char_cell_idx < ctx.user_data.text.page_marcel_char_cells.len();
 
-        if (!keep_on_rendering){
-            println!("FRAME: {}", ctx.frame_count);
-        }
+        // if !keep_on_rendering{ println!("FRAME: {}", ctx.frame_count); }
 
         if keep_on_rendering && frame_count % rand_mod == 0 {
             // get coords (row, column) of the current char cell
-            let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(ctx.user_data.text.char_cell_idx);
+            let char_cell_coords = ctx
+                .user_data
+                .text
+                .page_marcel_char_cells
+                .get(ctx.user_data.text.char_cell_idx);
             ctx.user_data.text.cursor_state = ON;
             if char_cell_coords.is_some() {
                 let char_cell_coords = char_cell_coords.unwrap();
@@ -531,13 +565,15 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             }
         }
         scanline::window(ctx, 1, 15);
-
     }
 
     if frame_count == MARCEL_CHECKMARK {
-
         ctx.user_data.text.cursor_state = OFF;
-        let checkmark_coords = ctx.user_data.text.page_marcel_char_cells.get(ctx.user_data.text.page_marcel_checkmark_char_idx-1);
+        let checkmark_coords = ctx
+            .user_data
+            .text
+            .page_marcel_char_cells
+            .get(ctx.user_data.text.page_marcel_checkmark_char_idx - 1);
         if checkmark_coords.is_some() {
             let (row, col) = (checkmark_coords.unwrap().0, checkmark_coords.unwrap().1);
             let new_position = GridPosition::new(row, col);
@@ -549,14 +585,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
         let win_dims = ctx.win.dimensions.clone();
         let mut buf_result = ctx
-            // .get_multi_frame_bufs(&[0, 1])
             .get_multi_frame_bufs(&[BUF_2_PAGE_MARCEL])
             .expect("Failed to get multiple frame buffers");
-        // let dst_buf = buf_result.active;
         let src_buf = buf_result.immut[0].frame_buf;
-
-
-
 
         buffer_op::copy::rect::to_another_buf(
             src_buf,
@@ -568,20 +599,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             true,
             1,
         );
-
-
-
-
-
     }
-
-
 }
-
-
-
-
-
 
 /*
 let next_cursor_state = if ctx.frame_count % 30 == 0 {
