@@ -1,5 +1,5 @@
 use crate::demo::user_data::DemoUserData;
-use graph1::buffer_op::scale;
+use graph1::buffer_op::{copy, scale};
 use graph1::core::context::GraphContext;
 use graph1::core::context_utils::context_snapshot::ContextSnapshot;
 use graph1::fx::scanline;
@@ -7,7 +7,7 @@ use graph1::primitives::data_structs::variant::Variant;
 use graph1::primitives::math::{Displacement, MinMax};
 use graph1::primitives::plane::Dimensions2d;
 use graph1::primitives::{plane::RectArea, point::Point};
-use graph1::text::char_grid::MonospacedCharGrid;
+
 use graph1::text::font::Spacing;
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
 use graph1::text::printer::Align;
@@ -16,8 +16,11 @@ use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
 use graph1::utils::color::palettes::RetroNeon;
 use graph1::utils::grid::grid_position::GridPosition;
-use graph1::utils::math::rng::XorShiftRng;
+use graph1::utils::math::rng::{shuffle, XorShiftRng};
 use graph1::{buffer_op, draw};
+use graph1::text::char_grid::make_monospaced_char_grid;
+use graph1::utils::grid::uniform::UniformGrid;
+use graph1::utils::math::geometry::region::Region;
 
 const ON: bool = true;
 const OFF: bool = false;
@@ -34,12 +37,14 @@ pub struct TextUserData {
     cursor_position: GridPosition,
 
     /// Character grid for the text page with the "Marcel van Deijl" text
-    page_marcel_grid: Option<MonospacedCharGrid>,
+    page_marcel_grid: Option<UniformGrid<u32>>,
     /// Coordinates of all character cells on the "Marcel van Deijl" text page
     page_marcel_char_cells: Vec<(usize, usize)>,
 
     /// Index of the character cell with the checkmark (✔) on the "Marcel van Deijl" text page
     page_marcel_checkmark_char_idx: usize,
+
+    page_marcel_shuffled_cells: Vec<Region>,
 
     /// Index of the current character cell to interact with
     char_cell_idx: usize,
@@ -58,6 +63,7 @@ pub fn get_text_user_data() -> TextUserData {
         page_marcel_char_cells: vec![],
         page_marcel_checkmark_char_idx: 0,
         char_cell_idx: 0,
+        page_marcel_shuffled_cells: vec![],
     }
 }
 
@@ -72,6 +78,7 @@ fn reset(ctx: &mut GraphContext<DemoUserData>) {
     ctx.user_data.text.page_marcel_checkmark_char_idx = 0;
     ctx.user_data.text.char_cell_idx = 0;
     ctx.rng = XorShiftRng::default();
+    ctx.user_data.text.page_marcel_shuffled_cells = vec![];
 }
 
 //
@@ -224,13 +231,26 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
 
     let dimensions_input: Variant<&[&str], Dimensions2d> = Variant::Primary(&MARCEL_PAGE_TEXT);
 
-    let page_marcel_grid = MonospacedCharGrid::new(
+    let page_marcel_grid = make_monospaced_char_grid(
         &text_font,
         dimensions_input,
         text_top_left,
         Some(MARCEL_CURSOR_COLOR),
     )
     .expect("Failed to create MonospacedCharGrid for Marcel page");
+
+
+    let mut cells = page_marcel_grid
+        .cells()
+        .into_iter()
+        .copied()
+        .collect::<Vec<Region>>();
+
+
+    // FIXME: is using `.ok()` really okay here?
+    shuffle::slice(&mut cells, &mut XorShiftRng::default() ).ok();
+
+    ctx.user_data.text.page_marcel_shuffled_cells = cells;
 
     ctx.user_data
         .text
@@ -391,10 +411,13 @@ const SCROLL_START: u32 = 0;
 const SCROLL_END: u32 = 412;
 const SCROLL_FADE_START: u32 = 408;
 const SCROLL_FADE_END: u32 = 455;
-
 const MARCEL_START: u32 = 455;
-const MARCEL_CHECKMARK: u32 = 1977;
-const MARCEL_END: u32 = 2000;
+const MARCEL_CHECKMARK: u32 = 1830;
+const MARCEL_END: u32 = 1957;
+const MARCEL_CHECKMARK_END: u32 = 2000;
+
+const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
+
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let frame_count = ctx.frame_count as u32;
@@ -409,17 +432,18 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         clear_screen(ctx); // Clear the main buffer first
     }
 
+    /*
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-    /*        if ctx.frame_count < MARCEL_START as usize {
+            if ctx.frame_count < MARCEL_START as usize {
             ctx.frame_count = MARCEL_START  as usize - 10;
             ctx.win.background_color = MARCEL_BG_COLOR;
             clear_screen(ctx);
         }
-    */
+        */
 
     // Scroll the title across the screen
     if frame_count > SCROLL_START && frame_count < SCROLL_END {
@@ -455,7 +479,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             .page_marcel_grid
             .as_ref()
             .unwrap()
-            .get_proto_cell()
+            .proto_cell
             .clone();
         initial_cursor.top_left.x += initial_cursor.dimensions.w;
         if ctx.user_data.text.cursor_state {
@@ -471,7 +495,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             .page_marcel_grid
             .as_ref()
             .unwrap()
-            .get_proto_cell()
+            .proto_cell
             .clone();
         initial_cursor.top_left.x += initial_cursor.dimensions.w;
         initial_cursor.color = Some(BLACK);
@@ -480,7 +504,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     //
     //=====[ BLINKING CURSOR END ] =================================================================
 
-    if frame_count > MARCEL_START && frame_count < MARCEL_CHECKMARK {
+    if frame_count > MARCEL_START && frame_count < MARCEL_END {
         let mut char_dst_area = RectArea::new(0, 0, 1, 1, None);
         if ctx.user_data.text.cursor_area.is_some() {
             char_dst_area = ctx.user_data.text.cursor_area.unwrap().clone();
@@ -564,10 +588,14 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
                 ctx.user_data.text.char_cell_idx += 1;
             }
         }
+    }
+
+    if frame_count > MARCEL_START && frame_count < MARCEL_CHECKMARK_END {
         scanline::window(ctx, 1, 15);
     }
 
-    if frame_count == MARCEL_CHECKMARK {
+
+    if frame_count > MARCEL_CHECKMARK && frame_count < MARCEL_PAGE_FADE_OUT_START {
         ctx.user_data.text.cursor_state = OFF;
         let checkmark_coords = ctx
             .user_data
@@ -599,7 +627,29 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             true,
             1,
         );
+        ctx.user_data.text.cursor_state = ON;
     }
+
+
+    // if frame_count > MARCEL_PAGE_FADE_OUT_START && frame_count < MARCEL_PAGE_FADE_OUT_START + 10 {
+    if frame_count > MARCEL_PAGE_FADE_OUT_START {
+
+                let cell = ctx
+                    .user_data
+                    .text
+                    .page_marcel_shuffled_cells
+                    .get((frame_count - MARCEL_PAGE_FADE_OUT_START-1) as usize);
+                if cell.is_some() {
+                    let mut cell_area = cell.unwrap().rect_area();
+                    cell_area.color = Some(BLACK);
+                    draw::rectangle::filled(ctx, &cell_area);
+                }
+
+
+    }
+
+
+
 }
 
 /*
