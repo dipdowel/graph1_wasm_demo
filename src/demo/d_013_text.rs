@@ -98,9 +98,14 @@ const SCROLLER_BG_COLOR: u32 = RetroNeon::ELECTRIC_BLUE;
 const SCROLLER_TEXT_COLOR: u32 = RetroNeon::CYBER_YELLOW;
 
 const DARK_GREEN: u32 = 0x00_04_00_ff;
-const MARCEL_BG_COLOR: u32 = DARK_GREEN;
-const MARCEL_TEXT_COLOR: u32 = 0x6f_ff_43_ff;
-const MARCEL_CURSOR_COLOR: u32 = 0x11_bb_05_ff;
+
+const MATRIKS_BG_COLOR: u32 = DARK_GREEN;
+const MATRIKS_TEXT_COLOR: u32 = 0x6f_ff_43_ff;
+const MATRIKS_CURSOR_COLOR: u32 = 0x11_bb_05_ff;
+
+// const RED_ALERT_TEXT_COLOR: u32 = RetroNeon::CYBERPUNK_FUCHSIA;
+const RED_ALERT_TEXT_COLOR: u32 = MATRIKS_TEXT_COLOR;
+// const RED_ALERT_TEXT_COLOR: u32 = MATRIKS_CURSOR_COLOR;
 
 //
 //
@@ -182,27 +187,39 @@ const MARCEL_PAGE_TEXT: [&str; 8] = [
     "  → [✔] Matriks Uaxactun Mono ",
     "  → [ ] Matriks Uaxactun Regular ",
     "---------------------------------     ",
-    // " → Matriks Uaxactun Mono",
+];
 
-    // " ", //"• • • • • • • • • • • • • ",
-    // "Each font contains 222 characters,",
-    // "that covers most European languages. ",
-    // "",
-    // "→ Red Alert Inet",
-    // "→ Red Alert Lan",
-    // "     by N3trunn3r",
+const N3TRUNN3R_PAGE_TEXT: [&str; 8] = [
+    " We have 2 more fonts for you,",
+    " created by N3tRunn3r in 2007.",
+    // " you can use, they were created ",
+
+    " …yeah… …time flies… ˚°•·¤·•°˚",
+    // " by N3tRunn3r in 2007. Time flies… ",
+    // "·································",
+    // "¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬",
+    // "✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕",
+    // "•••••••••••••••••••••••••••••••••",
+    "·································",
+    " Anyway… The fonts are: ",
+    "  → •·C&C Red Alert [INET] ",
+    "  → •·C&C Red Alert [LAN]  ",
+    // "=================================",
+    "✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕",
+    // "·································",
+    // "✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕",
 ];
 
 ///
-/// Prepare the text pages
+/// Prepare the text page about Marcel van Deijl
 ///
-fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
+fn prepare_text_marcel_page(ctx: &mut GraphContext<DemoUserData>) {
     let original_window = ctx.win.get_context();
 
     ctx.set_active_frame_buf(BUF_2_PAGE_MARCEL).ok();
 
     ctx.win.background_color = TRANSPARENT;
-    ctx.win.foreground_color = MARCEL_TEXT_COLOR;
+    ctx.win.foreground_color = MATRIKS_TEXT_COLOR;
     clear_screen(ctx);
 
     let text_font = instantiate_embedded_font(
@@ -213,7 +230,7 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
     );
 
     let title_font_props: printer::ColorProperties = printer::ColorProperties {
-        color: Some(MARCEL_TEXT_COLOR),
+        color: Some(MATRIKS_TEXT_COLOR),
         color_transformer: None,
         data: None,
     };
@@ -235,7 +252,7 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
         &text_font,
         dimensions_input,
         text_top_left,
-        Some(MARCEL_CURSOR_COLOR),
+        Some(MATRIKS_CURSOR_COLOR),
     )
     .expect("Failed to create MonospacedCharGrid for Marcel page");
 
@@ -278,6 +295,99 @@ fn prepare_text_pages(ctx: &mut GraphContext<DemoUserData>) {
     // Switch back to the main frame buffer (index 0)
     ctx.set_active_frame_buf(BUF_0_MAIN).ok();
 }
+
+///
+/// Prepare the text page about N3trunn3r
+///
+fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
+    let original_window = ctx.win.get_context();
+
+    let res = ctx.set_active_frame_buf(BUF_3_PAGE_N3TRUNN3R); //.ok();
+    if res.is_err() {
+        println!("prepare_text_n3trunn3r_page(), Failed to set active frame buffer");
+
+    }
+
+    ctx.win.background_color = BLACK;
+    ctx.win.foreground_color = MATRIKS_TEXT_COLOR;
+    clear_screen(ctx);
+
+    let text_font = instantiate_embedded_font(
+        EmbeddedFonts::MatriksUaxactunMono,
+        TEXT_FONT_SCALE,
+        Some(TEXT_FONT_SPACING),
+        None,
+    );
+
+    let title_font_props: printer::ColorProperties = printer::ColorProperties {
+        color: Some(RED_ALERT_TEXT_COLOR),
+        // color: Some(0xff_00_00_ff),
+        color_transformer: None,
+        data: None,
+    };
+
+    let text_top_left: Point = Point { x: 26, y: 19 };
+
+    let text_dims = printer::print(
+        ctx,
+        &text_top_left,
+        &text_font,
+        &title_font_props,
+        &N3TRUNN3R_PAGE_TEXT,
+        Align::Left,
+    );
+
+    // let dimensions_input: Variant<&[&str], Dimensions2d> = Variant::Primary(&MARCEL_PAGE_TEXT);
+    //
+    // let page_marcel_grid = make_monospaced_char_grid(
+    //     &text_font,
+    //     dimensions_input,
+    //     text_top_left,
+    //     Some(MATRIKS_CURSOR_COLOR),
+    // )
+    //     .expect("Failed to create MonospacedCharGrid for Marcel page");
+    //
+    //
+    // let mut cells = page_marcel_grid
+    //     .cells()
+    //     .into_iter()
+    //     .copied()
+    //     .collect::<Vec<Region>>();
+    //
+    //
+    // FIXME: is using `.ok()` really okay here?
+    // shuffle::slice(&mut cells, &mut XorShiftRng::default() ).ok();
+
+    // ctx.user_data.text.page_marcel_shuffled_cells = cells;
+    //
+    // ctx.user_data
+    //     .text
+    //     .page_marcel_grid
+    //     .get_or_insert(page_marcel_grid);
+    //
+    // for (line_idx, char_idx) in MARCEL_PAGE_TEXT.iter().enumerate() {
+    //     for (char_index, ch) in char_idx.chars().enumerate() {
+    //         ctx.user_data
+    //             .text
+    //             .page_marcel_char_cells
+    //             .push((line_idx, char_index));
+    //
+    //         // Save the index of the checkmark character (✔) in the text,
+    //         // so we can skip it during the initial text rendering, that's needed for a further animation
+            // if ch == '✔' {
+            //     ctx.user_data.text.page_marcel_checkmark_char_idx =
+            //         ctx.user_data.text.page_marcel_char_cells.len();
+            // }
+        // }
+    // }
+
+   // restore the original window context
+    ctx.win.set_context(original_window);
+   // Switch back to the main frame buffer (index 0)
+    ctx.set_active_frame_buf(BUF_0_MAIN).ok();
+}
+
+
 
 ///
 /// Scroll the title across the screen
@@ -407,16 +517,25 @@ fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos: GridPosition) {
 ////// [ RENDER FRAME ] ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
+// FRAME POINTERS
+
 const SCROLL_START: u32 = 0;
 const SCROLL_END: u32 = 412;
 const SCROLL_FADE_START: u32 = 408;
 const SCROLL_FADE_END: u32 = 455;
+
 const MARCEL_START: u32 = 455;
 const MARCEL_CHECKMARK: u32 = 1830;
 const MARCEL_END: u32 = 1957;
 const MARCEL_CHECKMARK_END: u32 = 2000;
-
 const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
+
+
+
+
+
+// const IS_DEV: bool = true;
+const IS_DEV: bool = false;
 
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
@@ -426,24 +545,28 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if ctx.frame_count == 0 {
         reset(ctx);
         prepare_scrolling_title(ctx);
-        prepare_text_pages(ctx);
+        prepare_text_marcel_page(ctx);
+        prepare_text_n3trunn3r_page(ctx);
         ctx.win.background_color = SCROLLER_BG_COLOR;
         ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
         clear_screen(ctx); // Clear the main buffer first
     }
 
-    /*
+
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-            if ctx.frame_count < MARCEL_START as usize {
-            ctx.frame_count = MARCEL_START  as usize - 10;
-            ctx.win.background_color = MARCEL_BG_COLOR;
+    if IS_DEV && ctx.frame_count < MARCEL_PAGE_FADE_OUT_START  as usize  - 50{
+            ctx.frame_count = MARCEL_PAGE_FADE_OUT_START  as usize - 40;
+            ctx.win.background_color = MATRIKS_BG_COLOR;
             clear_screen(ctx);
-        }
-        */
+        ctx.copy_to_active_frame_buf_from(BUF_2_PAGE_MARCEL);
+        scanline::window(ctx, 1, 255);
+        // ctx.copy_to_active_frame_buf_from(BUF_3_PAGE_N3TRUNN3R);
+    }
+
 
     // Scroll the title across the screen
     if frame_count > SCROLL_START && frame_count < SCROLL_END {
@@ -456,7 +579,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if frame_count > SCROLL_FADE_START && frame_count < SCROLL_FADE_END {
         ctx.win.background_color = gradient::linear_step(
             RetroNeon::ELECTRIC_BLUE,
-            MARCEL_BG_COLOR,
+            MATRIKS_BG_COLOR,
             (SCROLL_FADE_END - SCROLL_FADE_START) as usize,
             ctx.frame_count.saturating_sub(SCROLL_FADE_START as usize),
         );
@@ -631,22 +754,145 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     }
 
 
-    // if frame_count > MARCEL_PAGE_FADE_OUT_START && frame_count < MARCEL_PAGE_FADE_OUT_START + 10 {
+    // println!("FRAME: {}", ctx.frame_count);
+
+
+
     if frame_count > MARCEL_PAGE_FADE_OUT_START {
 
-                let cell = ctx
+        // FIXME:
+        // FIXME: REFACTOR TO A LOOP!!!
+        // FIXME: REFACTOR TO A LOOP!!!
+        // FIXME: REFACTOR TO A LOOP!!!
+        // FIXME: REFACTOR TO A LOOP!!!
+        // FIXME: REFACTOR TO A LOOP!!!
+        // FIXME: REFACTOR TO A LOOP!!!
+        // FIXME: REFACTOR TO A LOOP!!!
+        // FIXME: REFACTOR TO A LOOP!!!
+        // FIXME: REFACTOR TO A LOOP!!!
+        // FIXME:
+
+        let cells_per_step = 3;
+        let base_cell_index:usize = (frame_count - MARCEL_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
+
+        let win_dims = ctx.win.dimensions.clone();
+
+                let cell_1 = ctx
                     .user_data
                     .text
                     .page_marcel_shuffled_cells
-                    .get((frame_count - MARCEL_PAGE_FADE_OUT_START-1) as usize);
-                if cell.is_some() {
-                    let mut cell_area = cell.unwrap().rect_area();
-                    cell_area.color = Some(BLACK);
-                    draw::rectangle::filled(ctx, &cell_area);
+                    .get(base_cell_index);
+                if cell_1.is_some() {
+                    let mut cell_area = cell_1.unwrap().rect_area();
+
+                    let mut buf_result = ctx
+                        .get_multi_frame_bufs(&[BUF_3_PAGE_N3TRUNN3R])
+                        .expect("Failed to get multiple frame buffers");
+
+                    let src_buf = buf_result.immut[0].frame_buf;
+
+                    buffer_op::copy::rect::to_another_buf(
+                        src_buf,
+                        &win_dims,
+                        &cell_area,
+                        &mut buf_result.active,
+                        &win_dims,
+                        &cell_area.top_left,
+                        true,
+                        1,
+                    );
                 }
 
+        let cell_2 = ctx
+            .user_data
+            .text
+            .page_marcel_shuffled_cells
+            .get((base_cell_index+1) as usize);
+        if cell_2.is_some() {
+            let mut cell_area = cell_2.unwrap().rect_area();
+
+            let mut buf_result = ctx
+                .get_multi_frame_bufs(&[BUF_3_PAGE_N3TRUNN3R])
+                .expect("Failed to get multiple frame buffers");
+            let src_buf = buf_result.immut[0].frame_buf;
+
+            buffer_op::copy::rect::to_another_buf(
+                src_buf,
+                &win_dims,
+                &cell_area,
+                &mut buf_result.active,
+                &win_dims,
+                &cell_area.top_left,
+                true,
+                1,
+            );
+        }
+
+
+
+        let cell_3 = ctx
+            .user_data
+            .text
+            .page_marcel_shuffled_cells
+            .get((base_cell_index+2) as usize);
+        if cell_3.is_some() {
+            let mut cell_area = cell_3.unwrap().rect_area();
+
+            let mut buf_result = ctx
+                .get_multi_frame_bufs(&[BUF_3_PAGE_N3TRUNN3R])
+                .expect("Failed to get multiple frame buffers");
+            let src_buf = buf_result.immut[0].frame_buf;
+
+            buffer_op::copy::rect::to_another_buf(
+                src_buf,
+                &win_dims,
+                &cell_area,
+                &mut buf_result.active,
+                &win_dims,
+                &cell_area.top_left,
+                true,
+                1,
+            );
+        }
+
+
+
+        let cell_4 = ctx
+            .user_data
+            .text
+            .page_marcel_shuffled_cells
+            .get((base_cell_index+3) as usize);
+        if cell_4.is_some() {
+            let mut cell_area = cell_4.unwrap().rect_area();
+
+            let mut buf_result = ctx
+                .get_multi_frame_bufs(&[BUF_3_PAGE_N3TRUNN3R])
+                .expect("Failed to get multiple frame buffers");
+            let src_buf = buf_result.immut[0].frame_buf;
+
+            buffer_op::copy::rect::to_another_buf(
+                src_buf,
+                &win_dims,
+                &cell_area,
+                &mut buf_result.active,
+                &win_dims,
+                &cell_area.top_left,
+                true,
+                1,
+            );
+        }
+
+        //------------------------------------------
+        scanline::window(ctx, 1, 4);
 
     }
+
+
+
+
+
+    // cell_area.color = Some(BLACK);
+    // draw::rectangle::filled(ctx, &cell_area);
 
 
 
