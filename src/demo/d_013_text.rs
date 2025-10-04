@@ -1,5 +1,5 @@
 use crate::demo::user_data::DemoUserData;
-use graph1::buffer_op::{copy, scale};
+use graph1::buffer_op::scale;
 use graph1::core::context::GraphContext;
 use graph1::core::context_utils::context_snapshot::ContextSnapshot;
 use graph1::fx::scanline;
@@ -8,19 +8,19 @@ use graph1::primitives::math::{Displacement, MinMax};
 use graph1::primitives::plane::Dimensions2d;
 use graph1::primitives::{plane::RectArea, point::Point};
 
+use graph1::text::char_grid::make_monospaced_char_grid;
 use graph1::text::font::Spacing;
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
-use graph1::text::printer::Align;
 use graph1::text::printer;
+use graph1::text::printer::Align;
 use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
 use graph1::utils::color::palettes::RetroNeon;
 use graph1::utils::grid::grid_position::GridPosition;
-use graph1::utils::math::rng::{shuffle, XorShiftRng};
-use graph1::{buffer_op, draw};
-use graph1::text::char_grid::make_monospaced_char_grid;
 use graph1::utils::grid::uniform::UniformGrid;
 use graph1::utils::math::geometry::region::Region;
+use graph1::utils::math::rng::{shuffle, XorShiftRng};
+use graph1::{buffer_op, draw};
 
 const ON: bool = true;
 const OFF: bool = false;
@@ -102,10 +102,7 @@ const DARK_GREEN: u32 = 0x00_04_00_ff;
 const MATRIKS_BG_COLOR: u32 = DARK_GREEN;
 const MATRIKS_TEXT_COLOR: u32 = 0x6f_ff_43_ff;
 const MATRIKS_CURSOR_COLOR: u32 = 0x11_bb_05_ff;
-
-// const RED_ALERT_TEXT_COLOR: u32 = RetroNeon::CYBERPUNK_FUCHSIA;
 const RED_ALERT_TEXT_COLOR: u32 = MATRIKS_TEXT_COLOR;
-// const RED_ALERT_TEXT_COLOR: u32 = MATRIKS_CURSOR_COLOR;
 
 //
 //
@@ -192,22 +189,12 @@ const MARCEL_PAGE_TEXT: [&str; 8] = [
 const N3TRUNN3R_PAGE_TEXT: [&str; 8] = [
     " We have 2 more fonts for you,",
     " created by N3tRunn3r in 2007.",
-    // " you can use, they were created ",
-
     " …yeah… …time flies… ˚°•·¤·•°˚",
-    // " by N3tRunn3r in 2007. Time flies… ",
-    // "·································",
-    // "¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬-¬",
-    // "✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕",
-    // "•••••••••••••••••••••••••••••••••",
     "·································",
     " Anyway… The fonts are: ",
     "  → •·C&C Red Alert [INET] ",
     "  → •·C&C Red Alert [LAN]  ",
-    // "=================================",
     "✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕",
-    // "·································",
-    // "✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕",
 ];
 
 ///
@@ -237,7 +224,7 @@ fn prepare_text_marcel_page(ctx: &mut GraphContext<DemoUserData>) {
 
     let text_top_left: Point = Point { x: 26, y: 19 };
 
-    let text_dims = printer::print(
+    printer::print(
         ctx,
         &text_top_left,
         &text_font,
@@ -256,16 +243,14 @@ fn prepare_text_marcel_page(ctx: &mut GraphContext<DemoUserData>) {
     )
     .expect("Failed to create MonospacedCharGrid for Marcel page");
 
-
     let mut cells = page_marcel_grid
         .cells()
         .into_iter()
         .copied()
         .collect::<Vec<Region>>();
 
-
     // FIXME: is using `.ok()` really okay here?
-    shuffle::slice(&mut cells, &mut XorShiftRng::default() ).ok();
+    shuffle::slice(&mut cells, &mut XorShiftRng::default()).ok();
 
     ctx.user_data.text.page_marcel_shuffled_cells = cells;
 
@@ -294,6 +279,9 @@ fn prepare_text_marcel_page(ctx: &mut GraphContext<DemoUserData>) {
     ctx.win.set_context(original_window);
     // Switch back to the main frame buffer (index 0)
     ctx.set_active_frame_buf(BUF_0_MAIN).ok();
+
+    //-------------------------------------------------
+    // END OF prepare_text_marcel_page()
 }
 
 ///
@@ -305,7 +293,6 @@ fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
     let res = ctx.set_active_frame_buf(BUF_3_PAGE_N3TRUNN3R); //.ok();
     if res.is_err() {
         println!("prepare_text_n3trunn3r_page(), Failed to set active frame buffer");
-
     }
 
     ctx.win.background_color = BLACK;
@@ -321,14 +308,13 @@ fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
 
     let title_font_props: printer::ColorProperties = printer::ColorProperties {
         color: Some(RED_ALERT_TEXT_COLOR),
-        // color: Some(0xff_00_00_ff),
         color_transformer: None,
         data: None,
     };
 
     let text_top_left: Point = Point { x: 26, y: 19 };
 
-    let text_dims = printer::print(
+    printer::print(
         ctx,
         &text_top_left,
         &text_font,
@@ -337,57 +323,14 @@ fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
         Align::Left,
     );
 
-    // let dimensions_input: Variant<&[&str], Dimensions2d> = Variant::Primary(&MARCEL_PAGE_TEXT);
-    //
-    // let page_marcel_grid = make_monospaced_char_grid(
-    //     &text_font,
-    //     dimensions_input,
-    //     text_top_left,
-    //     Some(MATRIKS_CURSOR_COLOR),
-    // )
-    //     .expect("Failed to create MonospacedCharGrid for Marcel page");
-    //
-    //
-    // let mut cells = page_marcel_grid
-    //     .cells()
-    //     .into_iter()
-    //     .copied()
-    //     .collect::<Vec<Region>>();
-    //
-    //
-    // FIXME: is using `.ok()` really okay here?
-    // shuffle::slice(&mut cells, &mut XorShiftRng::default() ).ok();
-
-    // ctx.user_data.text.page_marcel_shuffled_cells = cells;
-    //
-    // ctx.user_data
-    //     .text
-    //     .page_marcel_grid
-    //     .get_or_insert(page_marcel_grid);
-    //
-    // for (line_idx, char_idx) in MARCEL_PAGE_TEXT.iter().enumerate() {
-    //     for (char_index, ch) in char_idx.chars().enumerate() {
-    //         ctx.user_data
-    //             .text
-    //             .page_marcel_char_cells
-    //             .push((line_idx, char_index));
-    //
-    //         // Save the index of the checkmark character (✔) in the text,
-    //         // so we can skip it during the initial text rendering, that's needed for a further animation
-            // if ch == '✔' {
-            //     ctx.user_data.text.page_marcel_checkmark_char_idx =
-            //         ctx.user_data.text.page_marcel_char_cells.len();
-            // }
-        // }
-    // }
-
-   // restore the original window context
+    // restore the original window context
     ctx.win.set_context(original_window);
-   // Switch back to the main frame buffer (index 0)
+    // Switch back to the main frame buffer (index 0)
     ctx.set_active_frame_buf(BUF_0_MAIN).ok();
+
+    //-------------------------------------------------
+    // END OF prepare_text_n3trunn3r_page()
 }
-
-
 
 ///
 /// Scroll the title across the screen
@@ -416,13 +359,10 @@ fn scroll_the_title(ctx: &mut GraphContext<DemoUserData>) {
 
 //---------------------------------------------------------------------
 
-// fn get_char_grid()
-
 /// Store the area under the cursor for later restoration
 /// NB: This function assumes the area is fully inside the frame buffer!
 fn store_area_under_cursor(ctx: &mut GraphContext<DemoUserData>, cursor: &RectArea) {
     ctx.user_data.text.cursor_area = Some(cursor.clone());
-
     if ctx.user_data.text.cursor_data.len() == 0 {
         let cursor_data_size = (cursor.dimensions.w * cursor.dimensions.h) as usize;
         ctx.user_data.text.cursor_data = vec![BLACK; cursor_data_size];
@@ -530,13 +470,8 @@ const MARCEL_END: u32 = 1957;
 const MARCEL_CHECKMARK_END: u32 = 2000;
 const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
 
-
-
-
-
 // const IS_DEV: bool = true;
 const IS_DEV: bool = false;
-
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let frame_count = ctx.frame_count as u32;
@@ -552,21 +487,19 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         clear_screen(ctx); // Clear the main buffer first
     }
 
-
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-    if IS_DEV && ctx.frame_count < MARCEL_PAGE_FADE_OUT_START  as usize  - 50{
-            ctx.frame_count = MARCEL_PAGE_FADE_OUT_START  as usize - 40;
-            ctx.win.background_color = MATRIKS_BG_COLOR;
-            clear_screen(ctx);
+    if IS_DEV && ctx.frame_count < MARCEL_PAGE_FADE_OUT_START as usize - 50 {
+        ctx.frame_count = MARCEL_PAGE_FADE_OUT_START as usize - 40;
+        ctx.win.background_color = MATRIKS_BG_COLOR;
+        clear_screen(ctx);
         ctx.copy_to_active_frame_buf_from(BUF_2_PAGE_MARCEL);
         scanline::window(ctx, 1, 255);
         // ctx.copy_to_active_frame_buf_from(BUF_3_PAGE_N3TRUNN3R);
     }
-
 
     // Scroll the title across the screen
     if frame_count > SCROLL_START && frame_count < SCROLL_END {
@@ -717,7 +650,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         scanline::window(ctx, 1, 15);
     }
 
-
     if frame_count > MARCEL_CHECKMARK && frame_count < MARCEL_PAGE_FADE_OUT_START {
         ctx.user_data.text.cursor_state = OFF;
         let checkmark_coords = ctx
@@ -753,13 +685,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.user_data.text.cursor_state = ON;
     }
 
-
-    // println!("FRAME: {}", ctx.frame_count);
-
-
-
     if frame_count > MARCEL_PAGE_FADE_OUT_START {
-
         // FIXME:
         // FIXME: REFACTOR TO A LOOP!!!
         // FIXME: REFACTOR TO A LOOP!!!
@@ -773,41 +699,42 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         // FIXME:
 
         let cells_per_step = 3;
-        let base_cell_index:usize = (frame_count - MARCEL_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
+        let base_cell_index: usize =
+            (frame_count - MARCEL_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
 
         let win_dims = ctx.win.dimensions.clone();
 
-                let cell_1 = ctx
-                    .user_data
-                    .text
-                    .page_marcel_shuffled_cells
-                    .get(base_cell_index);
-                if cell_1.is_some() {
-                    let mut cell_area = cell_1.unwrap().rect_area();
+        let cell_1 = ctx
+            .user_data
+            .text
+            .page_marcel_shuffled_cells
+            .get(base_cell_index);
+        if cell_1.is_some() {
+            let mut cell_area = cell_1.unwrap().rect_area();
 
-                    let mut buf_result = ctx
-                        .get_multi_frame_bufs(&[BUF_3_PAGE_N3TRUNN3R])
-                        .expect("Failed to get multiple frame buffers");
+            let mut buf_result = ctx
+                .get_multi_frame_bufs(&[BUF_3_PAGE_N3TRUNN3R])
+                .expect("Failed to get multiple frame buffers");
 
-                    let src_buf = buf_result.immut[0].frame_buf;
+            let src_buf = buf_result.immut[0].frame_buf;
 
-                    buffer_op::copy::rect::to_another_buf(
-                        src_buf,
-                        &win_dims,
-                        &cell_area,
-                        &mut buf_result.active,
-                        &win_dims,
-                        &cell_area.top_left,
-                        true,
-                        1,
-                    );
-                }
+            buffer_op::copy::rect::to_another_buf(
+                src_buf,
+                &win_dims,
+                &cell_area,
+                &mut buf_result.active,
+                &win_dims,
+                &cell_area.top_left,
+                true,
+                1,
+            );
+        }
 
         let cell_2 = ctx
             .user_data
             .text
             .page_marcel_shuffled_cells
-            .get((base_cell_index+1) as usize);
+            .get((base_cell_index + 1) as usize);
         if cell_2.is_some() {
             let mut cell_area = cell_2.unwrap().rect_area();
 
@@ -828,13 +755,11 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             );
         }
 
-
-
         let cell_3 = ctx
             .user_data
             .text
             .page_marcel_shuffled_cells
-            .get((base_cell_index+2) as usize);
+            .get((base_cell_index + 2) as usize);
         if cell_3.is_some() {
             let mut cell_area = cell_3.unwrap().rect_area();
 
@@ -855,13 +780,11 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             );
         }
 
-
-
         let cell_4 = ctx
             .user_data
             .text
             .page_marcel_shuffled_cells
-            .get((base_cell_index+3) as usize);
+            .get((base_cell_index + 3) as usize);
         if cell_4.is_some() {
             let mut cell_area = cell_4.unwrap().rect_area();
 
@@ -884,58 +807,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
         //------------------------------------------
         scanline::window(ctx, 1, 4);
-
     }
-
-
-
-
 
     // cell_area.color = Some(BLACK);
     // draw::rectangle::filled(ctx, &cell_area);
-
-
-
 }
-
-/*
-let next_cursor_state = if ctx.frame_count % 30 == 0 {
-    !ctx.user_data.text.cursor_state
-} else {
-    ctx.user_data.text.cursor_state
-};
-
-let idx = ctx.user_data.text.char_cell_idx;
-let char_cell_coords = ctx.user_data.text.page_marcel_char_cells.get(idx);
-// The cursor logic must begin here!
-if char_cell_coords.is_some() {
-    let char_cell_coords = char_cell_coords.unwrap();
-    let (row, col) = (char_cell_coords.0, char_cell_coords.1);
-    let cursor = ctx
-        .user_data
-        .text
-        .page_marcel_grid
-        .as_ref()
-        .unwrap()
-        .get_cell(row, col)
-        .unwrap()
-        .rect_area()
-        .clone();
-
-    if next_cursor_state != ctx.user_data.text.cursor_state {
-        if ctx.user_data.text.cursor_state == OFF {
-            store_area_under_cursor(ctx, &cursor);
-            draw::rectangle::filled(ctx, &cursor);
-        }
-        if ctx.user_data.text.cursor_state == ON {
-            restore_area_under_cursor(ctx);
-        }
-    }
-}
-
-
-// Update the cursor state in user data
-ctx.user_data.text.cursor_state = next_cursor_state;
-//---------------------------------------------------------------
-// All cursor logic must end before this line!
-*/
