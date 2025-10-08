@@ -24,6 +24,7 @@ use graph1::{buffer_op, draw};
 use graph1::draw::line;
 use graph1::draw::tools::brush::Brush;
 use graph1::draw::tools::spray;
+use crate::global_consts::{WIN_HEIGHT, WIN_WIDTH};
 
 const ON: bool = true;
 const OFF: bool = false;
@@ -92,6 +93,8 @@ const BUF_0_MAIN: usize = 0;
 const BUF_1_SCROLLER: usize = 1;
 const BUF_2_PAGE_MARCEL: usize = 2;
 const BUF_3_PAGE_N3TRUNN3R: usize = 3;
+
+const BUF_4_BIG_FONTS: usize = 3;
 
 //
 //
@@ -335,6 +338,121 @@ fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
     // END OF prepare_text_n3trunn3r_page()
 }
 
+fn prepare_4_big_fonts_buffer(ctx: &mut GraphContext<DemoUserData>) {
+
+    let original_window = ctx.win.get_context();
+
+    let res = ctx.set_active_frame_buf(BUF_4_BIG_FONTS); //.ok();
+    if res.is_err() {
+        println!("prepare_text_n3trunn3r_page(), Failed to set active frame buffer");
+    }
+
+    ctx.win.background_color = TRANSPARENT;
+    ctx.win.foreground_color = RetroNeon::HOT_PINK;
+    clear_screen(ctx);
+
+    let big_font_spacing: Spacing = Spacing {
+        kerning_px: 4,
+        leading_px: 0,
+    };
+
+    let big_font_matriks_mono = instantiate_embedded_font(
+        EmbeddedFonts::MatriksUaxactunMono,
+        6,
+        Some(big_font_spacing.clone()),
+        None,
+    );
+    let big_font_matriks_regular = instantiate_embedded_font(
+        EmbeddedFonts::MatriksUaxactun,
+        6,
+        Some(big_font_spacing.clone()),
+        None,
+    );
+    let big_font_red_alert_lan = instantiate_embedded_font(
+        EmbeddedFonts::CCRedAlertLan,
+        6,
+        Some(big_font_spacing.clone()),
+        None,
+    );
+    let big_font_red_alert_inet = instantiate_embedded_font(
+        EmbeddedFonts::CCRedAlertInet,
+        6,
+        Some(big_font_spacing.clone()),
+        None,
+    );
+
+
+    // pub type PixelColorTransformerFn = fn(color: u32, x: u32, y: u32, w: u32, h: u32, data: Option<&Vec<u32>>) -> u32
+
+    let big_font_props: printer::ColorProperties = printer::ColorProperties {
+        color: None,
+        color_transformer: Some(
+            move |color: u32, x: u32, y: u32, w: u32, h: u32, data: Option<&Vec<u32>>| {
+                println!("big_font_props.color_transformer(), x: {}, y: {}, w: {}, h: {}", x, y, w, h);
+                if y % 3 == 0 || x % 3 == 0 {
+                    return RetroNeon::CYBER_BLUE;
+                    // return BLACK;
+                }
+                RetroNeon::STROBE_WHITE
+                // return RetroNeon::ELECTRIC_VIOLET
+            }
+        ),
+        data: None,
+    };
+
+    let mut text_top_left: Point = Point { x: 10, y: 10 };
+
+    printer::print_line(
+        ctx,
+        &text_top_left,
+        &big_font_matriks_mono,
+        &big_font_props,
+        &"Graph1",
+    );
+
+    text_top_left.x = WIN_WIDTH/2+ 20;
+
+    printer::print_line(
+        ctx,
+        &text_top_left,
+        &big_font_matriks_regular,
+        &big_font_props,
+        &"Graph1",
+    );
+
+    text_top_left.x = 10;
+    text_top_left.y = WIN_HEIGHT/2+20;
+
+    printer::print_line(
+        ctx,
+        &text_top_left,
+        &big_font_red_alert_lan,
+        &big_font_props,
+        &"Graph1",
+    );
+
+    text_top_left.x = WIN_WIDTH/2+ 20;
+
+    printer::print_line(
+        ctx,
+        &text_top_left,
+        &big_font_red_alert_inet,
+        &big_font_props,
+        &"Graph1",
+    );
+
+
+
+    // restore the original window context
+    ctx.win.set_context(original_window);
+    // Switch back to the main frame buffer (index 0)
+    ctx.set_active_frame_buf(BUF_0_MAIN).ok();
+
+    //-------------------------------------------------
+    // END OF prepare_4_big_fonts_buffer
+}
+
+
 ///
 /// Scroll the title across the screen
 ///
@@ -491,6 +609,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.win.background_color = SCROLLER_BG_COLOR;
         ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
         clear_screen(ctx); // Clear the main buffer first
+
+        prepare_4_big_fonts_buffer(ctx);
+
     }
 
 
@@ -500,7 +621,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
     // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-    /*
+
         if IS_DEV && frame_count == 0 {
             ctx.win.background_color = MATRIKS_BG_COLOR;
             ctx.copy_to_active_frame_buf_from(BUF_3_PAGE_N3TRUNN3R);
@@ -509,7 +630,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         if IS_DEV {
             frame_count += TRANSITION_TO_ALL_FONTS_DEMO_START -10 ;
         }
-         */
+    /*     */
 
 
 
@@ -764,20 +885,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             line::horizontal(ctx, &line_start, scr_w, Some(ray_color));
     }
 
-    // let clear_delay = 210;
-    // if frame_count >= TRANSITION_TO_ALL_FONTS_DEMO + clear_delay && frame_count < TRANSITION_TO_ALL_FONTS_DEMO + scr_h + clear_delay {
-    //     let line_index = frame_count - TRANSITION_TO_ALL_FONTS_DEMO - clear_delay ;
-    //     let line_start:Point<i32> = Point{ x: 0, y: line_index as i32 };
-    //     line::horizontal(ctx, &line_start, scr_w, Some(bg_color));
-    // }
-
-    //
-    // if frame_count > TRANSITION_TO_ALL_FONTS_DEMO_START + 490  {
-    //     ctx.win.background_color = bg_color;
-    //     clear_screen(ctx);
-    //     scanline::window(ctx, 2,  160);
-    // }
-
 
 
     let scanline_delay = 40;
@@ -788,6 +895,33 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         // let intensity = ((frame_count - TRANSITION_TO_ALL_FONTS_DEMO - 20) as f32 / (scr_h as f32)).min(1.0);
 
         scanline::window(ctx, 2,  intensity);
+
+
+        //==========================================================================================
+        let mut char_dst_area = RectArea::new(0, 0, WIN_WIDTH, WIN_HEIGHT, None);
+
+
+        let win_dims = ctx.win.dimensions.clone();
+        let mut buf_result = ctx
+            // .get_multi_frame_bufs(&[0, 1])
+            .get_multi_frame_bufs(&[BUF_4_BIG_FONTS])
+            .expect("Failed to get multiple frame buffers");
+        ;
+        let src_buf = buf_result.immut[0].frame_buf;
+
+        buffer_op::copy::rect::to_another_buf(
+            src_buf,
+            &win_dims,
+            &char_dst_area,
+            &mut buf_result.active,
+            &win_dims,
+            &char_dst_area.top_left,
+            true,
+            1,
+        );
+        //==========================================================================================
+
+
     }
 
 
