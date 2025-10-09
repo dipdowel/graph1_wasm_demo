@@ -400,7 +400,15 @@ fn prepare_4_big_fonts_buffer(ctx: &mut GraphContext<DemoUserData>) {
         data: None,
     };
 
-    let mut text_top_left: Point = Point { x: 10, y: 10 };
+    let big_word = "Graph1";
+
+
+    // MATRIX UAXACTUN MONO
+    //-------------------------------------------------------------------------------------
+    let mut text_top_left = ctx.win.quadrants.top_left.center();
+    let mut big_word_dims = printer::get_line_dimensions(&big_font_matriks_mono, &big_word);
+    text_top_left.x = text_top_left.x.saturating_sub(big_word_dims.w/2);
+    text_top_left.y = text_top_left.y.saturating_sub(big_word_dims.h/2);
 
     printer::print_line(
         ctx,
@@ -410,7 +418,12 @@ fn prepare_4_big_fonts_buffer(ctx: &mut GraphContext<DemoUserData>) {
         &"Graph1",
     );
 
-    text_top_left.x = WIN_WIDTH/2+ 20;
+    // MATRIX UAXACTUN REGULAR
+    //-------------------------------------------------------------------------------------
+    text_top_left = ctx.win.quadrants.bottom_left.center();
+    big_word_dims = printer::get_line_dimensions(&big_font_matriks_regular, &big_word);
+    text_top_left.x = text_top_left.x.saturating_sub(big_word_dims.w/2);
+    text_top_left.y = text_top_left.y.saturating_sub(big_word_dims.h/2);
 
     printer::print_line(
         ctx,
@@ -420,8 +433,13 @@ fn prepare_4_big_fonts_buffer(ctx: &mut GraphContext<DemoUserData>) {
         &"Graph1",
     );
 
-    text_top_left.x = 10;
-    text_top_left.y = WIN_HEIGHT/2+20;
+
+    // CC RED ALERT LAN
+    //-------------------------------------------------------------------------------------
+    text_top_left = ctx.win.quadrants.top_right.center();
+    big_word_dims = printer::get_line_dimensions(&big_font_red_alert_lan, &big_word);
+    text_top_left.x = text_top_left.x.saturating_sub(big_word_dims.w/2);
+    text_top_left.y = text_top_left.y.saturating_sub(big_word_dims.h/2) + 10;
 
     printer::print_line(
         ctx,
@@ -431,7 +449,14 @@ fn prepare_4_big_fonts_buffer(ctx: &mut GraphContext<DemoUserData>) {
         &"Graph1",
     );
 
-    text_top_left.x = WIN_WIDTH/2+ 20;
+
+    // CC RED ALERT INET
+    //-------------------------------------------------------------------------------------
+    text_top_left = ctx.win.quadrants.bottom_right.center();
+    big_word_dims = printer::get_line_dimensions(&big_font_red_alert_inet, &big_word);
+    text_top_left.x = text_top_left.x.saturating_sub(big_word_dims.w/2);
+    text_top_left.y = text_top_left.y.saturating_sub(big_word_dims.h/2) + 4;
+
 
     printer::print_line(
         ctx,
