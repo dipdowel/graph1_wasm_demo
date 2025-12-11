@@ -585,9 +585,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.win.background_color = SCROLLER_BG_COLOR;
         ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
         clear_screen(ctx); // Clear the main buffer first
-        // prepare_4_big_fonts_buffer(ctx);
     }
-
 
 
     // Scroll the title across the screen
@@ -851,83 +849,4 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         //------------------------------------------
         scanline::window(ctx, 1, 4);
     }
-
-    // Fade closing page to SCROLLER_BG_COLOR and restart demo
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    // Restart the demo by resetting frame count
-
-
-//     let scr_w = ctx.win.dimensions.w;
-//     let scr_h = ctx.win.dimensions.h;
-//     let bg_color = RetroNeon::ELECTRIC_BLUE ;
-//     // let ray_color = RetroNeon::CYBER_YELLOW ;
-//     let ray_color = RetroNeon::LASER_LIME ;
-//     // let ray_color = BLACK ;
-//
-//
-//
-//     let spray_delay = 2;
-//     if frame_count > TRANSITION_TO_ALL_FONTS_DEMO_START + spray_delay  && frame_count < TRANSITION_TO_ALL_FONTS_DEMO_END + spray_delay {
-//         ctx.brush = Brush::new_rectangle(scr_w+1, (frame_count- TRANSITION_TO_ALL_FONTS_DEMO_START - spray_delay));
-//         let brush_head: Point<u32> = Point::new(scr_w/2, (frame_count- TRANSITION_TO_ALL_FONTS_DEMO_START - spray_delay - 1)/2);
-//         spray::simple(
-//             ctx,
-//             &brush_head,
-//             1800,
-//             &[bg_color],
-//         );
-//     }
-//
-//     if frame_count > TRANSITION_TO_ALL_FONTS_DEMO_START && frame_count < TRANSITION_TO_ALL_FONTS_DEMO_START + scr_h {
-//         let line_index = frame_count - TRANSITION_TO_ALL_FONTS_DEMO_START -1;
-//         // let line_start:Point<i32> = Point{ x: line_index as i32, y: line_index as i32 };
-//         // line::horizontal(ctx, &line_start, scr_w - 2*line_index, Some(ray_color));
-//             let line_start:Point<i32> = Point{ x: 0, y: line_index as i32 };
-//             line::horizontal(ctx, &line_start, scr_w, Some(ray_color));
-//     }
-//
-//
-//
-//     let scanline_delay = 40;
-//     if frame_count > TRANSITION_TO_ALL_FONTS_DEMO_START + scanline_delay {
-//
-//         // let intensity:u8 = ((frame_count - TRANSITION_TO_ALL_FONTS_DEMO) as f32 - (scanline_delay as f32) / (scr_h as f32) * 255.0).min(100.0) as u8;
-//         let intensity:u8 = ((frame_count - TRANSITION_TO_ALL_FONTS_DEMO_START - scanline_delay) as f32 / (scanline_delay as f32 / 4.0) ).min(200.0) as u8;
-//         // let intensity = ((frame_count - TRANSITION_TO_ALL_FONTS_DEMO - 20) as f32 / (scr_h as f32)).min(1.0);
-//
-//         scanline::window(ctx, 2,  intensity);
-//
-//
-//         //==========================================================================================
-//         let mut char_dst_area = RectArea::new(0, 0, WIN_WIDTH, WIN_HEIGHT, None);
-//
-//
-//         let win_dims = ctx.win.dimensions.clone();
-//         let mut buf_result = ctx
-//             // .get_multi_frame_bufs(&[0, 1])
-//             .get_multi_frame_bufs(&[BUF_5_BIG_FONTS])
-//             .expect("Failed to get multiple frame buffers");
-//         ;
-//         let src_buf = buf_result.immut[0].frame_buf;
-//
-//         buffer_op::copy::rect::to_another_buf(
-//             src_buf,
-//             &win_dims,
-//             &char_dst_area,
-//             &mut buf_result.active,
-//             &win_dims,
-//             &char_dst_area.top_left,
-//             true,
-//             1,
-//         );
-//         //==========================================================================================
-//
-//
-//     }
-//     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-    // cell_area.color = Some(BLACK);
-    // draw::rectangle::filled(ctx, &cell_area);
 }
