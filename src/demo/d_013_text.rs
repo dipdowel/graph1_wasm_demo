@@ -558,16 +558,26 @@ const MARCEL_END: u32 = 1957;
 const MARCEL_CHECKMARK_END: u32 = 2000;
 const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
 
-const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600;
-
 const TRANSITION_TO_ALL_FONTS_DEMO_START: u32 = 2900;
 
+const DEMO_END: u32 = 4440;
+
+const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600;
+
+
+
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-    let mut frame_count = ctx.frame_count as u32;
+
+    let frame_count = ctx.frame_count as u32;
+
+    if frame_count >= DEMO_END {
+        return;
+    }
 
     // Init the demo on frame 0
     if frame_count == 0 {
         reset(ctx);
+        clear_screen(ctx);
         prepare_scrolling_title(ctx);
         prepare_text_marcel_page(ctx);
         prepare_text_n3trunn3r_page(ctx);
@@ -841,6 +851,12 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         //------------------------------------------
         scanline::window(ctx, 1, 4);
     }
+
+    // Fade closing page to SCROLLER_BG_COLOR and restart demo
+    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    // Restart the demo by resetting frame count
+
 
 //     let scr_w = ctx.win.dimensions.w;
 //     let scr_h = ctx.win.dimensions.h;
