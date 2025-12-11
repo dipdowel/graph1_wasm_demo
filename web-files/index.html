@@ -318,6 +318,8 @@
         canvas.style.maxHeight = `${height}px`;
         canvas.width = width;
         canvas.height = height;
+        canvas.style.imageRendering = "crisp-edges"
+
 
         const imageData = ctx.createImageData(width, height);
         setActiveDemoFunction = set_active_demo;
