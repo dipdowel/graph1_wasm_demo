@@ -49,6 +49,7 @@ pub struct TextUserData {
     page_marcel_checkmark_char_idx: usize,
 
     page_marcel_shuffled_cells: Vec<Region>,
+    page_n3trunn3r_shuffled_cells: Vec<Region>,
 
     /// Index of the current character cell to interact with
     char_cell_idx: usize,
@@ -68,6 +69,7 @@ pub fn get_text_user_data() -> TextUserData {
         page_marcel_checkmark_char_idx: 0,
         char_cell_idx: 0,
         page_marcel_shuffled_cells: vec![],
+        page_n3trunn3r_shuffled_cells: vec![],
     }
 }
 
@@ -83,6 +85,7 @@ fn reset(ctx: &mut GraphContext<DemoUserData>) {
     ctx.user_data.text.char_cell_idx = 0;
     ctx.rng = XorShiftRng::default();
     ctx.user_data.text.page_marcel_shuffled_cells = vec![];
+    ctx.user_data.text.page_n3trunn3r_shuffled_cells = vec![];
 }
 
 //
@@ -93,8 +96,9 @@ const BUF_0_MAIN: usize = 0;
 const BUF_1_SCROLLER: usize = 1;
 const BUF_2_PAGE_MARCEL: usize = 2;
 const BUF_3_PAGE_N3TRUNN3R: usize = 3;
+const BUF_4_PAGE_CLOSING: usize = 4;
 
-const BUF_4_BIG_FONTS: usize = 3;
+const BUF_5_BIG_FONTS: usize = 5;
 
 //
 //
@@ -193,16 +197,28 @@ const MARCEL_PAGE_TEXT: [&str; 8] = [
 ];
 
 const N3TRUNN3R_PAGE_TEXT: [&str; 8] = [
-    " We have 2 more fonts for you¹,",
-    " created by N3tRunn3r in 2007:",
-    "  → •·C&C Red Alert [INET] ",
-    "  → •·C&C Red Alert [LAN]  ",
-    " Yeah… Time flies… ˚°•·¤·•°˚",
+    "  We have 2 more fonts for you¹,",
+    "  created by N3tRunn3r in 2007:",
+    "   → •·C&C Red Alert [INET] ",
+    "   → •·C&C Red Alert [LAN]  ",
+    "  Yeah… Time flies… ˚°•·¤·•°˚",
     "·································",
-    "  ¹ — See other demos here.",
+    "   ¹ — See other demos here.",
     "·································",
      // "✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕",
 ];
+
+const CLOSING_PAGE_TEXT: [&str; 8] = [
+    "  The \"Matriks Uaxactun\" fonts",
+    "  contain 225 characters each, ",
+    "  so you can render a text in ",
+    "  most European languages ;-)",
+    "••••••••••••••••••••••••••••••••• ",
+    "  See module `text` in Graph1",
+    "  for details on text rendering",
+    "•••••••••••••••••••••••••••••••••     ",
+];
+
 
 ///
 /// Prepare the text page about Marcel van Deijl
@@ -330,6 +346,28 @@ fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
         Align::Left,
     );
 
+    // Create shuffled cells for the transition from N3TRUNN3R to CLOSING page
+    let dimensions_input: Variant<&[&str], Dimensions2d> = Variant::Primary(&N3TRUNN3R_PAGE_TEXT);
+
+    let page_n3trunn3r_grid = make_monospaced_char_grid(
+        &text_font,
+        dimensions_input,
+        text_top_left,
+        Some(MATRIKS_CURSOR_COLOR),
+    )
+    .expect("Failed to create MonospacedCharGrid for N3TRUNN3R page");
+
+    let mut cells = page_n3trunn3r_grid
+        .cells()
+        .into_iter()
+        .copied()
+        .collect::<Vec<Region>>();
+
+    // FIXME: is using `.ok()` really okay here?
+    shuffle::slice(&mut cells, &mut XorShiftRng::default()).ok();
+
+    ctx.user_data.text.page_n3trunn3r_shuffled_cells = cells;
+
     // restore the original window context
     ctx.win.set_context(original_window);
     // Switch back to the main frame buffer (index 0)
@@ -339,11 +377,59 @@ fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
     // END OF prepare_text_n3trunn3r_page()
 }
 
+///
+/// Prepare the text page with closing text
+///
+fn prepare_text_closing_page(ctx: &mut GraphContext<DemoUserData>) {
+    let original_window = ctx.win.get_context();
+
+    let res = ctx.set_active_frame_buf(BUF_4_PAGE_CLOSING); //.ok();
+    if res.is_err() {
+        println!("prepare_text_closing_page(), Failed to set active frame buffer");
+    }
+
+    ctx.win.background_color = BLACK;
+    ctx.win.foreground_color = MATRIKS_TEXT_COLOR;
+    clear_screen(ctx);
+
+    let text_font = instantiate_embedded_font(
+        EmbeddedFonts::MatriksUaxactunMono,
+        TEXT_FONT_SCALE,
+        Some(TEXT_FONT_SPACING),
+        None,
+    );
+
+    let title_font_props: printer::ColorProperties = printer::ColorProperties {
+        color: Some(MATRIKS_TEXT_COLOR),
+        color_transformer: None,
+        data: None,
+    };
+
+    let text_top_left: Point = Point { x: 26, y: 19 };
+
+    printer::print(
+        ctx,
+        &text_top_left,
+        &text_font,
+        &title_font_props,
+        &CLOSING_PAGE_TEXT,
+        Align::Left,
+    );
+
+    // restore the original window context
+    ctx.win.set_context(original_window);
+    // Switch back to the main frame buffer (index 0)
+    ctx.set_active_frame_buf(BUF_0_MAIN).ok();
+
+    //-------------------------------------------------
+    // END OF prepare_text_closing_page()
+}
+
 fn prepare_4_big_fonts_buffer(ctx: &mut GraphContext<DemoUserData>) {
 
     let original_window = ctx.win.get_context();
 
-    let res = ctx.set_active_frame_buf(BUF_4_BIG_FONTS); //.ok();
+    let res = ctx.set_active_frame_buf(BUF_5_BIG_FONTS); //.ok().
     if res.is_err() {
         println!("prepare_text_n3trunn3r_page(), Failed to set active frame buffer");
     }
@@ -617,6 +703,9 @@ const MARCEL_END: u32 = 1957;
 const MARCEL_CHECKMARK_END: u32 = 2000;
 const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
 
+const N3TRUNN3R_PAGE_START: u32 = 2900;
+const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600;
+
 const TRANSITION_TO_ALL_FONTS_DEMO_START: u32 = 2900;
 const TRANSITION_TO_ALL_FONTS_DEMO_END: u32 = 3500;
 
@@ -632,6 +721,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         prepare_scrolling_title(ctx);
         prepare_text_marcel_page(ctx);
         prepare_text_n3trunn3r_page(ctx);
+        prepare_text_closing_page(ctx);
         ctx.win.background_color = SCROLLER_BG_COLOR;
         ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
         clear_screen(ctx); // Clear the main buffer first
@@ -881,6 +971,46 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         scanline::window(ctx, 1, 4);
     }
 
+    // Transition from N3TRUNN3R page to CLOSING page
+    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if frame_count > N3TRUNN3R_PAGE_FADE_OUT_START && frame_count < N3TRUNN3R_PAGE_FADE_OUT_START + 700 {
+
+        let cells_per_step = 3;
+        let base_cell_index: usize =
+            (frame_count - N3TRUNN3R_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
+
+        let win_dims = ctx.win.dimensions.clone();
+
+        for offset in 0..4 {
+            let cell = ctx
+                .user_data
+                .text
+                .page_n3trunn3r_shuffled_cells
+                .get(base_cell_index + offset);
+            if let Some(cell) = cell {
+                let mut cell_area = cell.rect_area();
+
+                let mut buf_result = ctx
+                    .get_multi_frame_bufs(&[BUF_4_PAGE_CLOSING])
+                    .expect("Failed to get multiple frame buffers");
+                let src_buf = buf_result.immut[0].frame_buf;
+
+                buffer_op::copy::rect::to_another_buf(
+                    src_buf,
+                    &win_dims,
+                    &cell_area,
+                    &mut buf_result.active,
+                    &win_dims,
+                    &cell_area.top_left,
+                    true,
+                    1,
+                );
+            }
+        }
+        //------------------------------------------
+        scanline::window(ctx, 1, 4);
+    }
+
 //     let scr_w = ctx.win.dimensions.w;
 //     let scr_h = ctx.win.dimensions.h;
 //     let bg_color = RetroNeon::ELECTRIC_BLUE ;
@@ -929,7 +1059,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 //         let win_dims = ctx.win.dimensions.clone();
 //         let mut buf_result = ctx
 //             // .get_multi_frame_bufs(&[0, 1])
-//             .get_multi_frame_bufs(&[BUF_4_BIG_FONTS])
+//             .get_multi_frame_bufs(&[BUF_5_BIG_FONTS])
 //             .expect("Failed to get multiple frame buffers");
 //         ;
 //         let src_buf = buf_result.immut[0].frame_buf;
