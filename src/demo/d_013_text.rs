@@ -21,10 +21,6 @@ use graph1::utils::grid::uniform::UniformGrid;
 use graph1::utils::math::geometry::region::Region;
 use graph1::utils::math::rng::{shuffle, XorShiftRng};
 use graph1::{buffer_op, draw};
-use graph1::draw::line;
-use graph1::draw::tools::brush::Brush;
-use graph1::draw::tools::spray;
-use crate::global_consts::{WIN_HEIGHT, WIN_WIDTH};
 
 const ON: bool = true;
 const OFF: bool = false;
@@ -98,7 +94,6 @@ const BUF_2_PAGE_MARCEL: usize = 2;
 const BUF_3_PAGE_N3TRUNN3R: usize = 3;
 const BUF_4_PAGE_CLOSING: usize = 4;
 
-const BUF_5_BIG_FONTS: usize = 5;
 
 //
 //
@@ -211,7 +206,7 @@ const N3TRUNN3R_PAGE_TEXT: [&str; 8] = [
 const CLOSING_PAGE_TEXT: [&str; 8] = [
     "  The \"Matriks Uaxactun\" fonts",
     "  contain 225 characters each, ",
-    "  so you can render a text in ",
+    "  so you can display texts in ",
     "  most European languages ;-)",
     "••••••••••••••••••••••••••••••••• ",
     "  See module `text` in Graph1",
@@ -425,146 +420,6 @@ fn prepare_text_closing_page(ctx: &mut GraphContext<DemoUserData>) {
     // END OF prepare_text_closing_page()
 }
 
-fn prepare_4_big_fonts_buffer(ctx: &mut GraphContext<DemoUserData>) {
-
-    let original_window = ctx.win.get_context();
-
-    let res = ctx.set_active_frame_buf(BUF_5_BIG_FONTS); //.ok().
-    if res.is_err() {
-        println!("prepare_text_n3trunn3r_page(), Failed to set active frame buffer");
-    }
-
-    ctx.win.background_color = TRANSPARENT;
-    ctx.win.foreground_color = RetroNeon::HOT_PINK;
-    clear_screen(ctx);
-
-    let big_font_spacing: Spacing = Spacing {
-        kerning_px: 4,
-        leading_px: 0,
-    };
-
-    let big_font_matriks_mono = instantiate_embedded_font(
-        EmbeddedFonts::MatriksUaxactunMono,
-        6,
-        Some(big_font_spacing.clone()),
-        None,
-    );
-    let big_font_matriks_regular = instantiate_embedded_font(
-        EmbeddedFonts::MatriksUaxactun,
-        6,
-        Some(big_font_spacing.clone()),
-        None,
-    );
-    let big_font_red_alert_lan = instantiate_embedded_font(
-        EmbeddedFonts::CCRedAlertLan,
-        6,
-        Some(big_font_spacing.clone()),
-        None,
-    );
-    let big_font_red_alert_inet = instantiate_embedded_font(
-        EmbeddedFonts::CCRedAlertInet,
-        6,
-        Some(big_font_spacing.clone()),
-        None,
-    );
-
-
-    // pub type PixelColorTransformerFn = fn(color: u32, x: u32, y: u32, w: u32, h: u32, data: Option<&Vec<u32>>) -> u32
-
-    let big_font_props: printer::ColorProperties = printer::ColorProperties {
-        color: None,
-        color_transformer: Some(
-            move |color: u32, x: u32, y: u32, w: u32, h: u32, data: Option<&Vec<u32>>| {
-                println!("big_font_props.color_transformer(), x: {}, y: {}, w: {}, h: {}", x, y, w, h);
-                if y % 3 == 0 || x % 3 == 0 {
-                    return RetroNeon::CYBER_BLUE;
-                    // return BLACK;
-                }
-                RetroNeon::STROBE_WHITE
-                // return RetroNeon::ELECTRIC_VIOLET
-            }
-        ),
-        data: None,
-    };
-
-    let big_word = "Graph1";
-
-
-    // MATRIX UAXACTUN MONO
-    //-------------------------------------------------------------------------------------
-    let mut text_top_left = ctx.win.quadrants.top_left.center();
-    let mut big_word_dims = printer::get_line_dimensions(&big_font_matriks_mono, &big_word);
-    text_top_left.x = text_top_left.x.saturating_sub(big_word_dims.w/2);
-    text_top_left.y = text_top_left.y.saturating_sub(big_word_dims.h/2);
-
-    printer::print_line(
-        ctx,
-        &text_top_left,
-        &big_font_matriks_mono,
-        &big_font_props,
-        &"Graph1",
-    );
-
-    // MATRIX UAXACTUN REGULAR
-    //-------------------------------------------------------------------------------------
-    text_top_left = ctx.win.quadrants.bottom_left.center();
-    big_word_dims = printer::get_line_dimensions(&big_font_matriks_regular, &big_word);
-    text_top_left.x = text_top_left.x.saturating_sub(big_word_dims.w/2);
-    text_top_left.y = text_top_left.y.saturating_sub(big_word_dims.h/2);
-
-    printer::print_line(
-        ctx,
-        &text_top_left,
-        &big_font_matriks_regular,
-        &big_font_props,
-        &"Graph1",
-    );
-
-
-    // CC RED ALERT LAN
-    //-------------------------------------------------------------------------------------
-    text_top_left = ctx.win.quadrants.top_right.center();
-    big_word_dims = printer::get_line_dimensions(&big_font_red_alert_lan, &big_word);
-    text_top_left.x = text_top_left.x.saturating_sub(big_word_dims.w/2);
-    text_top_left.y = text_top_left.y.saturating_sub(big_word_dims.h/2) + 10;
-
-    printer::print_line(
-        ctx,
-        &text_top_left,
-        &big_font_red_alert_lan,
-        &big_font_props,
-        &"Graph1",
-    );
-
-
-    // CC RED ALERT INET
-    //-------------------------------------------------------------------------------------
-    text_top_left = ctx.win.quadrants.bottom_right.center();
-    big_word_dims = printer::get_line_dimensions(&big_font_red_alert_inet, &big_word);
-    text_top_left.x = text_top_left.x.saturating_sub(big_word_dims.w/2);
-    text_top_left.y = text_top_left.y.saturating_sub(big_word_dims.h/2) + 4;
-
-
-    printer::print_line(
-        ctx,
-        &text_top_left,
-        &big_font_red_alert_inet,
-        &big_font_props,
-        &"Graph1",
-    );
-
-
-
-    // restore the original window context
-    ctx.win.set_context(original_window);
-    // Switch back to the main frame buffer (index 0)
-    ctx.set_active_frame_buf(BUF_0_MAIN).ok();
-
-    //-------------------------------------------------
-    // END OF prepare_4_big_fonts_buffer
-}
-
-
 ///
 /// Scroll the title across the screen
 ///
@@ -703,14 +558,9 @@ const MARCEL_END: u32 = 1957;
 const MARCEL_CHECKMARK_END: u32 = 2000;
 const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
 
-const N3TRUNN3R_PAGE_START: u32 = 2900;
 const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600;
 
 const TRANSITION_TO_ALL_FONTS_DEMO_START: u32 = 2900;
-const TRANSITION_TO_ALL_FONTS_DEMO_END: u32 = 3500;
-
-const IS_DEV: bool = true;
-// const IS_DEV: bool = false;
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let mut frame_count = ctx.frame_count as u32;
@@ -727,25 +577,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         clear_screen(ctx); // Clear the main buffer first
         // prepare_4_big_fonts_buffer(ctx);
     }
-
-
-
-            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-            // FIXME: Temporary fix for jumping frame count. REMOVE!!!!
-
-                if IS_DEV && frame_count == 0 {
-                    ctx.win.background_color = MATRIKS_BG_COLOR;
-                    ctx.copy_to_active_frame_buf_from(BUF_3_PAGE_N3TRUNN3R);
-                    scanline::window(ctx, 1, 255);
-                }
-                if IS_DEV {
-                    // frame_count += TRANSITION_TO_ALL_FONTS_DEMO_START -10 ;
-                    frame_count += MARCEL_START -10 ;
-                }
-    /* */
 
 
 
