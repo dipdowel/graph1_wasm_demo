@@ -94,7 +94,7 @@
 
  canvas {
      /*image-rendering: high-quality; !* Specific rendering *!*/
-     image-rendering: pixelated;
+     image-rendering: smooth;
      border: 1px solid #333333; /* Gray border */
      border-radius: 6px;
      background-color: #0f0f1f; /* Dark background */
