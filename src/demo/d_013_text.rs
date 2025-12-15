@@ -193,12 +193,12 @@ const MARCEL_PAGE_TEXT: [&str; 8] = [
 
 const N3TRUNN3R_PAGE_TEXT: [&str; 8] = [
     "  We have 2 more fonts for you¹,",
-    "  created by N3tRunn3r in 2007:",
+    "  created by N3tRunn3r in 2008:",
     "   → •·C&C Red Alert [INET] ",
     "   → •·C&C Red Alert [LAN]  ",
-    "  Yeah… Time flies… ˚°•·¤·•°˚",
+    "  Yeah… Time flies…˚°•·¤·•°˚",
     "·································",
-    "   ¹ — See other demos here.",
+    "   ¹ — Used in other demos.",
     "·································",
      // "✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕",
 ];
@@ -556,13 +556,14 @@ const MARCEL_START: u32 = 455;
 const MARCEL_CHECKMARK: u32 = 1830;
 const MARCEL_END: u32 = 1957;
 const MARCEL_CHECKMARK_END: u32 = 2000;
-const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
+// const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
+const MARCEL_PAGE_FADE_OUT_START: u32 = 2600;
 
-const TRANSITION_TO_ALL_FONTS_DEMO_START: u32 = 2900;
-
+const TRANSITION_TO_N3TRUNN3R_PAGE: u32 = 2750;
+const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600;
 const DEMO_END: u32 = 4440;
 
-const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600;
+
 
 
 
@@ -772,7 +773,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.user_data.text.cursor_state = ON;
     }
     // // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    if frame_count > MARCEL_PAGE_FADE_OUT_START && frame_count < TRANSITION_TO_ALL_FONTS_DEMO_START {
+    if frame_count > MARCEL_PAGE_FADE_OUT_START && frame_count < TRANSITION_TO_N3TRUNN3R_PAGE {
 
         let cells_per_step = 3;
         let base_cell_index: usize =
