@@ -1,6 +1,6 @@
 # Text Rendering
 
-Graph1 provides a text rendering system, **pixel fonts** in [CBF file format](https://github.com/dipdowel/compact-bitmap-font), and text layout capabilities. You can design and use your own CBF-fonts as well.
+Graph1 provides a text rendering system, **pixel fonts** in [CBF file format](https://github.com/dipdowel/compact-bitmap-font), and text layout capabilities. You can design and use your own CBF fonts as well.
 
 ---
 
@@ -14,13 +14,13 @@ Graph1 ships with 4 embedded pixel fonts in CBF format (CBF = Compact Bitmap Fon
 As of December 2025, there are two variants available:
 - `EmbeddedFonts::MatriksUaxactun` — Regular (proportional) variant
 - `EmbeddedFonts::MatriksUaxactunMono` — Monospaced variant
-- Fonts contain 225 characters, so most EU-languages can be rendered.
+- Fonts contain 225 characters, so most European languages can be rendered.
 - The demo above uses both of the fonts: the regular one for the title scroller, and the monospaced one for the terminal-like text.
 
 ### 2. C&C Red Alert fonts
 - `EmbeddedFonts::CCRedAlertInet` — INET variant
 - `EmbeddedFonts::CCRedAlertLan` — LAN variant
-- Created by [N3tRunn3r](https://forums.cncnet.org/topic/78-the-red-alert-fonts/) in 2008 after pixel fonts from the classic RTS game Command & Conquer: Red Alert.
+- Created by [N3tRunn3r](https://forums.cncnet.org/topic/78-the-red-alert-fonts/) in 2008, inspired by the pixel fonts from the classic RTS game Command & Conquer: Red Alert.
 
 ---
 
@@ -84,7 +84,7 @@ let font = instantiate_embedded_font(
 - `font_name`: One of the `EmbeddedFonts` enum variants
 - `font_scale_factor`: How much to scale the font up (1 = native size, 2 = double size, 3 = triple size, etc.)
 - `spacing`: Optional custom kerning and leading (defaults to font's native spacing)
-- `default_char`: Optional fallback character to render when the font does not contain a request character. `None` results in the font's built-in default char (e.g. `?`).
+- `default_char`: Optional fallback character to render when the font does not contain a requested character. `None` results in the font's built-in default char (e.g. `?`).
 
 ### External Fonts
 
@@ -162,7 +162,7 @@ let dimensions = printer::print(
 
 **Alignment behavior:**
 - `Align::Left`: All lines start at the same x-coordinate
-- `Align::Right`: All lines end at the same x-coordinate (aligned to longest line)
+- `Align::Right`: All lines end at the same x-coordinate (aligned to the longest line)
 - `Align::Center`: All lines centered relative to the longest line
 
 **Returns:** `Dimensions2d` with total width (longest line) and height (all lines + leading).
