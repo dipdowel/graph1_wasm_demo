@@ -15,7 +15,7 @@ As of December 2025, there are two variants available:
 - `EmbeddedFonts::MatriksUaxactun` — Regular (proportional) variant
 - `EmbeddedFonts::MatriksUaxactunMono` — Monospaced variant
 - Fonts contain 225 characters, so most EU-languages can be rendered.
-- The demo above uses both of the fonts: The regular one for the title scroller, and the monospaced one for the terminal-like text.
+- The demo above uses both of the fonts: the regular one for the title scroller, and the monospaced one for the terminal-like text.
 
 ### 2. C&C Red Alert fonts
 - `EmbeddedFonts::CCRedAlertInet` — INET variant

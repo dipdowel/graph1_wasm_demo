@@ -2,7 +2,7 @@ use crate::demo::user_data::DemoUserData;
 use graph1::buffer_op::scale;
 use graph1::core::context::GraphContext;
 use graph1::core::context_utils::context_snapshot::ContextSnapshot;
-use graph1::fx::scanline;
+use graph1::fx::{glitch, scanline};
 use graph1::primitives::data_structs::variant::Variant;
 use graph1::primitives::math::{Displacement, MinMax};
 use graph1::primitives::plane::Dimensions2d;
@@ -20,7 +20,9 @@ use graph1::utils::grid::grid_position::GridPosition;
 use graph1::utils::grid::uniform::UniformGrid;
 use graph1::utils::math::geometry::region::Region;
 use graph1::utils::math::rng::{shuffle, XorShiftRng};
-use graph1::{buffer_op, draw};
+use graph1::{buffer_op, draw, hash_random_u32};
+use graph1::fx::glitch::HorizontalGlitchProps;
+use graph1::utils::math::oscillator;
 
 const ON: bool = true;
 const OFF: bool = false;
@@ -586,8 +588,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.win.background_color = SCROLLER_BG_COLOR;
         ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
         clear_screen(ctx); // Clear the main buffer first
+        return;
     }
-
 
     // Scroll the title across the screen
     if frame_count > SCROLL_START && frame_count < SCROLL_END {
