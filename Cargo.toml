@@ -4,24 +4,21 @@ version = "0.1.0"
 edition = "2021"
 
 [profile.release]
-#debug = false
-opt-level = 's' # or 's' for size optimization with a balance between size and speed
-lto=true
+debug = false
+opt-level = 3  # Maximum performance
+lto = true
+codegen-units = 1  # Better optimization (slower compile)
 
 [package.metadata.wasm-pack.profile.dev]
 wasm-opt = false
 
-
 [package.metadata.wasm-pack.profile.release]
-# -Oz = optimize for smallest size
-wasm-opt = ["-Oz"]
-
+wasm-opt = ["-O3", "--enable-simd", "--enable-bulk-memory", "--strip-debug"]
 
 
 [dependencies]
-wasm-bindgen = "0.2.95"
-web-sys = { version = "0.3.56", features = ["console"] }
-wasm-bindgen-futures = "0.4.45"
+wasm-bindgen = "0.2.106"
+web-sys = { version = "0.3.83", features = ["console"] }
 graph1 = { path = "../graph1" }
 
 console_error_panic_hook = "0.1.7"

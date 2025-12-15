@@ -318,6 +318,8 @@
         canvas.style.maxHeight = `${height}px`;
         canvas.width = width;
         canvas.height = height;
+        // canvas.style.imageRendering = "pixelated"; // "pixelated" for sharp pixels
+
 
         const imageData = ctx.createImageData(width, height);
         setActiveDemoFunction = set_active_demo;
@@ -357,7 +359,7 @@
 
         // Throttle the framerate (just in case, if someone has a too good of a computer
         let lastTimestamp = 0;
-        let maxFPS = 120;
+        let maxFPS = 100;
         let period = 1000 / maxFPS; // ms for each frame
 
 
@@ -386,6 +388,7 @@
           applyGlowEffect(pixel_stats);
 
           frame_count++;
+          // console.log(" -> frame_count:", frame_count);
           // isPaused = true;  // FIXME: REMOVE THIS LINE!
         }
 
@@ -419,7 +422,7 @@
       <div class="centered-text">
         <ul>
           <li><a href="/info.html">✉️ Get in touch!</a></li>
-          <li><a href="/">🧡 Graph1, a Rust graphics library</a></li>
+          <li><a href="/">🧡 Graph1 – graphics & animation Rust library</a></li>
           <li><a href="/LICENSE">📄 MIT License (with attribution)</a></li>
 
         </ul>

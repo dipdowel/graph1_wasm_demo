@@ -135,9 +135,11 @@ pub fn init_state(frame: Option<usize>) -> InitStateResult {
                 Some(RetroNeon::LASER_LIME), // foreground color RGBA
             );
 
+            // FIXME: Once dynamic creation of frame buffers is available
+            // FIXME: use that instead of hardcoding number of buffers here!
             // Create a context with the basic configuration
             let ctx: GraphContext<DemoUserData> =
-                GraphContext::new(win_ctx, true, 1, None, 1, None);
+                GraphContext::new(win_ctx, true, 5, None, 1, None);
 
             // Place the context into the global container
             // so that it persists between frames
@@ -170,6 +172,19 @@ pub struct PixelStats {
     pub average_color: u32,
     pub average_luminance: u32,
     pub average_intensity: u32,
+}
+
+impl PixelStats {
+    pub fn new() -> Self {
+        PixelStats {
+            average_red: 0,
+            average_green: 0,
+            average_blue: 0,
+            average_color: 0,
+            average_luminance: 0,
+            average_intensity: 0,
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -218,8 +233,14 @@ pub fn update_frame(frame: usize) -> PixelStats {
 
             // Convert the internal RGBA buffer to ABGR and write it to `CANVAS_BUF_ABGR`.
             // JS renders `CANVAS_BUF_ABGR` on the HTML canvas, not `FRAME_BUF`.
-            let stats = rgba_to_abgr(&mut CANVAS_BUF_ABGR, &ctx.frame_buf, true).unwrap();
+            let stats = rgba_to_abgr(&mut CANVAS_BUF_ABGR, &ctx.frame_buf, true);
             // let stats = rgba_to_abgr_unsafe(&mut CANVAS_BUF_ABGR, &ctx.frame_buf, true).unwrap();
+
+            if stats.is_none(){
+                return PixelStats::new();
+            }
+
+            let stats = stats.unwrap();
 
             return PixelStats {
                 average_red: stats.average_red,
