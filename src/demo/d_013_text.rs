@@ -3,6 +3,7 @@ use graph1::buffer_op::{copy, scale};
 use graph1::core::context::{GraphContext, WindowContext};
 use graph1::core::context_utils::context_snapshot::ContextSnapshot;
 use graph1::fx::{glitch, scanline};
+use graph1::fx;
 use graph1::primitives::data_structs::variant::Variant;
 use graph1::primitives::math::{Displacement, MinMax};
 use graph1::primitives::plane::Dimensions2d;
@@ -22,6 +23,7 @@ use graph1::utils::math::geometry::region::Region;
 use graph1::utils::math::rng::{shuffle, XorShiftRng};
 use graph1::{buffer_op, draw, hash_random_u32};
 use graph1::fx::glitch::HorizontalGlitchProps;
+use graph1::utils::color::math::ColorOperation;
 use graph1::utils::math::oscillator;
 
 const ON: bool = true;
@@ -141,14 +143,9 @@ const RED_ALERT_TEXT_COLOR: u32 = MATRIKS_TEXT_COLOR;
 const SCROLLER_TEXT: &str = "  Pixel fonts!  ←";
 // const SCROLLER_TEXT: &str = "  Pixel fonts!  ←";
 fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
-    // let original_window = ctx.win.get_context();
-    // ctx.set_active_frame_buf(BUF_1_SCROLLER).ok();
 
     ctx.user_data.text.scroller_context.win.background_color = SCROLLER_BG_COLOR;
     ctx.user_data.text.scroller_context.win.foreground_color = SCROLLER_TEXT_COLOR;
-
-    // ctx.win.background_color = SCROLLER_BG_COLOR;
-    // ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
     clear_screen(&mut ctx.user_data.text.scroller_context);
 
     // Title that will be scrolled across the screen
@@ -188,21 +185,11 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
         &SCROLLER_TEXT,
     );
 
-
     //-----------------------------------------------------
-
-
 
     let dims = ctx.user_data.text.scroller_context.win.dimensions.clone();
     let scroller_frame_buf_copy =  &ctx.user_data.text.scroller_context.frame_buf.clone();
-
-
     clear_screen(&mut ctx.user_data.text.scroller_context);
-
-    // let dst_buf = buf_result.active;
-    // let src_buf = buf_result.immut[0].frame_buf;
-    // let src_buf = ctx.user_data.text.scroller_context.frame_buf;
-
 
     scale::up::sparse::to_another_buf(
         &scroller_frame_buf_copy,
@@ -213,23 +200,9 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
         &Point { x: 0, y: 0 },
         2,
         &Displacement { dx: 1, dy: 1 },
-        // &Displacement { dx: 0, dy: 0 },
         1,
     );
 
-
-
-
-
-
-
-
-
-    // restore the original window context
-    // ctx.win.set_context(original_window);
-
-    // Switch back to the main frame buffer (index 0)
-    // ctx.set_active_frame_buf(BUF_0_MAIN).ok();
 }
 
 //
@@ -241,9 +214,7 @@ const TEXT_FONT_SPACING: Spacing = Spacing {
     kerning_px: 3,
     leading_px: 4,
 };
-// —
-// –
-//which are shipped with Graph1:
+
 const MARCEL_PAGE_TEXT: [&str; 8] = [
     " Graph1 is shipped with a pixel ",
     " font family \"Matriks Uaxactun\", ",
@@ -500,10 +471,6 @@ fn scroll_the_title(ctx: &mut GraphContext<DemoUserData>) {
         .expect("Failed to get multiple frame buffers");
 
     let dst_buf = buf_result.active;
-    // let src_buf = buf_result.immut[0].frame_buf;
-    // let src_buf = ctx.user_data.text.scroller_context.frame_buf;
-
-    // let dst_x = if frame_count > 130 { 0 } else { 130 - frame_count };
 
     copy::rect::to_another_buf(
         &src_buf,
@@ -512,30 +479,9 @@ fn scroll_the_title(ctx: &mut GraphContext<DemoUserData>) {
         dst_buf,
         &dst_win_dims,
         &Point { x: 0, y: 72 },
-        // &Point { x: 130, y: 38 },
         false,
         1,
     );
-
-    /*
-    scale::up::sparse::to_another_buf(
-        &src_buf,
-        &src_win_dims,
-        &RectArea::new(frame_count, 0, 278, 120, None),
-        dst_buf,
-        &dst_win_dims,
-        &Point { x: 4, y: 38 },
-        3,
-        &Displacement { dx: 1, dy: 1 },
-        1,
-    );
-
-     */
-
-
-
-
-
 }
 
 //---------------------------------------------------------------------
@@ -634,37 +580,34 @@ fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos: GridPosition) {
     }
 }
 
+//
+//
+//
+//
+//
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////// [ RENDER FRAME ] ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
-
+//
+//
 // FRAME POINTERS
 
-
 const OFFSET: u32 = 500;
-
 const SCROLL_START: u32 = 1;
 const SCROLL_END: u32 = 412 + OFFSET;
 const SCROLL_FADE_START: u32 = 418+ OFFSET;
 const SCROLL_FADE_END: u32 = 455+ OFFSET;
-
 const MARCEL_START: u32 = 455+ OFFSET;
 const MARCEL_CHECKMARK: u32 = 1830+ OFFSET;
 const MARCEL_END: u32 = 1957+ OFFSET;
 const MARCEL_CHECKMARK_END: u32 = 2000+ OFFSET;
 // const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
 const MARCEL_PAGE_FADE_OUT_START: u32 = 2600+ OFFSET;
-
 const TRANSITION_TO_N3TRUNN3R_PAGE: u32 = 2750+ OFFSET;
 const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600+ OFFSET;
 const DEMO_END: u32 = 4440+ OFFSET;
 
-
-
-
-
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-
 
     let frame_count = ctx.frame_count as u32;
 
@@ -672,7 +615,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         return;
     }
 
-    // Init the demo on frame 0
+    //=====[ DEMO INIT on frame 0 ] ===============================================================
     if frame_count == 0 {
         reset(ctx);
         clear_screen(ctx);
@@ -686,11 +629,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         return;
     }
 
-    // Scroll the title across the screen
+    //
+    //=====[ TITLE SCROLLER: YELLOW ON BLUE ] ======================================================
     if frame_count > SCROLL_START && frame_count < SCROLL_END {
         clear_screen(ctx);
-
-
         scroll_the_title(ctx);
         // Add some noise to the background
         ctx.user_data
@@ -698,23 +640,12 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             .noise
             .generate_32(&mut ctx.frame_buf, None, None, &mut ctx.gpu_context);
         scanline::window(ctx, 1, 12);
-
-
-
     }
 
-
-
-    // Fade the screen out into [black?]
+    //
+    //=====[ FADE TO BLACK ] =======================================================================
     if frame_count > SCROLL_FADE_START && frame_count < SCROLL_FADE_END {
-        ctx.win.background_color = gradient::linear_step(
-            RetroNeon::ELECTRIC_BLUE,
-            MATRIKS_BG_COLOR,
-            (SCROLL_FADE_END - SCROLL_FADE_START) as usize,
-            frame_count.saturating_sub(SCROLL_FADE_START) as usize,
-        );
-        clear_screen(ctx);
-        scanline::window(ctx, 1, 14);
+        fx::fade(ctx, 0x07_10_10_00, ColorOperation::Subtract, false);
     }
 
     //=====[ BLINKING CURSOR START ] ===============================================================
@@ -754,9 +685,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         initial_cursor.color = Some(BLACK);
         draw::rectangle::filled(ctx, &initial_cursor);
     }
-    //
-    //=====[ BLINKING CURSOR END ] =================================================================
 
+    //
+    //=====[ RENDER MARCEL VAN DEIJL PAGE WITH TYPING CURSOR ] =====================================
     if frame_count > MARCEL_START && frame_count < MARCEL_END {
         let mut char_dst_area = RectArea::new(0, 0, 1, 1, None);
         if ctx.user_data.text.cursor_area.is_some() {
@@ -843,10 +774,14 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         }
     }
 
+    //
+    //=====[ RENDER THE CHECKMARK APPEARING ] ======================================================
     if frame_count > MARCEL_START && frame_count < MARCEL_CHECKMARK_END {
         scanline::window(ctx, 1, 15);
     }
 
+    //
+    //=====[ FADE OUT MARCEL PAGE ] ================================================================
     if frame_count > MARCEL_CHECKMARK && frame_count < MARCEL_PAGE_FADE_OUT_START {
         ctx.user_data.text.cursor_state = OFF;
         let checkmark_coords = ctx
@@ -881,7 +816,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         );
         ctx.user_data.text.cursor_state = ON;
     }
-    // // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    //
+    //=====[ TRANSITION FROM MARCEL PAGE TO N3TRUNN3R PAGE ] =======================================
     if frame_count > MARCEL_PAGE_FADE_OUT_START && frame_count < TRANSITION_TO_N3TRUNN3R_PAGE {
 
         let cells_per_step = 3;
@@ -920,8 +857,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         scanline::window(ctx, 1, 4);
     }
 
-    // Transition from N3TRUNN3R page to CLOSING page
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    //
+    //=====[ TRANSITION FROM N3TRUNN3R PAGE TO CLOSING PAGE ] ======================================
     if frame_count > N3TRUNN3R_PAGE_FADE_OUT_START && frame_count < N3TRUNN3R_PAGE_FADE_OUT_START + 700 {
 
         let cells_per_step = 3;
