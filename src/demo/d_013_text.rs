@@ -113,9 +113,9 @@ fn reset(ctx: &mut GraphContext<DemoUserData>) {
 //
 const BUF_0_MAIN: usize = 0;
 
-const BUF_2_PAGE_MARCEL: usize = 1;
-const BUF_3_PAGE_N3TRUNN3R: usize = 2;
-const BUF_4_PAGE_CLOSING: usize = 3;
+const BUF_1_PAGE_MARCEL: usize = 1;
+const BUF_2_PAGE_N3TRUNN3R: usize = 2;
+const BUF_3_PAGE_CLOSING: usize = 3;
 
 //
 //
@@ -133,7 +133,7 @@ const RED_ALERT_TEXT_COLOR: u32 = MATRIKS_TEXT_COLOR;
 // ===[ PREPARE SCROLLING TITLE ]===================================================================
 //
 const SCROLLER_TEXT: &str = "  Pixel fonts!  ←";
-// const SCROLLER_TEXT: &str = "  Pixel fonts!  ←";
+
 fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
     ctx.user_data.text.scroller_context.win.background_color = SCROLLER_BG_COLOR;
     ctx.user_data.text.scroller_context.win.foreground_color = SCROLLER_TEXT_COLOR;
@@ -245,7 +245,7 @@ const CLOSING_PAGE_TEXT: [&str; 8] = [
 fn prepare_text_marcel_page(ctx: &mut GraphContext<DemoUserData>) {
     let original_window = ctx.win.get_context();
 
-    ctx.set_active_frame_buf(BUF_2_PAGE_MARCEL).ok();
+    ctx.set_active_frame_buf(BUF_1_PAGE_MARCEL).ok();
 
     ctx.win.background_color = TRANSPARENT;
     ctx.win.foreground_color = MATRIKS_TEXT_COLOR;
@@ -332,7 +332,7 @@ fn prepare_text_marcel_page(ctx: &mut GraphContext<DemoUserData>) {
 fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
     let original_window = ctx.win.get_context();
 
-    let res = ctx.set_active_frame_buf(BUF_3_PAGE_N3TRUNN3R); //.ok();
+    let res = ctx.set_active_frame_buf(BUF_2_PAGE_N3TRUNN3R); //.ok();
     if res.is_err() {
         println!("prepare_text_n3trunn3r_page(), Failed to set active frame buffer");
     }
@@ -402,7 +402,7 @@ fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
 fn prepare_text_closing_page(ctx: &mut GraphContext<DemoUserData>) {
     let original_window = ctx.win.get_context();
 
-    let res = ctx.set_active_frame_buf(BUF_4_PAGE_CLOSING); //.ok();
+    let res = ctx.set_active_frame_buf(BUF_3_PAGE_CLOSING); //.ok();
     if res.is_err() {
         println!("prepare_text_closing_page(), Failed to set active frame buffer");
     }
@@ -600,13 +600,10 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     if frame_count >= DEMO_END {
         // clean up the memory used by the text user data
         if ctx.user_data.text.page_marcel_char_cells.len() > 0 {
-            println!("CLEAN UP TEXT USER DATA !!!!!!!!!!!!!!1");
             reset(ctx);
         }
         return;
     }
-
-    println!("current frame: {}", frame_count);
 
     //=====[ DEMO INIT on frame 0 ] ===============================================================
     if frame_count == 0 {
@@ -695,7 +692,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         let win_dims = ctx.win.dimensions.clone();
 
         let mut multi_bufs = ctx
-            .get_multi_frame_bufs(&[BUF_2_PAGE_MARCEL])
+            .get_multi_frame_bufs(&[BUF_1_PAGE_MARCEL])
             .expect("Failed to get multiple frame buffers");
 
         let src_buf = multi_bufs.immut[0].frame_buf;
@@ -794,7 +791,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         let char_dst_area = ctx.user_data.text.cursor_area.unwrap().clone();
         let win_dims = ctx.win.dimensions.clone();
         let mut buf_result = ctx
-            .get_multi_frame_bufs(&[BUF_2_PAGE_MARCEL])
+            .get_multi_frame_bufs(&[BUF_1_PAGE_MARCEL])
             .expect("Failed to get multiple frame buffers");
         let src_buf = buf_result.immut[0].frame_buf;
 
@@ -831,7 +828,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
                 let mut cell_area = cell.rect_area();
 
                 let mut buf_result = ctx
-                    .get_multi_frame_bufs(&[BUF_3_PAGE_N3TRUNN3R])
+                    .get_multi_frame_bufs(&[BUF_2_PAGE_N3TRUNN3R])
                     .expect("Failed to get multiple frame buffers");
                 let src_buf = buf_result.immut[0].frame_buf;
 
@@ -872,7 +869,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
                 let mut cell_area = cell.rect_area();
 
                 let mut buf_result = ctx
-                    .get_multi_frame_bufs(&[BUF_4_PAGE_CLOSING])
+                    .get_multi_frame_bufs(&[BUF_3_PAGE_CLOSING])
                     .expect("Failed to get multiple frame buffers");
                 let src_buf = buf_result.immut[0].frame_buf;
 
