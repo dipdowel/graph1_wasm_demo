@@ -114,9 +114,8 @@ fn reset(ctx: &mut GraphContext<DemoUserData>) {
 const BUF_0_MAIN: usize = 0;
 
 const BUF_1_PAGE_MARCEL: usize = 1;
-const BUF_2_PAGE_N3TRUNN3R: usize = 2;
-const BUF_3_PAGE_CLOSING: usize = 3;
-
+const BUF_2_PAGE_MARCEL_2: usize = 2;
+const BUF_3_PAGE_N3TRUNN3R: usize = 3;
 //
 //
 // ===[ COLORS ]========================================================
@@ -332,7 +331,7 @@ fn prepare_text_marcel_page(ctx: &mut GraphContext<DemoUserData>) {
 fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
     let original_window = ctx.win.get_context();
 
-    let res = ctx.set_active_frame_buf(BUF_2_PAGE_N3TRUNN3R); //.ok();
+    let res = ctx.set_active_frame_buf(BUF_3_PAGE_N3TRUNN3R); //.ok();
     if res.is_err() {
         println!("prepare_text_n3trunn3r_page(), Failed to set active frame buffer");
     }
@@ -399,10 +398,10 @@ fn prepare_text_n3trunn3r_page(ctx: &mut GraphContext<DemoUserData>) {
 ///
 /// Prepare the text page with closing text
 ///
-fn prepare_text_closing_page(ctx: &mut GraphContext<DemoUserData>) {
+fn prepare_text_marcel_2_page(ctx: &mut GraphContext<DemoUserData>) {
     let original_window = ctx.win.get_context();
 
-    let res = ctx.set_active_frame_buf(BUF_3_PAGE_CLOSING); //.ok();
+    let res = ctx.set_active_frame_buf(BUF_2_PAGE_MARCEL_2); //.ok();
     if res.is_err() {
         println!("prepare_text_closing_page(), Failed to set active frame buffer");
     }
@@ -590,9 +589,9 @@ const MARCEL_CHECKMARK: u32 = 2252;
 const MARCEL_END: u32 = 2383;
 const MARCEL_CHECKMARK_END: u32 = 2422;
 const MARCEL_PAGE_FADE_OUT_START: u32 = 2822;
-const TRANSITION_TO_N3TRUNN3R_PAGE: u32 = 2972;
-const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3462;
-const DEMO_END: u32 = 3700;
+const TRANSITION_TO_MARCEL_2_PAGE: u32 = 2972;
+const MARCEL_2_PAGE_FADE_OUT_START: u32 = 3562;
+const DEMO_END: u32 = 3800;
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let frame_count = ctx.frame_count as u32;
@@ -612,7 +611,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         prepare_scrolling_title(ctx);
         prepare_text_marcel_page(ctx);
         prepare_text_n3trunn3r_page(ctx);
-        prepare_text_closing_page(ctx);
+        prepare_text_marcel_2_page(ctx);
         ctx.win.background_color = SCROLLER_BG_COLOR;
         ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
         clear_screen(ctx); // Clear the main buffer first
@@ -810,8 +809,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     }
 
     //
-    //=====[ TRANSITION FROM MARCEL PAGE TO N3TRUNN3R PAGE ] =======================================
-    if frame_count > MARCEL_PAGE_FADE_OUT_START && frame_count < TRANSITION_TO_N3TRUNN3R_PAGE {
+    //=====[ TRANSITION FROM MARCEL 1 to MARCEL 2 PAGE ] ===========================================
+    if frame_count > MARCEL_PAGE_FADE_OUT_START && frame_count < TRANSITION_TO_MARCEL_2_PAGE {
         let cells_per_step = 3;
         let base_cell_index: usize =
             (frame_count - MARCEL_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
@@ -828,7 +827,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
                 let mut cell_area = cell.rect_area();
 
                 let mut buf_result = ctx
-                    .get_multi_frame_bufs(&[BUF_2_PAGE_N3TRUNN3R])
+                    .get_multi_frame_bufs(&[BUF_2_PAGE_MARCEL_2])
                     .expect("Failed to get multiple frame buffers");
                 let src_buf = buf_result.immut[0].frame_buf;
 
@@ -849,13 +848,13 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     }
 
     //
-    //=====[ TRANSITION FROM N3TRUNN3R PAGE TO CLOSING PAGE ] ======================================
-    if frame_count > N3TRUNN3R_PAGE_FADE_OUT_START
-        && frame_count < N3TRUNN3R_PAGE_FADE_OUT_START + 700
+    //=====[ TRANSITION FROM MARCEL 2 PAGE TO N3TRUNN3R PAGE ] =====================================
+    if frame_count > MARCEL_2_PAGE_FADE_OUT_START
+        && frame_count < MARCEL_2_PAGE_FADE_OUT_START + 700
     {
         let cells_per_step = 3;
         let base_cell_index: usize =
-            (frame_count - N3TRUNN3R_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
+            (frame_count - MARCEL_2_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
 
         let win_dims = ctx.win.dimensions.clone();
 
@@ -869,7 +868,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
                 let mut cell_area = cell.rect_area();
 
                 let mut buf_result = ctx
-                    .get_multi_frame_bufs(&[BUF_3_PAGE_CLOSING])
+                    .get_multi_frame_bufs(&[BUF_3_PAGE_N3TRUNN3R])
                     .expect("Failed to get multiple frame buffers");
                 let src_buf = buf_result.immut[0].frame_buf;
 
