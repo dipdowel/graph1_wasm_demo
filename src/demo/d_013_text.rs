@@ -587,19 +587,21 @@ fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos: GridPosition) {
 // FRAME POINTERS
 
 const OFFSET: u32 = 500;
+const OFFSET_2: u32 = 78;
+
+
 const SCROLL_START: u32 = 1;
 const SCROLL_END: u32 = 412 + OFFSET;
 const SCROLL_FADE_START: u32 = 418 + OFFSET;
 const SCROLL_FADE_END: u32 = 455 + OFFSET;
 const MARCEL_START: u32 = 455 + OFFSET;
-const MARCEL_CHECKMARK: u32 = 1830 + OFFSET;
-const MARCEL_END: u32 = 1957 + OFFSET;
-const MARCEL_CHECKMARK_END: u32 = 2000 + OFFSET;
-// const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
-const MARCEL_PAGE_FADE_OUT_START: u32 = 2600 + OFFSET;
-const TRANSITION_TO_N3TRUNN3R_PAGE: u32 = 2750 + OFFSET;
-const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600 + OFFSET;
-const DEMO_END: u32 = 4440 + OFFSET;
+const MARCEL_CHECKMARK: u32 = 1830 + OFFSET - OFFSET_2;
+const MARCEL_END: u32 = 1957 + OFFSET - OFFSET_2 + 4;
+const MARCEL_CHECKMARK_END: u32 = 2000 + OFFSET - OFFSET_2;
+const MARCEL_PAGE_FADE_OUT_START: u32 = 2600 + OFFSET - OFFSET_2;
+const TRANSITION_TO_N3TRUNN3R_PAGE: u32 = 2750 + OFFSET - OFFSET_2;
+const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600 + OFFSET - OFFSET_2;
+const DEMO_END: u32 = 4440 + OFFSET - OFFSET_2; // TODO: check if this value is correct
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     let frame_count = ctx.frame_count as u32;
@@ -645,7 +647,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     //
     // Calculate the range of frames at which the cursor should be blinking on its initial position
     let blinking_cursor_start = SCROLL_FADE_START + (SCROLL_FADE_END - SCROLL_FADE_START) / 5 * 3;
-    let blinking_cursor_end = MARCEL_START + 65;
+    let blinking_cursor_end = MARCEL_START + 37;
     if frame_count > blinking_cursor_start && frame_count < blinking_cursor_end {
         if frame_count % 16 == 0 {
             ctx.user_data.text.cursor_state = !ctx.user_data.text.cursor_state;
@@ -665,6 +667,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         draw::rectangle::filled(ctx, &initial_cursor);
         scanline::window(ctx, 1, 55);
     }
+
     if frame_count == blinking_cursor_end {
         let mut initial_cursor = ctx
             .user_data
@@ -682,6 +685,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     //
     //=====[ RENDER MARCEL VAN DEIJL PAGE WITH TYPING CURSOR ] =====================================
     if frame_count > MARCEL_START && frame_count < MARCEL_END {
+
         let mut char_dst_area = RectArea::new(0, 0, 1, 1, None);
         if ctx.user_data.text.cursor_area.is_some() {
             char_dst_area = ctx.user_data.text.cursor_area.unwrap().clone();
@@ -692,18 +696,18 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         }
 
         let win_dims = ctx.win.dimensions.clone();
-        let mut buf_result = ctx
-            // .get_multi_frame_bufs(&[0, 1])
+
+        let mut multi_bufs = ctx
             .get_multi_frame_bufs(&[BUF_2_PAGE_MARCEL])
             .expect("Failed to get multiple frame buffers");
-        // let dst_buf = buf_result.active;
-        let src_buf = buf_result.immut[0].frame_buf;
+
+        let src_buf = multi_bufs.immut[0].frame_buf;
 
         buffer_op::copy::rect::to_another_buf(
             src_buf,
             &win_dims,
             &char_dst_area,
-            &mut buf_result.active,
+            &mut multi_bufs.active,
             &win_dims,
             &char_dst_area.top_left,
             true,
@@ -723,8 +727,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         // Slow down the cursor when it junps to the new line
         if next_char_cell_coords.is_some() {
             if next_char_cell_coords.unwrap().1 == 0 {
-                min = 59;
-                max = 63;
+                min = 39;
+                max = 50;
             }
 
             if next_char_cell_coords.unwrap().0 == 3 || next_char_cell_coords.unwrap().0 == 7 {
@@ -732,6 +736,8 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
                 max = 5;
             }
         }
+
+        println!("current frame: {}", frame_count);
 
         // The speed of cursor movement is randomized here
         let rand_mod = ctx.rng.get_u32(&MinMax { min, max });
@@ -754,7 +760,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
                 .text
                 .page_marcel_char_cells
                 .get(ctx.user_data.text.char_cell_idx);
+
             ctx.user_data.text.cursor_state = ON;
+
             if char_cell_coords.is_some() {
                 let char_cell_coords = char_cell_coords.unwrap();
                 let (row, col) = (char_cell_coords.0, char_cell_coords.1);
@@ -764,6 +772,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             }
         }
     }
+
+
+
 
     //
     //=====[ RENDER THE CHECKMARK APPEARING ] ======================================================
@@ -780,21 +791,23 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             .text
             .page_marcel_char_cells
             .get(ctx.user_data.text.page_marcel_checkmark_char_idx - 1);
+
+
         if checkmark_coords.is_some() {
             let (row, col) = (checkmark_coords.unwrap().0, checkmark_coords.unwrap().1);
             let new_position = GridPosition::new(row, col);
-
             set_cursor(ctx, new_position); // TODO uncomment!
         }
 
+        // // Prepare for setting the checkmark on
         let char_dst_area = ctx.user_data.text.cursor_area.unwrap().clone();
-
         let win_dims = ctx.win.dimensions.clone();
         let mut buf_result = ctx
             .get_multi_frame_bufs(&[BUF_2_PAGE_MARCEL])
             .expect("Failed to get multiple frame buffers");
         let src_buf = buf_result.immut[0].frame_buf;
 
+        // // Set the checkmark on!
         buffer_op::copy::rect::to_another_buf(
             src_buf,
             &win_dims,
@@ -808,83 +821,85 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         ctx.user_data.text.cursor_state = ON;
     }
 
-    //
-    //=====[ TRANSITION FROM MARCEL PAGE TO N3TRUNN3R PAGE ] =======================================
-    if frame_count > MARCEL_PAGE_FADE_OUT_START && frame_count < TRANSITION_TO_N3TRUNN3R_PAGE {
-        let cells_per_step = 3;
-        let base_cell_index: usize =
-            (frame_count - MARCEL_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
+        //
+        //=====[ TRANSITION FROM MARCEL PAGE TO N3TRUNN3R PAGE ] =======================================
+        if frame_count > MARCEL_PAGE_FADE_OUT_START && frame_count < TRANSITION_TO_N3TRUNN3R_PAGE {
+            let cells_per_step = 3;
+            let base_cell_index: usize =
+                (frame_count - MARCEL_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
 
-        let win_dims = ctx.win.dimensions.clone();
+            let win_dims = ctx.win.dimensions.clone();
 
-        for offset in 0..4 {
-            let cell = ctx
-                .user_data
-                .text
-                .page_marcel_shuffled_cells
-                .get(base_cell_index + offset);
-            if let Some(cell) = cell {
-                let mut cell_area = cell.rect_area();
+            for offset in 0..4 {
+                let cell = ctx
+                    .user_data
+                    .text
+                    .page_marcel_shuffled_cells
+                    .get(base_cell_index + offset);
+                if let Some(cell) = cell {
+                    let mut cell_area = cell.rect_area();
 
-                let mut buf_result = ctx
-                    .get_multi_frame_bufs(&[BUF_3_PAGE_N3TRUNN3R])
-                    .expect("Failed to get multiple frame buffers");
-                let src_buf = buf_result.immut[0].frame_buf;
+                    let mut buf_result = ctx
+                        .get_multi_frame_bufs(&[BUF_3_PAGE_N3TRUNN3R])
+                        .expect("Failed to get multiple frame buffers");
+                    let src_buf = buf_result.immut[0].frame_buf;
 
-                buffer_op::copy::rect::to_another_buf(
-                    src_buf,
-                    &win_dims,
-                    &cell_area,
-                    &mut buf_result.active,
-                    &win_dims,
-                    &cell_area.top_left,
-                    true,
-                    1,
-                );
+                    buffer_op::copy::rect::to_another_buf(
+                        src_buf,
+                        &win_dims,
+                        &cell_area,
+                        &mut buf_result.active,
+                        &win_dims,
+                        &cell_area.top_left,
+                        true,
+                        1,
+                    );
+                }
             }
+            //------------------------------------------
+            scanline::window(ctx, 1, 4);
         }
-        //------------------------------------------
-        scanline::window(ctx, 1, 4);
-    }
 
-    //
-    //=====[ TRANSITION FROM N3TRUNN3R PAGE TO CLOSING PAGE ] ======================================
-    if frame_count > N3TRUNN3R_PAGE_FADE_OUT_START
-        && frame_count < N3TRUNN3R_PAGE_FADE_OUT_START + 700
-    {
-        let cells_per_step = 3;
-        let base_cell_index: usize =
-            (frame_count - N3TRUNN3R_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
+        //
+        //=====[ TRANSITION FROM N3TRUNN3R PAGE TO CLOSING PAGE ] ======================================
+        if frame_count > N3TRUNN3R_PAGE_FADE_OUT_START
+            && frame_count < N3TRUNN3R_PAGE_FADE_OUT_START + 700
+        {
+            let cells_per_step = 3;
+            let base_cell_index: usize =
+                (frame_count - N3TRUNN3R_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
 
-        let win_dims = ctx.win.dimensions.clone();
+            let win_dims = ctx.win.dimensions.clone();
 
-        for offset in 0..4 {
-            let cell = ctx
-                .user_data
-                .text
-                .page_n3trunn3r_shuffled_cells
-                .get(base_cell_index + offset);
-            if let Some(cell) = cell {
-                let mut cell_area = cell.rect_area();
+            for offset in 0..4 {
+                let cell = ctx
+                    .user_data
+                    .text
+                    .page_n3trunn3r_shuffled_cells
+                    .get(base_cell_index + offset);
+                if let Some(cell) = cell {
+                    let mut cell_area = cell.rect_area();
 
-                let mut buf_result = ctx
-                    .get_multi_frame_bufs(&[BUF_4_PAGE_CLOSING])
-                    .expect("Failed to get multiple frame buffers");
-                let src_buf = buf_result.immut[0].frame_buf;
+                    let mut buf_result = ctx
+                        .get_multi_frame_bufs(&[BUF_4_PAGE_CLOSING])
+                        .expect("Failed to get multiple frame buffers");
+                    let src_buf = buf_result.immut[0].frame_buf;
 
-                buffer_op::copy::rect::to_another_buf(
-                    src_buf,
-                    &win_dims,
-                    &cell_area,
-                    &mut buf_result.active,
-                    &win_dims,
-                    &cell_area.top_left,
-                    true,
-                    1,
-                );
+                    buffer_op::copy::rect::to_another_buf(
+                        src_buf,
+                        &win_dims,
+                        &cell_area,
+                        &mut buf_result.active,
+                        &win_dims,
+                        &cell_area.top_left,
+                        true,
+                        1,
+                    );
+                }
             }
+            //------------------------------------------
+            scanline::window(ctx, 1, 4);
         }
-        //------------------------------------------
-        scanline::window(ctx, 1, 4);
-    }
+
+    /*       */
 }
