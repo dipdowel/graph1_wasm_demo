@@ -698,46 +698,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             .noise
             .generate_32(&mut ctx.frame_buf, None, None, &mut ctx.gpu_context);
         scanline::window(ctx, 1, 12);
-        //------------------------------------------------------------------------------------------
-/*
 
-        if frame_count < SCROLL_END / 12*10 {
-            // if frame_count >1000000 {
-
-
-            let is_nth = |n: u32| -> bool {
-                frame_count % (SCROLL_END / n) == 0
-            };
-
-            let  glitch_1 = is_nth(6) || is_nth(7) ;
-            let  glitch_2 = is_nth(3) || is_nth(2);
-
-
-
-            if glitch_1 {
-                glitch::horizontal_glitch(
-                    ctx,
-                    &mut HorizontalGlitchProps {
-                        strength: 25,
-                        chance: 220,
-                        left_right_balance: 128,
-                    },
-                    None,
-                );
-            }
-            if glitch_2 {
-                glitch::horizontal_glitch(
-                    ctx,
-                    &mut HorizontalGlitchProps {
-                        strength: ctx.win.w / 2,
-                        chance: 180,
-                        left_right_balance: 128,
-                    },
-                    None,
-                );
-            }
-        }*/
-        //------------------------------------------------------------------------------------------
 
 
     }
