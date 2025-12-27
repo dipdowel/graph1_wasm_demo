@@ -390,20 +390,18 @@
           frame_count++;
 
 
-          //FIXME: REMOVE REMOVE REMOVE!!!
-          if (frame_count === 10){
-            frame_count = 880;
-          }
+          // DEBUG: Skip some frames
+          // if (frame_count === 10){
+          //   frame_count = 880;
+          // }
 
-          //FIXME: REMOVE REMOVE REMOVE!!!
+          // DEBUG: Auto-pause at frame N
           // if (frame_count === 1000){
           //   isPaused = true;
           // }
 
-          /* */
-
           // console.log(" -> frame_count:", frame_count);
-          // isPaused = true;  // FIXME: REMOVE THIS LINE!
+          // isPaused = true;
         }
 
         renderFunction = render;
