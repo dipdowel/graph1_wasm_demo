@@ -1,6 +1,6 @@
 use crate::demo::user_data::DemoUserData;
-use graph1::buffer_op::scale;
-use graph1::core::context::GraphContext;
+use graph1::buffer_op::{copy, scale};
+use graph1::core::context::{GraphContext, WindowContext};
 use graph1::core::context_utils::context_snapshot::ContextSnapshot;
 use graph1::fx::{glitch, scanline};
 use graph1::primitives::data_structs::variant::Variant;
@@ -48,13 +48,34 @@ pub struct TextUserData {
 
     page_marcel_shuffled_cells: Vec<Region>,
     page_n3trunn3r_shuffled_cells: Vec<Region>,
+    scroller_context: GraphContext<Vec<u32>>,
 
     /// Index of the current character cell to interact with
     char_cell_idx: usize,
 }
 
+impl TextUserData {
+
+    pub fn get_scroller_context(&self) -> &GraphContext<Vec<u32>> {
+        &self.scroller_context
+    }
+}
+
+
 const BLACK: u32 = 0x00_00_00_ff;
 const TRANSPARENT: u32 = 0x00_00_00_00;
+
+
+// 1000*120
+fn make_scroller_context() -> GraphContext<Vec<u32>> {
+    GraphContext::new(
+        WindowContext::new(1170, 116, Some(0xffffffff), Some(0x000000ff)),
+        false,
+        1,
+        None,
+        1,
+        None)
+}
 
 pub fn get_text_user_data() -> TextUserData {
     TextUserData {
@@ -68,6 +89,7 @@ pub fn get_text_user_data() -> TextUserData {
         char_cell_idx: 0,
         page_marcel_shuffled_cells: vec![],
         page_n3trunn3r_shuffled_cells: vec![],
+        scroller_context: make_scroller_context(),
     }
 }
 
@@ -84,6 +106,7 @@ fn reset(ctx: &mut GraphContext<DemoUserData>) {
     ctx.rng = XorShiftRng::default();
     ctx.user_data.text.page_marcel_shuffled_cells = vec![];
     ctx.user_data.text.page_n3trunn3r_shuffled_cells = vec![];
+    ctx.user_data.text.scroller_context = make_scroller_context();
 }
 
 //
@@ -115,20 +138,22 @@ const RED_ALERT_TEXT_COLOR: u32 = MATRIKS_TEXT_COLOR;
 //
 // ===[ PREPARE SCROLLING TITLE ]===================================================================
 //
-const SCROLLER_TEXT: &str = "   Pixel fonts!  ←     ";
-
+const SCROLLER_TEXT: &str = "  Pixel fonts!  ←";
+// const SCROLLER_TEXT: &str = "  Pixel fonts!  ←";
 fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
-    let original_window = ctx.win.get_context();
+    // let original_window = ctx.win.get_context();
+    // ctx.set_active_frame_buf(BUF_1_SCROLLER).ok();
 
-    ctx.set_active_frame_buf(BUF_1_SCROLLER).ok();
-    ctx.win.background_color = SCROLLER_BG_COLOR;
-    ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
-    clear_screen(ctx); // Clear the main buffer first
+    ctx.user_data.text.scroller_context.win.background_color = SCROLLER_BG_COLOR;
+    ctx.user_data.text.scroller_context.win.foreground_color = SCROLLER_TEXT_COLOR;
+
+    // ctx.win.background_color = SCROLLER_BG_COLOR;
+    // ctx.win.foreground_color = SCROLLER_TEXT_COLOR;
+    clear_screen(&mut ctx.user_data.text.scroller_context);
 
     // Title that will be scrolled across the screen
     let title_font = instantiate_embedded_font(
         EmbeddedFonts::MatriksUaxactun,
-        // EmbeddedFonts::MatriksUaxactunMono,
         4,
         Some(Spacing {
             kerning_px: 4,
@@ -146,8 +171,8 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
     };
 
     printer::print_line(
-        ctx,
-        &Point { x: 1, y: 30 },
+        &mut ctx.user_data.text.scroller_context,
+        &Point { x: 1, y: 1 },
         &title_font,
         &title_font_props,
         &SCROLLER_TEXT,
@@ -156,18 +181,55 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
     title_font_props.color = Some(RetroNeon::CYBER_YELLOW);
 
     printer::print_line(
-        ctx,
-        &Point { x: 0, y: 29 },
+        &mut ctx.user_data.text.scroller_context,
+        &Point { x: 0, y: 0 },
         &title_font,
         &title_font_props,
         &SCROLLER_TEXT,
     );
 
+
+    //-----------------------------------------------------
+
+
+
+    let dims = ctx.user_data.text.scroller_context.win.dimensions.clone();
+    let scroller_frame_buf_copy =  &ctx.user_data.text.scroller_context.frame_buf.clone();
+
+
+    clear_screen(&mut ctx.user_data.text.scroller_context);
+
+    // let dst_buf = buf_result.active;
+    // let src_buf = buf_result.immut[0].frame_buf;
+    // let src_buf = ctx.user_data.text.scroller_context.frame_buf;
+
+
+    scale::up::sparse::to_another_buf(
+        &scroller_frame_buf_copy,
+        &dims,
+        &RectArea::new(0, 0, 416, 116, None),
+        &mut ctx.user_data.text.scroller_context.frame_buf,
+        &dims,
+        &Point { x: 0, y: 0 },
+        2,
+        &Displacement { dx: 1, dy: 1 },
+        // &Displacement { dx: 0, dy: 0 },
+        1,
+    );
+
+
+
+
+
+
+
+
+
     // restore the original window context
-    ctx.win.set_context(original_window);
+    // ctx.win.set_context(original_window);
 
     // Switch back to the main frame buffer (index 0)
-    ctx.set_active_frame_buf(BUF_0_MAIN).ok();
+    // ctx.set_active_frame_buf(BUF_0_MAIN).ok();
 }
 
 //
@@ -427,24 +489,53 @@ fn prepare_text_closing_page(ctx: &mut GraphContext<DemoUserData>) {
 ///
 fn scroll_the_title(ctx: &mut GraphContext<DemoUserData>) {
     let frame_count = ctx.frame_count as u32;
-    let win_dims = ctx.win.dimensions.clone();
+
+    let src_win_dims = ctx.user_data.text.scroller_context.win.dimensions.clone();
+    let src_buf =  &ctx.user_data.text.scroller_context.frame_buf.to_owned();
+
+    let dst_win_dims = ctx.win.dimensions.clone();
+
     let buf_result = ctx
         .get_multi_frame_bufs(&[0, 1])
         .expect("Failed to get multiple frame buffers");
-    let dst_buf = buf_result.active;
-    let src_buf = buf_result.immut[0].frame_buf;
 
+    let dst_buf = buf_result.active;
+    // let src_buf = buf_result.immut[0].frame_buf;
+    // let src_buf = ctx.user_data.text.scroller_context.frame_buf;
+
+    // let dst_x = if frame_count > 130 { 0 } else { 130 - frame_count };
+
+    copy::rect::to_another_buf(
+        &src_buf,
+        &src_win_dims,
+        &RectArea::new(frame_count, 20, 678, 90, None),
+        dst_buf,
+        &dst_win_dims,
+        &Point { x: 0, y: 72 },
+        // &Point { x: 130, y: 38 },
+        false,
+        1,
+    );
+
+    /*
     scale::up::sparse::to_another_buf(
         &src_buf,
-        &win_dims,
-        &RectArea::new(frame_count, 30, 278, 200, None),
+        &src_win_dims,
+        &RectArea::new(frame_count, 0, 278, 120, None),
         dst_buf,
-        &win_dims,
+        &dst_win_dims,
         &Point { x: 4, y: 38 },
         3,
         &Displacement { dx: 1, dy: 1 },
         1,
     );
+
+     */
+
+
+
+
+
 }
 
 //---------------------------------------------------------------------
@@ -549,27 +640,31 @@ fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos: GridPosition) {
 
 // FRAME POINTERS
 
-const SCROLL_START: u32 = 0;
-const SCROLL_END: u32 = 412;
-const SCROLL_FADE_START: u32 = 408;
-const SCROLL_FADE_END: u32 = 455;
 
-const MARCEL_START: u32 = 455;
-const MARCEL_CHECKMARK: u32 = 1830;
-const MARCEL_END: u32 = 1957;
-const MARCEL_CHECKMARK_END: u32 = 2000;
+const OFFSET: u32 = 500;
+
+const SCROLL_START: u32 = 1;
+const SCROLL_END: u32 = 412 + OFFSET;
+const SCROLL_FADE_START: u32 = 418+ OFFSET;
+const SCROLL_FADE_END: u32 = 455+ OFFSET;
+
+const MARCEL_START: u32 = 455+ OFFSET;
+const MARCEL_CHECKMARK: u32 = 1830+ OFFSET;
+const MARCEL_END: u32 = 1957+ OFFSET;
+const MARCEL_CHECKMARK_END: u32 = 2000+ OFFSET;
 // const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
-const MARCEL_PAGE_FADE_OUT_START: u32 = 2600;
+const MARCEL_PAGE_FADE_OUT_START: u32 = 2600+ OFFSET;
 
-const TRANSITION_TO_N3TRUNN3R_PAGE: u32 = 2750;
-const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600;
-const DEMO_END: u32 = 4440;
+const TRANSITION_TO_N3TRUNN3R_PAGE: u32 = 2750+ OFFSET;
+const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600+ OFFSET;
+const DEMO_END: u32 = 4440+ OFFSET;
 
 
 
 
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
+
 
     let frame_count = ctx.frame_count as u32;
 
@@ -594,9 +689,60 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     // Scroll the title across the screen
     if frame_count > SCROLL_START && frame_count < SCROLL_END {
         clear_screen(ctx);
+
+
         scroll_the_title(ctx);
-        scanline::window(ctx, 2, 26);
+        // Add some noise to the background
+        ctx.user_data
+            .intro
+            .noise
+            .generate_32(&mut ctx.frame_buf, None, None, &mut ctx.gpu_context);
+        scanline::window(ctx, 1, 12);
+        //------------------------------------------------------------------------------------------
+/*
+
+        if frame_count < SCROLL_END / 12*10 {
+            // if frame_count >1000000 {
+
+
+            let is_nth = |n: u32| -> bool {
+                frame_count % (SCROLL_END / n) == 0
+            };
+
+            let  glitch_1 = is_nth(6) || is_nth(7) ;
+            let  glitch_2 = is_nth(3) || is_nth(2);
+
+
+
+            if glitch_1 {
+                glitch::horizontal_glitch(
+                    ctx,
+                    &mut HorizontalGlitchProps {
+                        strength: 25,
+                        chance: 220,
+                        left_right_balance: 128,
+                    },
+                    None,
+                );
+            }
+            if glitch_2 {
+                glitch::horizontal_glitch(
+                    ctx,
+                    &mut HorizontalGlitchProps {
+                        strength: ctx.win.w / 2,
+                        chance: 180,
+                        left_right_balance: 128,
+                    },
+                    None,
+                );
+            }
+        }*/
+        //------------------------------------------------------------------------------------------
+
+
     }
+
+
 
     // Fade the screen out into [black?]
     if frame_count > SCROLL_FADE_START && frame_count < SCROLL_FADE_END {
@@ -607,7 +753,7 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
             frame_count.saturating_sub(SCROLL_FADE_START) as usize,
         );
         clear_screen(ctx);
-        scanline::window(ctx, 2, 26);
+        scanline::window(ctx, 1, 14);
     }
 
     //=====[ BLINKING CURSOR START ] ===============================================================
