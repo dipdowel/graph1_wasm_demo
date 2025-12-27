@@ -2,13 +2,14 @@ use crate::demo::user_data::DemoUserData;
 use graph1::buffer_op::{copy, scale};
 use graph1::core::context::{GraphContext, WindowContext};
 use graph1::core::context_utils::context_snapshot::ContextSnapshot;
-use graph1::fx::{glitch, scanline};
 use graph1::fx;
+use graph1::fx::{glitch, scanline};
 use graph1::primitives::data_structs::variant::Variant;
 use graph1::primitives::math::{Displacement, MinMax};
 use graph1::primitives::plane::Dimensions2d;
 use graph1::primitives::{plane::RectArea, point::Point};
 
+use graph1::fx::glitch::HorizontalGlitchProps;
 use graph1::text::char_grid::make_monospaced_char_grid;
 use graph1::text::font::Spacing;
 use graph1::text::font_embedder::{instantiate_embedded_font, EmbeddedFonts};
@@ -16,15 +17,14 @@ use graph1::text::printer;
 use graph1::text::printer::Align;
 use graph1::utils::clear_screen;
 use graph1::utils::color::gradient;
+use graph1::utils::color::math::ColorOperation;
 use graph1::utils::color::palettes::RetroNeon;
 use graph1::utils::grid::grid_position::GridPosition;
 use graph1::utils::grid::uniform::UniformGrid;
 use graph1::utils::math::geometry::region::Region;
+use graph1::utils::math::oscillator;
 use graph1::utils::math::rng::{shuffle, XorShiftRng};
 use graph1::{buffer_op, draw, hash_random_u32};
-use graph1::fx::glitch::HorizontalGlitchProps;
-use graph1::utils::color::math::ColorOperation;
-use graph1::utils::math::oscillator;
 
 const ON: bool = true;
 const OFF: bool = false;
@@ -57,16 +57,13 @@ pub struct TextUserData {
 }
 
 impl TextUserData {
-
     pub fn get_scroller_context(&self) -> &GraphContext<Vec<u32>> {
         &self.scroller_context
     }
 }
 
-
 const BLACK: u32 = 0x00_00_00_ff;
 const TRANSPARENT: u32 = 0x00_00_00_00;
-
 
 // 1000*120
 fn make_scroller_context() -> GraphContext<Vec<u32>> {
@@ -76,7 +73,8 @@ fn make_scroller_context() -> GraphContext<Vec<u32>> {
         1,
         None,
         1,
-        None)
+        None,
+    )
 }
 
 pub fn get_text_user_data() -> TextUserData {
@@ -121,7 +119,6 @@ const BUF_2_PAGE_MARCEL: usize = 2;
 const BUF_3_PAGE_N3TRUNN3R: usize = 3;
 const BUF_4_PAGE_CLOSING: usize = 4;
 
-
 //
 //
 // ===[ COLORS ]========================================================
@@ -143,7 +140,6 @@ const RED_ALERT_TEXT_COLOR: u32 = MATRIKS_TEXT_COLOR;
 const SCROLLER_TEXT: &str = "  Pixel fonts!  ←";
 // const SCROLLER_TEXT: &str = "  Pixel fonts!  ←";
 fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
-
     ctx.user_data.text.scroller_context.win.background_color = SCROLLER_BG_COLOR;
     ctx.user_data.text.scroller_context.win.foreground_color = SCROLLER_TEXT_COLOR;
     clear_screen(&mut ctx.user_data.text.scroller_context);
@@ -188,7 +184,7 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
     //-----------------------------------------------------
 
     let dims = ctx.user_data.text.scroller_context.win.dimensions.clone();
-    let scroller_frame_buf_copy =  &ctx.user_data.text.scroller_context.frame_buf.clone();
+    let scroller_frame_buf_copy = &ctx.user_data.text.scroller_context.frame_buf.clone();
     clear_screen(&mut ctx.user_data.text.scroller_context);
 
     scale::up::sparse::to_another_buf(
@@ -202,7 +198,6 @@ fn prepare_scrolling_title(ctx: &mut GraphContext<DemoUserData>) {
         &Displacement { dx: 1, dy: 1 },
         1,
     );
-
 }
 
 //
@@ -235,7 +230,7 @@ const N3TRUNN3R_PAGE_TEXT: [&str; 8] = [
     "·································",
     "   ¹ — Used in other demos.",
     "·································",
-     // "✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕",
+    // "✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕+✕",
 ];
 
 const CLOSING_PAGE_TEXT: [&str; 8] = [
@@ -248,7 +243,6 @@ const CLOSING_PAGE_TEXT: [&str; 8] = [
     "  for details on text rendering",
     "•••••••••••••••••••••••••••••••••     ",
 ];
-
 
 ///
 /// Prepare the text page about Marcel van Deijl
@@ -462,7 +456,7 @@ fn scroll_the_title(ctx: &mut GraphContext<DemoUserData>) {
     let frame_count = ctx.frame_count as u32;
 
     let src_win_dims = ctx.user_data.text.scroller_context.win.dimensions.clone();
-    let src_buf =  &ctx.user_data.text.scroller_context.frame_buf.to_owned();
+    let src_buf = &ctx.user_data.text.scroller_context.frame_buf.to_owned();
 
     let dst_win_dims = ctx.win.dimensions.clone();
 
@@ -595,20 +589,19 @@ fn set_cursor(ctx: &mut GraphContext<DemoUserData>, pos: GridPosition) {
 const OFFSET: u32 = 500;
 const SCROLL_START: u32 = 1;
 const SCROLL_END: u32 = 412 + OFFSET;
-const SCROLL_FADE_START: u32 = 418+ OFFSET;
-const SCROLL_FADE_END: u32 = 455+ OFFSET;
-const MARCEL_START: u32 = 455+ OFFSET;
-const MARCEL_CHECKMARK: u32 = 1830+ OFFSET;
-const MARCEL_END: u32 = 1957+ OFFSET;
-const MARCEL_CHECKMARK_END: u32 = 2000+ OFFSET;
+const SCROLL_FADE_START: u32 = 418 + OFFSET;
+const SCROLL_FADE_END: u32 = 455 + OFFSET;
+const MARCEL_START: u32 = 455 + OFFSET;
+const MARCEL_CHECKMARK: u32 = 1830 + OFFSET;
+const MARCEL_END: u32 = 1957 + OFFSET;
+const MARCEL_CHECKMARK_END: u32 = 2000 + OFFSET;
 // const MARCEL_PAGE_FADE_OUT_START: u32 = 2222;
-const MARCEL_PAGE_FADE_OUT_START: u32 = 2600+ OFFSET;
-const TRANSITION_TO_N3TRUNN3R_PAGE: u32 = 2750+ OFFSET;
-const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600+ OFFSET;
-const DEMO_END: u32 = 4440+ OFFSET;
+const MARCEL_PAGE_FADE_OUT_START: u32 = 2600 + OFFSET;
+const TRANSITION_TO_N3TRUNN3R_PAGE: u32 = 2750 + OFFSET;
+const N3TRUNN3R_PAGE_FADE_OUT_START: u32 = 3600 + OFFSET;
+const DEMO_END: u32 = 4440 + OFFSET;
 
 pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
-
     let frame_count = ctx.frame_count as u32;
 
     if frame_count >= DEMO_END {
@@ -754,8 +747,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
         let keep_on_rendering =
             ctx.user_data.text.char_cell_idx < ctx.user_data.text.page_marcel_char_cells.len();
 
-
-
         if keep_on_rendering && frame_count % rand_mod == 0 {
             // get coords (row, column) of the current char cell
             let char_cell_coords = ctx
@@ -820,7 +811,6 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
     //
     //=====[ TRANSITION FROM MARCEL PAGE TO N3TRUNN3R PAGE ] =======================================
     if frame_count > MARCEL_PAGE_FADE_OUT_START && frame_count < TRANSITION_TO_N3TRUNN3R_PAGE {
-
         let cells_per_step = 3;
         let base_cell_index: usize =
             (frame_count - MARCEL_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
@@ -859,8 +849,9 @@ pub fn render_frame(ctx: &mut GraphContext<DemoUserData>) {
 
     //
     //=====[ TRANSITION FROM N3TRUNN3R PAGE TO CLOSING PAGE ] ======================================
-    if frame_count > N3TRUNN3R_PAGE_FADE_OUT_START && frame_count < N3TRUNN3R_PAGE_FADE_OUT_START + 700 {
-
+    if frame_count > N3TRUNN3R_PAGE_FADE_OUT_START
+        && frame_count < N3TRUNN3R_PAGE_FADE_OUT_START + 700
+    {
         let cells_per_step = 3;
         let base_cell_index: usize =
             (frame_count - N3TRUNN3R_PAGE_FADE_OUT_START - 1) as usize * cells_per_step;
