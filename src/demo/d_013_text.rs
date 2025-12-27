@@ -113,9 +113,9 @@ fn reset(ctx: &mut GraphContext<DemoUserData>) {
 //
 const BUF_0_MAIN: usize = 0;
 
-const BUF_2_PAGE_MARCEL: usize = 2;
-const BUF_3_PAGE_N3TRUNN3R: usize = 3;
-const BUF_4_PAGE_CLOSING: usize = 4;
+const BUF_2_PAGE_MARCEL: usize = 1;
+const BUF_3_PAGE_N3TRUNN3R: usize = 2;
+const BUF_4_PAGE_CLOSING: usize = 3;
 
 //
 //
