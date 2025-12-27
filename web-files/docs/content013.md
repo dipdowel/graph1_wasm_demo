@@ -328,6 +328,6 @@ Graph1 uses a custom binary format called [CBF](https://github.com/dipdowel/comp
 
 All the embedded fonts are stored as `.cbf` files in `src/text/cbf_data/`.
  
-
+---
 💻 [Code of this demo on GitHub](https://github.com/dipdowel/graph1_wasm_demo/blob/develop/src/demo/d_013_text.rs)
 
